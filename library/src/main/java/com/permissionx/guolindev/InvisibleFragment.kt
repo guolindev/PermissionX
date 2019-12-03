@@ -79,7 +79,6 @@ class InvisibleFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        println("onActivityResult requestCode=$requestCode")
         if (requestCode == SETTINGS_CODE) {
             permissionBuilder.requestAgain(permissions.toMutableList())
         }

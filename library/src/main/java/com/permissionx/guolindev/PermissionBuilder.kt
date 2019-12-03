@@ -2,9 +2,10 @@ package com.permissionx.guolindev
 
 import android.app.AlertDialog
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
-import androidx.fragment.app.Fragment
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 
 /**
@@ -20,7 +21,7 @@ class PermissionBuilder internal constructor(private val activity: FragmentActiv
 
     private var requestCallback: RequestCallback? = null
 
-    private var showRequestReasonAtFirst = false
+    private var explainReasonBeforeRequest = false
 
     fun shouldExplainRequestReason(block: Callback): PermissionBuilder {
         explainReasonCallback = block
@@ -32,12 +33,12 @@ class PermissionBuilder internal constructor(private val activity: FragmentActiv
         return this
     }
 
-    fun explainRequestReasonAtFirst(): PermissionBuilder {
-        showRequestReasonAtFirst = true
+    fun explainReasonBeforeRequest(): PermissionBuilder {
+        explainReasonBeforeRequest = true
         return this
     }
 
-    fun showRequestReasonDialog(permissions: List<String>, message: String, positiveText: String) {
+    fun showRequestReasonDialog(permissions: MutableList<String>, message: String, positiveText: String, negativeText: String? = null) {
         AlertDialog.Builder(activity).apply {
             setMessage(message)
             setCancelable(false)
@@ -48,7 +49,7 @@ class PermissionBuilder internal constructor(private val activity: FragmentActiv
         }
     }
 
-    fun showForwardToSettingsDialog(message: String, positiveText: String, negativeText: String? = null) {
+    fun showForwardToSettingsDialog(permissions: MutableList<String>, message: String, positiveText: String, negativeText: String? = null) {
         AlertDialog.Builder(activity).apply {
             setMessage(message)
             setCancelable(false)
@@ -77,11 +78,22 @@ class PermissionBuilder internal constructor(private val activity: FragmentActiv
 
     fun request(vararg permissions: String, callback: RequestCallback) {
         requestCallback = callback
-        if (showRequestReasonAtFirst && explainReasonCallback != null) {
-            showRequestReasonAtFirst = false
-            explainReasonCallback?.let { it(permissions.toMutableList()) }
+        var allGranted = true
+        for (permission in permissions) {
+            if (ContextCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
+                allGranted = false
+                break
+            }
+        }
+        if (allGranted) {
+            requestCallback?.let { it(true, permissions.toMutableList(), mutableListOf()) }
         } else {
-            getInvisibleFragment().requestNow(this, explainReasonCallback, forwardToSettingsCallback, callback, *permissions)
+            if (explainReasonBeforeRequest && explainReasonCallback != null) {
+                explainReasonBeforeRequest = false
+                explainReasonCallback?.let { it(permissions.toMutableList()) }
+            } else {
+                getInvisibleFragment().requestNow(this, explainReasonCallback, forwardToSettingsCallback, callback, *permissions)
+            }
         }
     }
 
