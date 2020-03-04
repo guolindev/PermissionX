@@ -1,5 +1,8 @@
 package com.permissionx.guolindev
 
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 
 /**
@@ -9,6 +12,14 @@ import androidx.fragment.app.FragmentActivity
  */
 object PermissionX {
 
-    fun init(activity: FragmentActivity) = PermissionBuilder(activity)
+    fun init(activity: FragmentActivity) = PermissionCollection(activity)
+
+    fun isGranted(context: Context, permission: String) = ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+
+}
+
+class PermissionCollection(private val activity: FragmentActivity) {
+
+    fun permissions(vararg permissions: String) = PermissionBuilder(activity, permissions.toList())
 
 }

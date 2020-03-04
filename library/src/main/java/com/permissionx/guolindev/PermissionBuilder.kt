@@ -2,10 +2,8 @@ package com.permissionx.guolindev
 
 import android.app.AlertDialog
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 
 /**
@@ -13,7 +11,7 @@ import androidx.fragment.app.FragmentActivity
  * @author guolin
  * @since 2019/11/17
  */
-class PermissionBuilder internal constructor(private val activity: FragmentActivity) {
+class PermissionBuilder internal constructor(private val activity: FragmentActivity, internal val allPermissions: List<String>) {
 
     private var explainReasonCallback: Callback? = null
 
@@ -22,6 +20,14 @@ class PermissionBuilder internal constructor(private val activity: FragmentActiv
     private var requestCallback: RequestCallback? = null
 
     private var explainReasonBeforeRequest = false
+
+    internal val grantedPermissions = HashSet<String>()
+
+    internal val deniedPermissions = HashSet<String>()
+
+    internal val permanentDeniedPermissions = HashSet<String>()
+
+    internal val forwardPermissions = ArrayList<String>()
 
     fun shouldExplainRequestReason(block: Callback): PermissionBuilder {
         explainReasonCallback = block
@@ -38,63 +44,52 @@ class PermissionBuilder internal constructor(private val activity: FragmentActiv
         return this
     }
 
-    fun showRequestReasonDialog(permissions: MutableList<String>, message: String, positiveText: String, negativeText: String? = null) {
-        AlertDialog.Builder(activity).apply {
-            setMessage(message)
-            setCancelable(false)
-            setPositiveButton(positiveText) { _, _ ->
-                requestAgain(permissions)
-            }
-            show()
-        }
+    fun showRequestReasonDialog(permissions: List<String>, message: String, positiveText: String, negativeText: String? = null) {
+        showHandlePermissionDialog(true, permissions, message, positiveText, negativeText)
     }
 
-    fun showForwardToSettingsDialog(permissions: MutableList<String>, message: String, positiveText: String, negativeText: String? = null) {
-        AlertDialog.Builder(activity).apply {
-            setMessage(message)
-            setCancelable(false)
-            setPositiveButton(positiveText) { _, _ ->
-                forwardToSettings()
-            }
-            negativeText?.let {
-                setNegativeButton(it, null)
-            }
-            show()
-        }
+    fun showForwardToSettingsDialog(permissions: List<String>, message: String, positiveText: String, negativeText: String? = null) {
+        showHandlePermissionDialog(false, permissions, message, positiveText, negativeText)
     }
 
-    fun requestAgain(permissions: List<String>) {
-        requestCallback?.let {
-            request(*permissions.toTypedArray(), callback = it)
-        }
-    }
-
-    fun forwardToSettings() {
-        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-        val uri = Uri.fromParts("package", activity.packageName, null)
-        intent.data = uri
-        getInvisibleFragment().startActivityForResult(intent, SETTINGS_CODE)
-    }
-
-    fun request(vararg permissions: String, callback: RequestCallback) {
+    fun request(callback: RequestCallback) {
         requestCallback = callback
-        var allGranted = true
-        for (permission in permissions) {
-            if (ContextCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
-                allGranted = false
-                break
-            }
-        }
-        if (allGranted) {
-            requestCallback?.let { it(true, permissions.toMutableList(), mutableListOf()) }
-        } else {
-            if (explainReasonBeforeRequest && explainReasonCallback != null) {
-                explainReasonBeforeRequest = false
-                explainReasonCallback?.let { it(permissions.toMutableList()) }
+        val requestList = ArrayList<String>()
+        for (permission in allPermissions) {
+            if (PermissionX.isGranted(activity, permission)) {
+                grantedPermissions.add(permission)
             } else {
-                getInvisibleFragment().requestNow(this, explainReasonCallback, forwardToSettingsCallback, callback, *permissions)
+                requestList.add(permission)
             }
         }
+        if (requestList.isEmpty()) {
+            callback(true, allPermissions, listOf())
+            return
+        }
+        if (explainReasonBeforeRequest && explainReasonCallback != null) {
+            explainReasonBeforeRequest = false
+            deniedPermissions.addAll(requestList)
+            explainReasonCallback?.let { it(requestList) }
+        } else {
+            request(allPermissions, callback)
+        }
+    }
+
+    internal fun requestAgain(permissions: List<String>) {
+        if (permissions.isEmpty()) {
+            onPermissionDialogCancel()
+            return
+        }
+        requestCallback?.let {
+            // when request again, put all granted permissions into permission list again, in case user turn them off in settings.
+            val permissionSet = HashSet(grantedPermissions)
+            permissionSet.addAll(permissions)
+            request(permissionSet.toList(), it)
+        }
+    }
+
+    private fun request(permissions: List<String>, callback: RequestCallback) {
+        getInvisibleFragment().requestNow(this, explainReasonCallback, forwardToSettingsCallback, callback, *permissions.toTypedArray())
     }
 
     private fun getInvisibleFragment(): InvisibleFragment {
@@ -106,6 +101,50 @@ class PermissionBuilder internal constructor(private val activity: FragmentActiv
             val invisibleFragment = InvisibleFragment()
             fragmentManager.beginTransaction().add(invisibleFragment, TAG).commitNow()
             invisibleFragment
+        }
+    }
+
+    private fun showHandlePermissionDialog(showReasonOrGoSettings: Boolean, permissions: List<String>, message: String, positiveText: String, negativeText: String? = null) {
+        val filteredPermissions = permissions.filter {
+            !grantedPermissions.contains(it) && allPermissions.contains(it)
+        }
+        if (filteredPermissions.isEmpty()) {
+            onPermissionDialogCancel()
+            return
+        }
+        AlertDialog.Builder(activity).apply {
+            setMessage(message)
+            setCancelable(negativeText.isNullOrBlank())
+            setPositiveButton(positiveText) { _, _ ->
+                if (showReasonOrGoSettings) {
+                    requestAgain(filteredPermissions)
+                } else {
+                    forwardToSettings(filteredPermissions)
+                }
+            }
+            negativeText?.let {
+                setNegativeButton(it) { _, _ ->
+                    onPermissionDialogCancel()
+                }
+            }
+            show()
+        }
+    }
+
+    private fun forwardToSettings(permissions: List<String>) {
+        forwardPermissions.addAll(permissions)
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        val uri = Uri.fromParts("package", activity.packageName, null)
+        intent.data = uri
+        getInvisibleFragment().startActivityForResult(intent, SETTINGS_CODE)
+    }
+
+    private fun onPermissionDialogCancel() {
+        val deniedList = ArrayList<String>()
+        deniedList.addAll(deniedPermissions)
+        deniedList.addAll(permanentDeniedPermissions)
+        requestCallback?.let {
+            it(deniedList.isEmpty(), grantedPermissions.toList(), deniedList)
         }
     }
 
