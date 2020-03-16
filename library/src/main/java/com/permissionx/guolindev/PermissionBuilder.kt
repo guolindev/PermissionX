@@ -21,6 +21,8 @@ class PermissionBuilder internal constructor(private val activity: FragmentActiv
 
     private var explainReasonBeforeRequest = false
 
+    internal var showDialogCalled = false
+
     internal val grantedPermissions = HashSet<String>()
 
     internal val deniedPermissions = HashSet<String>()
@@ -29,12 +31,12 @@ class PermissionBuilder internal constructor(private val activity: FragmentActiv
 
     internal val forwardPermissions = ArrayList<String>()
 
-    fun shouldExplainRequestReason(block: Callback): PermissionBuilder {
+    fun onExplainRequestReason(block: Callback): PermissionBuilder {
         explainReasonCallback = block
         return this
     }
 
-    fun shouldForwardToSettings(block: Callback): PermissionBuilder {
+    fun onForwardToSettings(block: Callback): PermissionBuilder {
         forwardToSettingsCallback = block
         return this
     }
@@ -105,6 +107,7 @@ class PermissionBuilder internal constructor(private val activity: FragmentActiv
     }
 
     private fun showHandlePermissionDialog(showReasonOrGoSettings: Boolean, permissions: List<String>, message: String, positiveText: String, negativeText: String? = null) {
+        showDialogCalled = true
         val filteredPermissions = permissions.filter {
             !grantedPermissions.contains(it) && allPermissions.contains(it)
         }

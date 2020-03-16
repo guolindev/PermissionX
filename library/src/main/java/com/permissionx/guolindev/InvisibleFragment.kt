@@ -74,7 +74,8 @@ class InvisibleFragment : Fragment() {
                     explainReasonCallback?.let { permissionBuilder.it(showReasonList) }
                 } else if (forwardToSettingsCallback != null && forwardList.isNotEmpty()) {
                     forwardToSettingsCallback?.let { permissionBuilder.it(forwardList) }
-                } else {
+                }
+                if (!permissionBuilder.showDialogCalled) {
                     val deniedList = ArrayList<String>()
                     deniedList.addAll(permissionBuilder.deniedPermissions)
                     deniedList.addAll(permissionBuilder.permanentDeniedPermissions)
