@@ -6,6 +6,16 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 
 /**
+ * An open source Android library that makes handling runtime permissions extremely easy.
+ *
+ * Calling the following snippet for simple usage:
+ * ```kotlin
+ *   PermissionX.init(activity)
+ *      .permissions(Manifest.permission.READ_CONTACTS, Manifest.permission.CAMERA)
+ *      .request { allGranted, grantedList, deniedList ->
+ *          // do the logic
+ *      }
+ *```
  *
  * @author guolin
  * @since 2019/11/2
@@ -18,7 +28,7 @@ object PermissionX {
 
 }
 
-class PermissionCollection(private val activity: FragmentActivity) {
+class PermissionCollection internal constructor(private val activity: FragmentActivity) {
 
     fun permissions(vararg permissions: String) = PermissionBuilder(activity, permissions.toList())
 

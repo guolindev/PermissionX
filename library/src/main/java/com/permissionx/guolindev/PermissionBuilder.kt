@@ -13,13 +13,17 @@ import androidx.fragment.app.FragmentActivity
  */
 class PermissionBuilder internal constructor(private val activity: FragmentActivity, internal val allPermissions: List<String>) {
 
-    private var explainReasonCallback: Callback? = null
+    private var explainReasonCallback: ExplainReasonCallback? = null
 
-    private var forwardToSettingsCallback: Callback? = null
+    private var forwardToSettingsCallback: ForwardToSettingsCallback? = null
+
+    private var explainReasonBeforeRequest = false
 
     private var requestCallback: RequestCallback? = null
 
-    private var explainReasonBeforeRequest = false
+    internal val explainReasonScope = ExplainReasonScope(this)
+
+    internal val forwardToSettingsScope = ForwardToSettingsScope(this)
 
     internal var showDialogCalled = false
 
@@ -31,12 +35,12 @@ class PermissionBuilder internal constructor(private val activity: FragmentActiv
 
     internal val forwardPermissions = ArrayList<String>()
 
-    fun onExplainRequestReason(block: Callback): PermissionBuilder {
+    fun onExplainRequestReason(block: ExplainReasonCallback): PermissionBuilder {
         explainReasonCallback = block
         return this
     }
 
-    fun onForwardToSettings(block: Callback): PermissionBuilder {
+    fun onForwardToSettings(block: ForwardToSettingsCallback): PermissionBuilder {
         forwardToSettingsCallback = block
         return this
     }
@@ -44,14 +48,6 @@ class PermissionBuilder internal constructor(private val activity: FragmentActiv
     fun explainReasonBeforeRequest(): PermissionBuilder {
         explainReasonBeforeRequest = true
         return this
-    }
-
-    fun showRequestReasonDialog(permissions: List<String>, message: String, positiveText: String, negativeText: String? = null) {
-        showHandlePermissionDialog(true, permissions, message, positiveText, negativeText)
-    }
-
-    fun showForwardToSettingsDialog(permissions: List<String>, message: String, positiveText: String, negativeText: String? = null) {
-        showHandlePermissionDialog(false, permissions, message, positiveText, negativeText)
     }
 
     fun request(callback: RequestCallback) {
@@ -71,7 +67,7 @@ class PermissionBuilder internal constructor(private val activity: FragmentActiv
         if (explainReasonBeforeRequest && explainReasonCallback != null) {
             explainReasonBeforeRequest = false
             deniedPermissions.addAll(requestList)
-            explainReasonCallback?.let { it(requestList) }
+            explainReasonCallback?.let { explainReasonScope.it(requestList) }
         } else {
             request(allPermissions, callback)
         }
@@ -90,23 +86,7 @@ class PermissionBuilder internal constructor(private val activity: FragmentActiv
         }
     }
 
-    private fun request(permissions: List<String>, callback: RequestCallback) {
-        getInvisibleFragment().requestNow(this, explainReasonCallback, forwardToSettingsCallback, callback, *permissions.toTypedArray())
-    }
-
-    private fun getInvisibleFragment(): InvisibleFragment {
-        val fragmentManager = activity.supportFragmentManager
-        val existedFragment = fragmentManager.findFragmentByTag(TAG)
-        return if (existedFragment != null) {
-            existedFragment as InvisibleFragment
-        } else {
-            val invisibleFragment = InvisibleFragment()
-            fragmentManager.beginTransaction().add(invisibleFragment, TAG).commitNow()
-            invisibleFragment
-        }
-    }
-
-    private fun showHandlePermissionDialog(showReasonOrGoSettings: Boolean, permissions: List<String>, message: String, positiveText: String, negativeText: String? = null) {
+    internal fun showHandlePermissionDialog(showReasonOrGoSettings: Boolean, permissions: List<String>, message: String, positiveText: String, negativeText: String? = null) {
         showDialogCalled = true
         val filteredPermissions = permissions.filter {
             !grantedPermissions.contains(it) && allPermissions.contains(it)
@@ -131,6 +111,22 @@ class PermissionBuilder internal constructor(private val activity: FragmentActiv
                 }
             }
             show()
+        }
+    }
+
+    private fun request(permissions: List<String>, callback: RequestCallback) {
+        getInvisibleFragment().requestNow(this, explainReasonCallback, forwardToSettingsCallback, callback, *permissions.toTypedArray())
+    }
+
+    private fun getInvisibleFragment(): InvisibleFragment {
+        val fragmentManager = activity.supportFragmentManager
+        val existedFragment = fragmentManager.findFragmentByTag(TAG)
+        return if (existedFragment != null) {
+            existedFragment as InvisibleFragment
+        } else {
+            val invisibleFragment = InvisibleFragment()
+            fragmentManager.beginTransaction().add(invisibleFragment, TAG).commitNow()
+            invisibleFragment
         }
     }
 

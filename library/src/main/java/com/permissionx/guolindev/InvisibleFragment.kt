@@ -11,7 +11,9 @@ import androidx.fragment.app.Fragment
  */
 typealias RequestCallback = PermissionBuilder.(allGranted: Boolean, grantedList: List<String>, deniedList: List<String>) -> Unit
 
-typealias Callback = PermissionBuilder.(deniedList: MutableList<String>) -> Unit
+typealias ExplainReasonCallback = ExplainReasonScope.(deniedList: MutableList<String>) -> Unit
+
+typealias ForwardToSettingsCallback = ForwardToSettingsScope.(deniedList: MutableList<String>) -> Unit
 
 const val TAG = "InvisibleFragment"
 
@@ -23,15 +25,15 @@ class InvisibleFragment : Fragment() {
 
     private lateinit var permissionBuilder: PermissionBuilder
 
-    private var explainReasonCallback: Callback? = null
+    private var explainReasonCallback: ExplainReasonCallback? = null
 
-    private var forwardToSettingsCallback: Callback? = null
+    private var forwardToSettingsCallback: ForwardToSettingsCallback? = null
 
     private lateinit var requestCallback: RequestCallback
 
     private lateinit var permissions: Array<out String>
 
-    fun requestNow(builder: PermissionBuilder, cb1: Callback?, cb2: Callback?, cb3: RequestCallback, vararg p: String) {
+    fun requestNow(builder: PermissionBuilder, cb1: ExplainReasonCallback?, cb2: ForwardToSettingsCallback?, cb3: RequestCallback, vararg p: String) {
         permissionBuilder = builder
         explainReasonCallback = cb1
         forwardToSettingsCallback = cb2
@@ -71,9 +73,9 @@ class InvisibleFragment : Fragment() {
                 permissionBuilder.requestCallback(true, permissionBuilder.allPermissions, listOf())
             } else {
                 if (explainReasonCallback != null && showReasonList.isNotEmpty()) {
-                    explainReasonCallback?.let { permissionBuilder.it(showReasonList) }
+                    explainReasonCallback?.let { permissionBuilder.explainReasonScope.it(showReasonList) }
                 } else if (forwardToSettingsCallback != null && forwardList.isNotEmpty()) {
-                    forwardToSettingsCallback?.let { permissionBuilder.it(forwardList) }
+                    forwardToSettingsCallback?.let { permissionBuilder.forwardToSettingsScope.it(forwardList) }
                 }
                 if (!permissionBuilder.showDialogCalled) {
                     val deniedList = ArrayList<String>()
