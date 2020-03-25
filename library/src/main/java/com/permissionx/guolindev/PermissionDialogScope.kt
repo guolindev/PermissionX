@@ -1,7 +1,7 @@
 package com.permissionx.guolindev
 
 /**
- * Provide specific scopes for ExplainReasonCallback and ForwardToSettingsCallback to give them specific functions to call.
+ * Provide specific scopes for [ExplainReasonCallback] to give it specific functions to call.
  * @author guolin
  * @since 2020/3/18
  */
@@ -13,6 +13,11 @@ class ExplainReasonScope(private val permissionBuilder: PermissionBuilder) {
 
 }
 
+/**
+ * Provide specific scopes for [ForwardToSettingsCallback] to give it specific functions to call.
+ * @author guolin
+ * @since 2020/3/18
+ */
 class ForwardToSettingsScope(private val permissionBuilder: PermissionBuilder) {
 
     fun showForwardToSettingsDialog(permissions: List<String>, message: String, positiveText: String, negativeText: String? = null) {
