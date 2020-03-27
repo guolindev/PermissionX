@@ -6,20 +6,14 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.permissionx.guolindev.PermissionCollection
 import com.permissionx.guolindev.PermissionX
 import kotlinx.android.synthetic.main.activity_main.*
-import java.util.concurrent.Executors
 
-/**
- * <pre></pre>
- */
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        Executors.newSingleThreadExecutor()
         makeCallBtn.setOnClickListener {
             PermissionX.init(this)
                 .permissions(Manifest.permission.READ_CONTACTS, Manifest.permission.CAMERA, Manifest.permission.CALL_PHONE, Manifest.permission.READ_CALENDAR, Manifest.permission.READ_EXTERNAL_STORAGE)
