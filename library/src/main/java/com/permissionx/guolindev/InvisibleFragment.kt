@@ -7,7 +7,7 @@ import androidx.fragment.app.Fragment
 /**
  * Callback for [PermissionBuilder.request] method.
  */
-typealias RequestCallback = PermissionBuilder.(allGranted: Boolean, grantedList: List<String>, deniedList: List<String>) -> Unit
+typealias RequestCallback = (allGranted: Boolean, grantedList: List<String>, deniedList: List<String>) -> Unit
 
 /**
  * Callback for [PermissionBuilder.onExplainRequestReason] method.
@@ -115,7 +115,7 @@ class InvisibleFragment : Fragment() {
             permissionBuilder.grantedPermissions.addAll(grantedList)
             val allGranted = permissionBuilder.grantedPermissions.size == permissionBuilder.allPermissions.size
             if (allGranted) { // If all permissions are granted, call RequestCallback directly.
-                permissionBuilder.requestCallback(true, permissionBuilder.allPermissions, listOf())
+                requestCallback(true, permissionBuilder.allPermissions, listOf())
             } else {
                 // If explainReasonCallback is not null and there're denied permissions. Try the ExplainReasonCallback.
                 if (explainReasonCallback != null && showReasonList.isNotEmpty()) {
@@ -133,7 +133,7 @@ class InvisibleFragment : Fragment() {
                     val deniedList = ArrayList<String>()
                     deniedList.addAll(permissionBuilder.deniedPermissions)
                     deniedList.addAll(permissionBuilder.permanentDeniedPermissions)
-                    permissionBuilder.requestCallback(false, permissionBuilder.grantedPermissions.toList(), deniedList)
+                    requestCallback(false, permissionBuilder.grantedPermissions.toList(), deniedList)
                 }
             }
         }
