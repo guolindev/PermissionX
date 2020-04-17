@@ -81,7 +81,7 @@ class InvisibleFragment : Fragment() {
      * There may be 3 callbacks: [ExplainReasonCallback], [ForwardToSettingsCallback] and [RequestCallback].
      * Only one callback can be called normally(But not always true, see the exception in below codes).
      * The priority is [ExplainReasonCallback] -> [ForwardToSettingsCallback] -> [RequestCallback].
-     * Always try to call the higher priority callback. If that's not possible, goes to the lower ones.
+     * Always try to call the higher priority callback. If that's not possible, goes to the lower one.
      */
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode == PERMISSION_CODE) {
@@ -117,19 +117,22 @@ class InvisibleFragment : Fragment() {
             if (allGranted) { // If all permissions are granted, call RequestCallback directly.
                 requestCallback(true, permissionBuilder.allPermissions, listOf())
             } else {
+                var goesToRequestCallback = true // If there's need goes to RequestCallback
                 // If explainReasonCallback is not null and there're denied permissions. Try the ExplainReasonCallback.
                 if (explainReasonCallback != null && showReasonList.isNotEmpty()) {
+                    goesToRequestCallback = false // No need cause ExplainReasonCallback handles it
                     explainReasonCallback?.let { permissionBuilder.explainReasonScope.it(showReasonList) }
                 }
                 // If forwardToSettingsCallback is not null and there're permanently denied permissions. Try the ForwardToSettingsCallback.
                 else if (forwardToSettingsCallback != null && forwardList.isNotEmpty()) {
+                    goesToRequestCallback = false // No need cause ForwardToSettingsCallback handles it
                     forwardToSettingsCallback?.let { permissionBuilder.forwardToSettingsScope.it(forwardList) }
                 }
                 // If showRequestReasonDialog or showForwardToSettingsDialog is not called. Try the RequestCallback.
-                // There's case that ExplainReasonCallback or ForwardToSettingsCallback is called, but developer didn't call
+                // There's case that ExplainReasonCallback or ForwardToSettingsCallback is called, but developer didn't invoke
                 // showRequestReasonDialog or showForwardToSettingsDialog in the callback.
                 // At this case and all other cases, RequestCallback will be called.
-                if (!permissionBuilder.showDialogCalled) {
+                if (goesToRequestCallback || !permissionBuilder.showDialogCalled) {
                     val deniedList = ArrayList<String>()
                     deniedList.addAll(permissionBuilder.deniedPermissions)
                     deniedList.addAll(permissionBuilder.permanentDeniedPermissions)
