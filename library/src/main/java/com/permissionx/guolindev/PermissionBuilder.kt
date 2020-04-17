@@ -19,6 +19,11 @@ class PermissionBuilder internal constructor(private val activity: FragmentActiv
     private var explainReasonCallback: ExplainReasonCallback? = null
 
     /**
+     * The callback for onExplainRequestReason() method with beforeRequest param. Maybe null.
+     */
+    private var explainReasonCallback2: ExplainReasonCallback2? = null
+
+    /**
      * The callback for onForwardToSettings() method. Maybe null.
      */
     private var forwardToSettingsCallback: ForwardToSettingsCallback? = null
@@ -73,13 +78,27 @@ class PermissionBuilder internal constructor(private val activity: FragmentActiv
     /**
      * Called when permissions need to explain request reason.
      * Typically every time user denies your request would call this method.
-     * If you chained [explainReasonBeforeRequest], this method would run before permission request.
+     * If you chained [explainReasonBeforeRequest], this method might run before permission request.
      *
      * @param callback
      *          Callback with permissions denied by user.
      */
     fun onExplainRequestReason(callback: ExplainReasonCallback): PermissionBuilder {
         explainReasonCallback = callback
+        return this
+    }
+
+    /**
+     * Called when permissions need to explain request reason.
+     * Typically every time user denies your request would call this method.
+     * If you chained [explainReasonBeforeRequest], this method might run before permission request.
+     * beforeRequest param would tell you this method is currently before or after permission request.
+     *
+     * @param callback
+     *          Callback with permissions denied by user.
+     */
+    fun onExplainRequestReason(callback: ExplainReasonCallback2): PermissionBuilder {
+        explainReasonCallback2 = callback
         return this
     }
 
@@ -126,9 +145,12 @@ class PermissionBuilder internal constructor(private val activity: FragmentActiv
             callback(true, allPermissions, listOf())
             return
         }
-        if (explainReasonBeforeRequest && explainReasonCallback != null) { // should show request permission rationale before request
+        if (explainReasonBeforeRequest && (explainReasonCallback != null || explainReasonCallback2 != null)) { // should show request permission rationale before request
             explainReasonBeforeRequest = false
             deniedPermissions.addAll(requestList)
+            explainReasonCallback2?.let { // callback ExplainReasonCallback2 prior to ExplainReasonCallback
+                explainReasonScope.it(requestList, true)
+            } ?:
             explainReasonCallback?.let { explainReasonScope.it(requestList) }
         } else {
             // Do the request at once. Always request all permissions no matter they are already granted or not, in case user turn them off in Settings.
@@ -211,7 +233,7 @@ class PermissionBuilder internal constructor(private val activity: FragmentActiv
      *          Callback with 3 params. allGranted, grantedList, deniedList.
      */
     private fun requestNow(permissions: List<String>, callback: RequestCallback) {
-        getInvisibleFragment().requestNow(this, explainReasonCallback, forwardToSettingsCallback, callback, *permissions.toTypedArray())
+        getInvisibleFragment().requestNow(this, explainReasonCallback, explainReasonCallback2, forwardToSettingsCallback, callback, *permissions.toTypedArray())
     }
 
     /**
