@@ -1,8 +1,32 @@
+/*
+ * Copyright (C)  guolin, PermissionX Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.permissionx.guolindev
 
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.fragment.app.Fragment
+
+/**
+ * An invisible fragment to embedded into activity for handling permission requests.
+ * This is very lightweight. Will not affect your app's efficiency.
+ *
+ * @author guolin
+ * @since 2019/11/2
+ */
 
 /**
  * Callback for [PermissionBuilder.request] method.
@@ -30,13 +54,6 @@ const val PERMISSION_CODE = 1
 
 const val SETTINGS_CODE = 2
 
-/**
- * An invisible fragment to embedded into activity for handling permission requests.
- * This is very lightweight. Will not affect your app's efficiency.
- *
- * @author guolin
- * @since 2019/11/2
- */
 class InvisibleFragment : Fragment() {
 
     /**
@@ -101,7 +118,7 @@ class InvisibleFragment : Fragment() {
             val grantedList = ArrayList<String>() // holds granted permissions in the request permissions
             val showReasonList = ArrayList<String>() // holds denied permissions in the request permissions.
             val forwardList = ArrayList<String>() // hold permanently denied permissions in the request permissions.
-            for ((index, result) in grantResults.withIndex()) { // iterator all grant results
+            for ((index, result) in grantResults.withIndex()) { // iterate all granted results
                 if (result == PackageManager.PERMISSION_GRANTED) {
                     grantedList.add(permissions[index])
                     // Remove granted permissions from deniedPermissions and permanentDeniedPermissions set in PermissionBuilder.
