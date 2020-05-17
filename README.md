@@ -127,9 +127,9 @@ PermissionX.init(activity)
     }
 ```
 
-## permission-support
+## Permission-Support
 
-If your app is still not ready for AndroidX, you need to use permission-support library instead. The API of permission-support library is completely same as PermissionX, except declare another dependency in your build.gradle file.
+If your app is still not ready for AndroidX, you need to use Permission-Support library instead. The API of Permission-Support library is completely same as PermissionX, except declare another dependency in your build.gradle file.
 
 ```groovy
 dependencies {
