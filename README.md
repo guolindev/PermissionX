@@ -24,8 +24,8 @@ For example. If you want to request READ_CONTACTS, CAMERA and CALL_PHONE permiss
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.permissionx.app">
 
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission android:name="android.permission.CAMERA" />
+	<uses-permission android:name="android.permission.READ_CONTACTS" />
+	<uses-permission android:name="android.permission.CAMERA" />
 	<uses-permission android:name="android.permission.CALL_PHONE" />
 
 </manifest>
@@ -49,7 +49,7 @@ Pass any instance of FragmentActivity into **init** method, and specify the perm
 
 The request result will be callback in the request lambda. **allGranted** means if all permissions that you requested are granted by user, maybe true or false. **grantedList** holds all granted permissions and **deniedList** holds all denied permissions.
 
-<img src="screenshots/1.gif" width="28%" />
+<img src="screenshots/1.gif" width="35%" />
 
 Now you can write your own logic in the request lambda to handle the specific cases of your app.
 
@@ -78,7 +78,7 @@ PermissionX.init(activity)
 
 The fourth parameter as text for negative button is optional. If the denied permissions are necessary, you can ignore the fourth parameter and the dialog will be uncancelable. Which means user must allow these permissions for further usage.
 
-<img src="screenshots/2.gif" width="28%" />
+<img src="screenshots/2.gif" width="35%" />
 
 Of course, user still may deny some permissions and checked **never ask again** option. In this case, each time we request these permissions again will be denied automatically. The only thing we could do is prompt to users they need to allow these permissions manually in app settings for continuation usage. But PermissionX did better.
 
@@ -104,7 +104,7 @@ PermissionX.init(activity)
 
 The parameters in **showRequestReasonDialog** method are similar with **showRequestReasonDialog** method. When user click positive button, PermissionX will forward to the settings page of your app and user can turn on the necessary permissions very quickly. When user switch back to app, PermissionX will request the necessary permissions again automatically.
 
-<img src="screenshots/3.gif" width="28%" />
+<img src="screenshots/3.gif" width="35%" />
 
 One more thing. If you want to show rationale dialog before request which might be a very good experience for users, you can chain **explainReasonBeforeRequest** method like below.
 
