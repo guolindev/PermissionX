@@ -1,8 +1,6 @@
 # PermissionX
 
-中文文档
-
-PermissionX is an open source library that makes Android runtime permission request extremely easy.  You can use it for basic permission request occasions or handling more complex conditions, like show rationale dialog or go to app settings for allowance manually.
+PermissionX is an extension Android library that makes Android runtime permission request extremely easy.  You can use it for basic permission request occasions or handle more complex conditions, like showing rationale dialog or go to app settings for allowance manually.
 
 ## Quick Setup
 
@@ -20,7 +18,7 @@ That's all. Now you are ready to go.
 
 Use PermissionX to request Android runtime permissions is extremely simple.
 
-For example. If you want to request READ_CONTACTS, CAMERA and CALL_PHONE permissions, declare them in the AndroidManifest.xml first.
+For example. If you want to request READ_CONTACTS, CAMERA and CALL_PHONE permissions, declared them in the AndroidManifest.xml first.
 
 ```xml
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -33,7 +31,7 @@ For example. If you want to request READ_CONTACTS, CAMERA and CALL_PHONE permiss
 </manifest>
 ```
 
-Then you can use below codes to request runtime permissions.
+Then you can use below codes to request.
 
 ```kotlin
 PermissionX.init(activity)
@@ -47,11 +45,11 @@ PermissionX.init(activity)
     }
 ```
 
-Pass any instance of FragmentActivity into **init** method, and specify the permissions you want to request in the **permissions** method, then call **request** method for actual request.
+Pass any instance of FragmentActivity into **init** method, and specify the permissions that you want to request in the **permissions** method, then call **request** method for actual request.
 
 The request result will be callback in the request lambda. **allGranted** means if all permissions that you requested are granted by user, maybe true or false. **grantedList** holds all granted permissions and **deniedList** holds all denied permissions.
 
-pic
+<img src="screenshots/1.gif" width="28%" />
 
 Now you can write your own logic in the request lambda to handle the specific cases of your app.
 
@@ -59,7 +57,7 @@ Now you can write your own logic in the request lambda to handle the specific ca
 
 As you know, Android provide **shouldShowRequestPermissionRationale** method to indicate us if we should show a rationale dialog to explain to user why we need this permission. Otherwise user may deny the permissions we requested and checked **never ask again** option.
 
-To simplify this process, PermissionX provide **onExplainRequestReason** method. Chain this method before **request** method, if user deny one of the permissions, **onExplainRequestReason** method will get callback first. Then you can call **showRequestReasonDialog** method to explain to user why these permissions are necessary like below.
+To simplify this process, PermissionX provide **onExplainRequestReason** method. Chain this method before **request** method, If user deny one of the permissions, **onExplainRequestReason** method will get callback first. Then you can call **showRequestReasonDialog** method to explain to user why these permissions are necessary like below.
 
 ```kotlin
 PermissionX.init(activity)
@@ -78,13 +76,13 @@ PermissionX.init(activity)
 
 **showRequestReasonDialog** method will prompt a rationale dialog with the information that second parameter provide. If user click positive button which shows text as third parameter provide, PermissionX will request again with the permissions that first parameter provide.
 
-The fourth parameter as text for negative button is optional. If the denied permissions are necessary, you can ignore the fourth parameter and the dialog will be non-cancelable. Which means user must allow these permissions for further usage of your app.
+The fourth parameter as text for negative button is optional. If the denied permissions are necessary, you can ignore the fourth parameter and the dialog will be uncancelable. Which means user must allow these permissions for further usage.
 
-pic
+<img src="screenshots/2.gif" width="28%" />
 
 Of course, user still may deny some permissions and checked **never ask again** option. In this case, each time we request these permissions again will be denied automatically. The only thing we could do is prompt to users they need to allow these permissions manually in app settings for continuation usage. But PermissionX did better.
 
-PermissionX provide **onForwardToSettings** method for handling this occasion. Chain this method before **request** method, if some permissions are "denied and never ask again" by user, **onForwardToSettings** method will get callback. Then you can call **showForwardToSettingsDialog** method like below.
+PermissionX provide **onForwardToSettings** method for handling this occasion. Chain this method before **request** method, If some permissions are "denied and never ask again" by user, **onForwardToSettings** method will get callback. Then you can call **showForwardToSettingsDialog** method like below.
 
 ```kotlin
 PermissionX.init(activity)
@@ -104,16 +102,16 @@ PermissionX.init(activity)
     }
 ```
 
-The parameters in **showRequestReasonDialog** method are similar with **showRequestReasonDialog** method. When user click positive button, PermissionX will forward to the settings page of your app and user can turn on the necessary permissions very quickly. When user switch back to your app, PermissionX will request the necessary permissions again automatically.
+The parameters in **showRequestReasonDialog** method are similar with **showRequestReasonDialog** method. When user click positive button, PermissionX will forward to the settings page of your app and user can turn on the necessary permissions very quickly. When user switch back to app, PermissionX will request the necessary permissions again automatically.
 
-pic
+<img src="screenshots/3.gif" width="28%" />
 
-One more thing. If you want to show rationale dialog before request which might be a very good experience to users, you can chain **explainReasonBeforeRequest** method like below.
+One more thing. If you want to show rationale dialog before request which might be a very good experience for users, you can chain **explainReasonBeforeRequest** method like below.
 
 ```kotlin
 PermissionX.init(activity)
     .permissions(Manifest.permission.READ_CONTACTS, Manifest.permission.CAMERA, Manifest.permission.CALL_PHONE)
-    .explainReasonBeforeRequest()
+	.explainReasonBeforeRequest()
     .onExplainRequestReason { deniedList ->
         showRequestReasonDialog(deniedList, "Core fundamental are based on these permissions", "OK", "Cancel")
     }
@@ -131,7 +129,7 @@ PermissionX.init(activity)
 
 ## permission-support
 
-If your app is still not ready for AndroidX, you need to use permission-support library instead. The API of permission-support library is completely same as PermissionX library, except declare another dependency in your build.gradle file.
+If your app is still not ready for AndroidX, you need to use permission-support library instead. The API of permission-support library is completely same as PermissionX, except declare another dependency in your build.gradle file.
 
 ```groovy
 dependencies {
