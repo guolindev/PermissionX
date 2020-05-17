@@ -1,30 +1,160 @@
 # PermissionX
 
-PermissionX是一个用于简化Android运行时权限用法的开源库。
+中文文档
 
-添加如下配置将PermissionX引入到你的项目当中：
+PermissionX is an open source library that makes Android runtime permission request extremely easy.  You can use it for basic permission request occasions or handling more complex conditions, like show rationale dialog or go to app settings for allowance manually.
+
+## Quick Setup
+
+Edit your build.gradle file and add below dependency.
 
 ```groovy
 dependencies {
-    ...
-    implementation 'com.permissionx.guolindev:permissionx:1.0.0'
+    implementation 'com.permissionx.guolindev:permissionx:1.1.1'
 }
 ```
 
-然后就可以使用如下语法结构来申请运行时权限了：
+That's all. Now you are ready to go.
+
+## Basic usage
+
+Use PermissionX to request Android runtime permissions is extremely simple.
+
+For example. If you want to request READ_CONTACTS, CAMERA and CALL_PHONE permissions, declare them in the AndroidManifest.xml first.
+
+```xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.permissionx.app">
+
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.CAMERA" />
+	<uses-permission android:name="android.permission.CALL_PHONE" />
+
+</manifest>
+```
+
+Then you can use below codes to request runtime permissions.
 
 ```kotlin
-PermissionX.request(this,
-                Manifest.permission.CALL_PHONE,
-                Manifest.permission.READ_CONTACTS) { allGranted, deniedList ->
-    if (allGranted) {
-        Toast.makeText(this, "All permissions are granted", Toast.LENGTH_SHORT).show()
-    } else {
-        Toast.makeText(this, "You denied $deniedList", Toast.LENGTH_SHORT).show()
+PermissionX.init(activity)
+    .permissions(Manifest.permission.READ_CONTACTS, Manifest.permission.CAMERA, Manifest.permission.CALL_PHONE)
+    .request { allGranted, grantedList, deniedList ->
+        if (allGranted) {
+            Toast.makeText(this, "All permissions are granted", Toast.LENGTH_LONG).show()
+        } else {
+            Toast.makeText(this, "These permissions are denied: $deniedList", Toast.LENGTH_LONG).show()
+        }
     }
+```
+
+Pass any instance of FragmentActivity into **init** method, and specify the permissions you want to request in the **permissions** method, then call **request** method for actual request.
+
+The request result will be callback in the request lambda. **allGranted** means if all permissions that you requested are granted by user, maybe true or false. **grantedList** holds all granted permissions and **deniedList** holds all denied permissions.
+
+pic
+
+Now you can write your own logic in the request lambda to handle the specific cases of your app.
+
+## More usage
+
+As you know, Android provide **shouldShowRequestPermissionRationale** method to indicate us if we should show a rationale dialog to explain to user why we need this permission. Otherwise user may deny the permissions we requested and checked **never ask again** option.
+
+To simplify this process, PermissionX provide **onExplainRequestReason** method. Chain this method before **request** method, if user deny one of the permissions, **onExplainRequestReason** method will get callback first. Then you can call **showRequestReasonDialog** method to explain to user why these permissions are necessary like below.
+
+```kotlin
+PermissionX.init(activity)
+    .permissions(Manifest.permission.READ_CONTACTS, Manifest.permission.CAMERA, Manifest.permission.CALL_PHONE)
+    .onExplainRequestReason { deniedList ->
+        showRequestReasonDialog(deniedList, "Core fundamental are based on these permissions", "OK", "Cancel")
+    }
+    .request { allGranted, grantedList, deniedList ->
+        if (allGranted) {
+            Toast.makeText(this, "All permissions are granted", Toast.LENGTH_LONG).show()
+        } else {
+            Toast.makeText(this, "These permissions are denied: $deniedList", Toast.LENGTH_LONG).show()
+        }
+    }
+```
+
+**showRequestReasonDialog** method will prompt a rationale dialog with the information that second parameter provide. If user click positive button which shows text as third parameter provide, PermissionX will request again with the permissions that first parameter provide.
+
+The fourth parameter as text for negative button is optional. If the denied permissions are necessary, you can ignore the fourth parameter and the dialog will be non-cancelable. Which means user must allow these permissions for further usage of your app.
+
+pic
+
+Of course, user still may deny some permissions and checked **never ask again** option. In this case, each time we request these permissions again will be denied automatically. The only thing we could do is prompt to users they need to allow these permissions manually in app settings for continuation usage. But PermissionX did better.
+
+PermissionX provide **onForwardToSettings** method for handling this occasion. Chain this method before **request** method, if some permissions are "denied and never ask again" by user, **onForwardToSettings** method will get callback. Then you can call **showForwardToSettingsDialog** method like below.
+
+```kotlin
+PermissionX.init(activity)
+    .permissions(Manifest.permission.READ_CONTACTS, Manifest.permission.CAMERA, Manifest.permission.CALL_PHONE)
+    .onExplainRequestReason { deniedList ->
+        showRequestReasonDialog(deniedList, "Core fundamental are based on these permissions", "OK", "Cancel")
+    }
+    .onForwardToSettings { deniedList ->
+        showForwardToSettingsDialog(deniedList, "You need to allow necessary permissions in Settings manually", "OK", "Cancel")
+    }
+    .request { allGranted, grantedList, deniedList ->
+        if (allGranted) {
+            Toast.makeText(this, "All permissions are granted", Toast.LENGTH_LONG).show()
+        } else {
+            Toast.makeText(this, "These permissions are denied: $deniedList", Toast.LENGTH_LONG).show()
+        }
+    }
+```
+
+The parameters in **showRequestReasonDialog** method are similar with **showRequestReasonDialog** method. When user click positive button, PermissionX will forward to the settings page of your app and user can turn on the necessary permissions very quickly. When user switch back to your app, PermissionX will request the necessary permissions again automatically.
+
+pic
+
+One more thing. If you want to show rationale dialog before request which might be a very good experience to users, you can chain **explainReasonBeforeRequest** method like below.
+
+```kotlin
+PermissionX.init(activity)
+    .permissions(Manifest.permission.READ_CONTACTS, Manifest.permission.CAMERA, Manifest.permission.CALL_PHONE)
+    .explainReasonBeforeRequest()
+    .onExplainRequestReason { deniedList ->
+        showRequestReasonDialog(deniedList, "Core fundamental are based on these permissions", "OK", "Cancel")
+    }
+    .onForwardToSettings { deniedList ->
+        showForwardToSettingsDialog(deniedList, "You need to allow these permissions in Settings $deniedList", "OK", "Cancel")
+    }
+    .request { allGranted, grantedList, deniedList ->
+        if (allGranted) {
+            Toast.makeText(this, "All permissions are granted", Toast.LENGTH_LONG).show()
+        } else {
+            Toast.makeText(this, "These permissions are denied: $deniedList", Toast.LENGTH_LONG).show()
+        }
+    }
+```
+
+## permission-support
+
+If your app is still not ready for AndroidX, you need to use permission-support library instead. The API of permission-support library is completely same as PermissionX library, except declare another dependency in your build.gradle file.
+
+```groovy
+dependencies {
+    implementation 'com.permissionx.guolindev:permission-support:1.1.1'
 }
 ```
 
+This library won't be long term supported, and could be deprecated at any time. So try to switch to AndroidX as soon as you can.
 
+## License
 
+```
+Copyright (C)  guolin, PermissionX Open Source Project
 
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
