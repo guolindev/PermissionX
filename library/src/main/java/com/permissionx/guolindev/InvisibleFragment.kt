@@ -18,6 +18,7 @@ package com.permissionx.guolindev
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.fragment.app.Fragment
 
 /**
@@ -182,7 +183,11 @@ class InvisibleFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == SETTINGS_CODE) {
             // When user switch back from settings, just request again.
-            permissionBuilder.requestAgain(permissionBuilder.forwardPermissions)
+            if (::permissionBuilder.isInitialized) { // On some phones, when switch back from settings, permissionBuilder will become uninitialized
+                permissionBuilder.requestAgain(permissionBuilder.forwardPermissions)
+            } else {
+                Log.w("PermissionX", "permissionBuilder should not be uninitialized at this time, so we can do nothing in this case.")
+            }
         }
     }
 
