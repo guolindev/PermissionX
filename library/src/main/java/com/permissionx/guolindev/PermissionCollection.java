@@ -27,6 +27,14 @@ public class PermissionCollection {
     }
 
     /**
+     * All permissions that you want to request.
+     * @param permissions A vararg param to pass permissions.
+     */
+    public PermissionBuilder permissions(List<String> permissions)  {
+        return new PermissionBuilder(activity, distinctPermissions(permissions.toArray(new String[0])));
+    }
+
+    /**
      * Distinct the permissions that passed in. Duplicate permissions can lead to the wrong answer.
      * @param permissions
      *          Permissions that app want to request.
