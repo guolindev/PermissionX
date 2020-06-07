@@ -1,3 +1,4 @@
-include ':app', ':library'
+include ':app'
+include ':library'
+//include ':support'
 rootProject.name='PermissionX'
-include ':support'

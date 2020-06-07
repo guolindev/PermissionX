@@ -1,5 +1,2 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.permissionx.guolindev">
-
-    /
-</manifest>
+    package="com.permissionx.guolindev" />
