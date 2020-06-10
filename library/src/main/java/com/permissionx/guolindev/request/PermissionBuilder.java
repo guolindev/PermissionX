@@ -15,12 +15,14 @@
  */
 
 
-package com.permissionx.guolindev;
+package com.permissionx.guolindev.request;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.Settings;
 import android.text.TextUtils;
 
@@ -28,6 +30,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
+import com.permissionx.guolindev.PermissionX;
+import com.permissionx.guolindev.callback.ChainedRequestCallback;
 import com.permissionx.guolindev.callback.ExplainReasonCallback;
 import com.permissionx.guolindev.callback.ExplainReasonCallbackWithBeforeParam;
 import com.permissionx.guolindev.callback.ForwardToSettingsCallback;
@@ -54,12 +58,18 @@ public class PermissionBuilder {
     /**
      * Instance of activity for everything.
      */
-    private FragmentActivity activity;
+    FragmentActivity activity;
+
+    private String currentProcess;
 
     /**
-     * All permissions that app want to request.
+     * Normal runtime permissions that app want to request.
      */
-    List<String> allPermissions;
+    Set<String> normalPermissions;
+
+    boolean requireBackgroundLocationPermission;
+
+    Set<String> permissionsWontRequest;
 
     /**
      * Indicates should PermissionX explain request reason before request.
@@ -91,7 +101,7 @@ public class PermissionBuilder {
      * Holds permissions which should forward to Settings to allow them.
      * Not all permanently denied permissions should forward to Settings. Only the ones developer think they are necessary should.
      */
-    List<String> forwardPermissions = new ArrayList<>();
+    Set<String> forwardPermissions = new HashSet<>();
 
     /**
      * The callback for {@link #request(RequestCallback)} method. Can not be null.
@@ -113,19 +123,11 @@ public class PermissionBuilder {
      */
     ForwardToSettingsCallback forwardToSettingsCallback;
 
-    /**
-     * Provide specific scopes for explainReasonCallback for specific functions to call.
-     */
-    ExplainScope explainReasonScope = new ExplainScope(this);
-
-    /**
-     * Provide specific scopes for forwardToSettingsCallback for specific functions to call.
-     */
-    ForwardScope forwardToSettingsScope = new ForwardScope(this);
-
-    PermissionBuilder(FragmentActivity activity, List<String> allPermissions) {
+    PermissionBuilder(FragmentActivity activity, Set<String> normalPermissions, boolean requireBackgroundLocationPermission, Set<String> permissionsWontRequest) {
         this.activity = activity;
-        this.allPermissions = allPermissions;
+        this.normalPermissions = normalPermissions;
+        this.requireBackgroundLocationPermission = requireBackgroundLocationPermission;
+        this.permissionsWontRequest = permissionsWontRequest;
     }
 
     /**
@@ -182,31 +184,7 @@ public class PermissionBuilder {
      */
     public void request(RequestCallback callback) {
         requestCallback = callback;
-        List<String> requestList = new ArrayList<>();
-        for (String permission : allPermissions) {
-            if (PermissionX.isGranted(activity, permission)) {
-                grantedPermissions.add(permission); // already granted
-            } else {
-                requestList.add(permission); // still need to request
-            }
-        }
-        if (requestList.isEmpty()) { // all permissions are granted
-            callback.onResult(true, allPermissions, new ArrayList<String>());
-            return;
-        }
-        if (explainReasonBeforeRequest && (explainReasonCallback != null || explainReasonCallbackWithBeforeParam != null)) {
-            explainReasonBeforeRequest = false;
-            deniedPermissions.addAll(requestList);
-            if (explainReasonCallbackWithBeforeParam != null) {
-                // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
-                explainReasonCallbackWithBeforeParam.onExplainReason(explainReasonScope, requestList, true);
-            } else {
-                explainReasonCallback.onExplainReason(explainReasonScope, requestList);
-            }
-        } else {
-            // Do the request at once. Always request all permissions no matter they are already granted or not, in case user turn them off in Settings.
-            requestNow(allPermissions);
-        }
+        requestNormalPermissions();
     }
 
     /**
@@ -222,12 +200,34 @@ public class PermissionBuilder {
             onPermissionDialogCancel();
             return;
         }
-        if (requestCallback != null) {
-            // when request again, put all granted permissions into permission list again, in case user turn them off in settings.
-            List<String> requestAgainPermissions = new ArrayList<>(grantedPermissions);
-            requestAgainPermissions.addAll(permissions);
-            requestNow(requestAgainPermissions);
-        }
+        Set<String> requestAgainPermissions = new HashSet<>(grantedPermissions);
+        requestAgainPermissions.addAll(permissions);
+        requestNow(new ArrayList<>(requestAgainPermissions), new ChainedRequestCallback() {
+            @Override
+            public void onResult() {
+                notifyResult();
+            }
+        });
+//        if (requestCallback != null) {
+//            if (currentProcess.equals("requestNormalPermissions")) {
+//                // when request again, put all granted permissions into permission list again, in case user turn them off in settings.
+//                Set<String> requestAgainPermissions = new HashSet<>(grantedPermissions);
+//                requestAgainPermissions.addAll(permissions);
+//                requestNow(new ArrayList<>(requestAgainPermissions), new ChainedRequestCallback() {
+//                    @Override
+//                    public void onResult() {
+//                        notifyResult();
+//                    }
+//                });
+//            } else if (currentProcess.equals("requestBackgroundLocationPermissions")) {
+//                requestBackgroundLocationPermissionNow(new ChainedRequestCallback() {
+//                    @Override
+//                    public void onResult() {
+//                        notifyResult();
+//                    }
+//                });
+//            }
+//        }
     }
 
     /**
@@ -241,18 +241,8 @@ public class PermissionBuilder {
      * @param positiveText           Positive text on the positive button to request again.
      * @param negativeText           Negative text on the negative button. Maybe null if this dialog should not be canceled.
      */
-    void showHandlePermissionDialog(final boolean showReasonOrGoSettings, List<String> permissions, String message, String positiveText, String negativeText) {
+    void showHandlePermissionDialog(ChainTask chainTask, final boolean showReasonOrGoSettings, final List<String> permissions, String message, String positiveText, String negativeText) {
         showDialogCalled = true;
-        final List<String> filteredPermissions = new ArrayList<>();
-        for (String permission : permissions) {
-            if (!grantedPermissions.contains(permission) && allPermissions.contains(permission)) {
-                filteredPermissions.add(permission);
-            }
-        }
-        if (filteredPermissions.isEmpty()) {
-            onPermissionDialogCancel();
-            return;
-        }
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setMessage(message);
         builder.setCancelable(!TextUtils.isEmpty(negativeText));
@@ -260,9 +250,9 @@ public class PermissionBuilder {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (showReasonOrGoSettings) {
-                    requestAgain(filteredPermissions);
+                    requestAgain(permissions);
                 } else {
-                    forwardToSettings(filteredPermissions);
+                    forwardToSettings(permissions);
                 }
             }
         });
@@ -277,13 +267,69 @@ public class PermissionBuilder {
         builder.show();
     }
 
+    private void requestNormalPermissions() {
+//        currentProcess = "requestNormalPermissions";
+//        List<String> requestList = new ArrayList<>();
+//        for (String permission : normalPermissions) {
+//            if (PermissionX.isGranted(activity, permission)) {
+//                grantedPermissions.add(permission); // already granted
+//            } else {
+//                requestList.add(permission); // still need to request
+//            }
+//        }
+//        if (requestList.isEmpty()) { // all permissions are granted
+//            notifyResult();
+//            return;
+//        }
+//        if (explainReasonBeforeRequest && (explainReasonCallback != null || explainReasonCallbackWithBeforeParam != null)) {
+//            explainReasonBeforeRequest = false;
+//            deniedPermissions.addAll(requestList);
+//            if (explainReasonCallbackWithBeforeParam != null) {
+//                // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
+//                explainReasonCallbackWithBeforeParam.onExplainReason(explainReasonScope, requestList, true);
+//            } else {
+//                explainReasonCallback.onExplainReason(explainReasonScope, requestList);
+//            }
+//        } else {
+//            // Do the request at once. Always request all permissions no matter they are already granted or not, in case user turn them off in Settings.
+//            requestNow(new ArrayList<>(normalPermissions), new ChainedRequestCallback() {
+//                @Override
+//                public void onResult() {
+//                    notifyResult();
+//                }
+//            });
+//        }
+    }
+
+    private void requestBackgroundLocationPermissions() {
+        currentProcess = "requestBackgroundLocationPermissions";
+        if (requireBackgroundLocationPermission && Build.VERSION.SDK_INT >= 29) {
+            if (explainReasonCallback != null || explainReasonCallbackWithBeforeParam != null) {
+                List<String> requestList =  new ArrayList<>();
+                requestList.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION);
+                if (explainReasonCallbackWithBeforeParam != null) {
+                    // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
+                    explainReasonCallbackWithBeforeParam.onExplainReason(explainReasonScope, requestList, true);
+                } else {
+                    explainReasonCallback.onExplainReason(explainReasonScope, requestList);
+                }
+                return;
+            }
+        }
+        notifyResult();
+    }
+
     /**
      * Request permissions at once in the fragment.
      *
      * @param permissions Permissions that you want to request.
      */
-    private void requestNow(List<String> permissions) {
-        getInvisibleFragment().requestNow(this, permissions.toArray(new String[0]));
+    void requestNow(Set<String> permissions, ChainedRequestCallback callback) {
+        getInvisibleFragment().requestNow(this, permissions, callback);
+    }
+
+    void requestBackgroundLocationPermissionNow(ChainedRequestCallback callback) {
+        getInvisibleFragment().requestBackgroundLocationPermissionNow(this, callback);
     }
 
     /**
@@ -309,11 +355,12 @@ public class PermissionBuilder {
      * @param permissions Permissions which are necessary.
      */
     private void forwardToSettings(List<String> permissions) {
+        forwardPermissions.clear();
         forwardPermissions.addAll(permissions);
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         Uri uri = Uri.fromParts("package", activity.getPackageName(), null);
         intent.setData(uri);
-        getInvisibleFragment().startActivityForResult(intent, InvisibleFragment.SETTINGS_CODE);
+        getInvisibleFragment().startActivityForResult(intent, InvisibleFragment.FORWARD_TO_SETTINGS);
     }
 
     /**
@@ -321,11 +368,20 @@ public class PermissionBuilder {
      * when user clicked negative button, will call this method.
      */
     private void onPermissionDialogCancel() {
-        List<String> deniedList = new ArrayList<>();
-        deniedList.addAll(deniedPermissions);
-        deniedList.addAll(permanentDeniedPermissions);
-        if (requestCallback != null) {
-            requestCallback.onResult(deniedList.isEmpty(), new ArrayList<>(grantedPermissions), deniedList);
+        notifyResult();
+    }
+
+    private void notifyResult() {
+        if (currentProcess.equals("requestNormalPermissions")) {
+            requestBackgroundLocationPermissions();
+        } else if (currentProcess.equals("requestBackgroundLocationPermissions")) {
+            List<String> deniedList = new ArrayList<>();
+            deniedList.addAll(deniedPermissions);
+            deniedList.addAll(permanentDeniedPermissions);
+            deniedList.addAll(permissionsWontRequest);
+            if (requestCallback != null) {
+                requestCallback.onResult(deniedList.isEmpty(), new ArrayList<>(grantedPermissions), deniedList);
+            }
         }
     }
 

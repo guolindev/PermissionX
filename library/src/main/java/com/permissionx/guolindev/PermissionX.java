@@ -22,6 +22,8 @@ import android.content.pm.PackageManager;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import com.permissionx.guolindev.request.PermissionCollection;
+
 /**
  * An open source Android library that makes handling runtime permissions extremely easy.
  *

@@ -1,11 +1,12 @@
 package com.permissionx.guolindev.callback;
 
-import com.permissionx.guolindev.ForwardScope;
+import com.permissionx.guolindev.request.ForwardScope;
+import com.permissionx.guolindev.request.PermissionBuilder;
 
 import java.util.List;
 
 /**
- * Callback for {@link com.permissionx.guolindev.PermissionBuilder#onForwardToSettings(ForwardToSettingsCallback)} method.
+ * Callback for {@link PermissionBuilder#onForwardToSettings(ForwardToSettingsCallback)} method.
  */
 public interface ForwardToSettingsCallback {
 

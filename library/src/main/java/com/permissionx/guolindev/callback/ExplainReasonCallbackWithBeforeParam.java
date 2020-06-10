@@ -1,12 +1,12 @@
 package com.permissionx.guolindev.callback;
 
-import com.permissionx.guolindev.ExplainScope;
-import com.permissionx.guolindev.PermissionBuilder;
+import com.permissionx.guolindev.request.ExplainScope;
+import com.permissionx.guolindev.request.PermissionBuilder;
 
 import java.util.List;
 
 /**
- * Callback for {@link com.permissionx.guolindev.PermissionBuilder#onExplainRequestReason(ExplainReasonCallbackWithBeforeParam)} method.
+ * Callback for {@link PermissionBuilder#onExplainRequestReason(ExplainReasonCallbackWithBeforeParam)} method.
  */
 public interface ExplainReasonCallbackWithBeforeParam {
 

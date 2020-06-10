@@ -1,4 +1,4 @@
-package com.permissionx.guolindev;
+package com.permissionx.guolindev.request;
 
 import java.util.List;
 
@@ -11,8 +11,11 @@ public class ForwardScope {
 
     private PermissionBuilder pb;
 
-    ForwardScope(PermissionBuilder pb) {
+    private ChainTask chainTask;
+
+    ForwardScope(PermissionBuilder pb, ChainTask chainTask) {
         this.pb = pb;
+        this.chainTask = chainTask;
     }
 
     /**
@@ -27,7 +30,7 @@ public class ForwardScope {
      *          Text on the negative button. When user click, PermissionX will finish request.
      */
     public void showForwardToSettingsDialog(List<String> permissions, String message, String positiveText, String negativeText) {
-        pb.showHandlePermissionDialog(false, permissions, message, positiveText, negativeText);
+        pb.showHandlePermissionDialog(chainTask, false, permissions, message, positiveText, negativeText);
     }
 
     /**
@@ -40,7 +43,7 @@ public class ForwardScope {
      *          Text on the positive button. When user click, PermissionX will forward to settings page of your app.
      */
     public void showForwardToSettingsDialog(List<String> permissions, String message, String positiveText) {
-        pb.showHandlePermissionDialog(false, permissions, message, positiveText, null);
+        showForwardToSettingsDialog(permissions, message, positiveText, null);
     }
 
 }

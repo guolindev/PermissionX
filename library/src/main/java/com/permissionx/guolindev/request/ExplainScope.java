@@ -1,4 +1,4 @@
-package com.permissionx.guolindev;
+package com.permissionx.guolindev.request;
 
 import java.util.List;
 
@@ -11,8 +11,11 @@ public class ExplainScope {
 
     private PermissionBuilder pb;
 
-    ExplainScope(PermissionBuilder pb) {
+    private ChainTask chainTask;
+
+    ExplainScope(PermissionBuilder pb, ChainTask chainTask) {
         this.pb = pb;
+        this.chainTask = chainTask;
     }
 
     /**
@@ -27,7 +30,7 @@ public class ExplainScope {
      *          Text on the negative button. When user click, PermissionX will finish request.
      */
     public void showRequestReasonDialog(List<String> permissions, String message, String positiveText, String negativeText) {
-        pb.showHandlePermissionDialog(true, permissions, message, positiveText, negativeText);
+        pb.showHandlePermissionDialog(chainTask, true, permissions, message, positiveText, negativeText);
     }
 
     /**

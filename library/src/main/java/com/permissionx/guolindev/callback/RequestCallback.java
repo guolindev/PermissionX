@@ -1,9 +1,11 @@
 package com.permissionx.guolindev.callback;
 
+import com.permissionx.guolindev.request.PermissionBuilder;
+
 import java.util.List;
 
 /**
- * Callback for {@link com.permissionx.guolindev.PermissionBuilder#request(RequestCallback)} method.
+ * Callback for {@link PermissionBuilder#request(RequestCallback)} method.
  */
 public interface RequestCallback {
 

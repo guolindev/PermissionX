@@ -20,14 +20,14 @@ class MainActivity : AppCompatActivity() {
                 .permissions(Manifest.permission.CAMERA, Manifest.permission.READ_CONTACTS, Manifest.permission.CALL_PHONE)
                 .explainReasonBeforeRequest()
                 .onExplainRequestReason { scope, deniedList, beforeRequest ->
-                    if (beforeRequest) {
+//                    if (beforeRequest) {
                         scope.showRequestReasonDialog(deniedList, "为了保证程序正常工作，请您同意以下权限申请", "我已明白")
-                    } else {
-                        val filteredList = deniedList.filter {
-                            it == Manifest.permission.CAMERA
-                        }
-                        scope.showRequestReasonDialog(filteredList, "摄像机权限是程序必须依赖的权限", "我已明白")
-                    }
+//                    } else {
+//                        val filteredList = deniedList.filter {
+//                            it == Manifest.permission.CAMERA
+//                        }
+//                        scope.showRequestReasonDialog(filteredList, "摄像机权限是程序必须依赖的权限", "我已明白")
+//                    }
                 }
                 .onForwardToSettings { scope, deniedList ->
                     scope.showForwardToSettingsDialog(deniedList, "您需要去应用程序设置当中手动开启权限", "我已明白")
