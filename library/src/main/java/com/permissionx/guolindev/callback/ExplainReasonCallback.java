@@ -7,6 +7,9 @@ import java.util.List;
 
 /**
  * Callback for {@link PermissionBuilder#onExplainRequestReason(ExplainReasonCallback)} method.
+ *
+ * @author guolin
+ * @since 2020/6/7
  */
 public interface ExplainReasonCallback {
 

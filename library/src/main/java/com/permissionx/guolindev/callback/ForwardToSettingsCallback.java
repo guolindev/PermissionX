@@ -7,6 +7,9 @@ import java.util.List;
 
 /**
  * Callback for {@link PermissionBuilder#onForwardToSettings(ForwardToSettingsCallback)} method.
+ *
+ * @author guolin
+ * @since 2020/6/7
  */
 public interface ForwardToSettingsCallback {
 

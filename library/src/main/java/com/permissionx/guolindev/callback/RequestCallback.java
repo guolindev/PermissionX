@@ -6,6 +6,9 @@ import java.util.List;
 
 /**
  * Callback for {@link PermissionBuilder#request(RequestCallback)} method.
+ *
+ * @author guolin
+ * @since 2020/6/7
  */
 public interface RequestCallback {
 

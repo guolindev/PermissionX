@@ -1,8 +1,6 @@
 package com.permissionx.guolindev.request;
 
-import android.Manifest;
 import android.content.Intent;
-import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -10,19 +8,30 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.permissionx.guolindev.PermissionX;
-import com.permissionx.guolindev.callback.ChainedRequestCallback;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static com.permissionx.guolindev.request.RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION;
+
+/**
+ * An invisible fragment to embedded into activity for handling permission requests.
+ * This is very lightweight. Will not affect your app's efficiency.
+ *
+ * @author guolin
+ * @since 2019/11/2
+ */
 public class InvisibleFragment extends Fragment {
 
     /**
-     * Code for request permissions.
+     * Code for request normal permissions.
      */
     public static final int REQUEST_NORMAL_PERMISSIONS = 1;
 
+    /**
+     * Code for request ACCESS_BACKGROUND_LOCATION permissions. This permissions can't be requested with others over Android R.
+     */
     public static final int REQUEST_BACKGROUND_LOCATION_PERMISSION = 2;
 
     /**
@@ -35,26 +44,34 @@ public class InvisibleFragment extends Fragment {
      */
     private PermissionBuilder pb;
 
-    private ChainedRequestCallback cb;
+    /**
+     * Instance of current task.
+     */
+    private ChainTask task;
 
     /**
      * Request permissions at once by calling {@link Fragment#requestPermissions(String[], int)}, and handle request result in {@link androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback}.
      *
      * @param permissionBuilder The instance of PermissionBuilder.
      * @param permissions       Permissions that you want to request.
+     * @param chainTask         Instance of current task.
      */
-    void requestNow(PermissionBuilder permissionBuilder, Set<String> permissions, ChainedRequestCallback callback) {
+    void requestNow(PermissionBuilder permissionBuilder, Set<String> permissions, ChainTask chainTask) {
         pb = permissionBuilder;
-        cb = callback;
+        task = chainTask;
         requestPermissions(permissions.toArray(new String[0]), REQUEST_NORMAL_PERMISSIONS);
     }
 
-    void requestBackgroundLocationPermissionNow(PermissionBuilder permissionBuilder, ChainedRequestCallback callback) {
+    /**
+     * Request ACCESS_BACKGROUND_LOCATION at once by calling {@link Fragment#requestPermissions(String[], int)}, and handle request result in {@link androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback}.
+     *
+     * @param permissionBuilder The instance of PermissionBuilder.
+     * @param chainTask         Instance of current task.
+     */
+    void requestAccessBackgroundLocationNow(PermissionBuilder permissionBuilder, ChainTask chainTask) {
         pb = permissionBuilder;
-        cb = callback;
-        if (Build.VERSION.SDK_INT >= 29) {
-            requestPermissions(new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, REQUEST_BACKGROUND_LOCATION_PERMISSION);
-        }
+        task = chainTask;
+        requestPermissions(new String[]{ ACCESS_BACKGROUND_LOCATION }, REQUEST_BACKGROUND_LOCATION_PERMISSION);
     }
 
     @Override
@@ -74,14 +91,17 @@ public class InvisibleFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == FORWARD_TO_SETTINGS) {
             // When user switch back from settings, just request again.
-            if (pb != null) { // On some phones, when switch back from settings, permissionBuilder may become null
-                pb.requestAgain(new ArrayList<>(pb.forwardPermissions));
+            if (task != null && pb != null) { // On some phones, when switch back from settings, permissionBuilder may become null
+                task.requestAgain(new ArrayList<>(pb.forwardPermissions));
             } else {
                 Log.w("PermissionX", "permissionBuilder should not be null at this time, so we can do nothing in this case.");
             }
         }
     }
 
+    /**
+     * Handle result of normal permissions request.
+     */
     private void onRequestNormalPermissionsResult() {
         // We can never holds granted permissions for safety, because user may turn some permissions off in settings.
         // So every time request, must request the already granted permissions again and refresh the granted permission set.
@@ -106,73 +126,73 @@ public class InvisibleFragment extends Fragment {
             }
         }
         boolean allGranted = pb.grantedPermissions.size() == pb.normalPermissions.size();
-        if (allGranted) { // If all permissions are granted, call ChainedRequestCallback directly.
-            cb.onResult();
+        if (allGranted) { // If all permissions are granted, finish current task directly.
+            task.finish();
         } else {
-            boolean goesToRequestCallback = true; // If there's need goes to ChainedRequestCallback
+            boolean shouldFinishTheTask = true; // Indicate if we should finish the task
             // If explainReasonCallback is not null and there're denied permissions. Try the ExplainReasonCallback.
             if ((pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) && !pb.deniedPermissions.isEmpty()) {
-                goesToRequestCallback = false; // No need cause ExplainReasonCallback handles it
+                shouldFinishTheTask = false; // shouldn't because ExplainReasonCallback handles it
                 if (pb.explainReasonCallbackWithBeforeParam != null) {
                     // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
-                    pb.explainReasonCallbackWithBeforeParam.onExplainReason(cb.getExplainScope(), new ArrayList<>(pb.deniedPermissions), false);
+                    pb.explainReasonCallbackWithBeforeParam.onExplainReason(task.getExplainScope(), new ArrayList<>(pb.deniedPermissions), false);
                 } else {
-                    pb.explainReasonCallback.onExplainReason(cb.getExplainScope(), new ArrayList<>(pb.deniedPermissions));
+                    pb.explainReasonCallback.onExplainReason(task.getExplainScope(), new ArrayList<>(pb.deniedPermissions));
                 }
             }
             // If forwardToSettingsCallback is not null and there're permanently denied permissions. Try the ForwardToSettingsCallback.
             else if (pb.forwardToSettingsCallback != null && !pb.permanentDeniedPermissions.isEmpty()) {
-                goesToRequestCallback = false; // No need cause ForwardToSettingsCallback handles it
-                pb.forwardToSettingsCallback.onForwardToSettings(cb.getForwardScope(), new ArrayList<>(pb.permanentDeniedPermissions));
+                shouldFinishTheTask = false; // shouldn't because ForwardToSettingsCallback handles it
+                pb.forwardToSettingsCallback.onForwardToSettings(task.getForwardScope(), new ArrayList<>(pb.permanentDeniedPermissions));
             }
-            // If showRequestReasonDialog or showForwardToSettingsDialog is not called. Try the ChainedRequestCallback.
+            // If showRequestReasonDialog or showForwardToSettingsDialog is not called. We should finish the task.
             // There's case that ExplainReasonCallback or ForwardToSettingsCallback is called, but developer didn't invoke
             // showRequestReasonDialog or showForwardToSettingsDialog in the callback.
-            // At this case and all other cases, ChainedRequestCallback will be called.
-            if (goesToRequestCallback || !pb.showDialogCalled) {
-                cb.onResult();
+            // At this case and all other cases, task should be finished.
+            if (shouldFinishTheTask || !pb.showDialogCalled) {
+                task.finish();
             }
         }
     }
 
+    /**
+     * Handle result of ACCESS_BACKGROUND_LOCATION permission request.
+     */
     private void onRequestBackgroundLocationPermissionResult() {
-        if (Build.VERSION.SDK_INT >= 29) {
-            String accessBackgroundLocation = Manifest.permission.ACCESS_BACKGROUND_LOCATION;
-            if (PermissionX.isGranted(getContext(), accessBackgroundLocation)) {
-                pb.grantedPermissions.add(accessBackgroundLocation);
-                // Remove granted permissions from deniedPermissions and permanentDeniedPermissions set in PermissionBuilder.
-                pb.deniedPermissions.remove(accessBackgroundLocation);
-                pb.permanentDeniedPermissions.remove(accessBackgroundLocation);
-                cb.onResult();
-            } else {
-                boolean goesToRequestCallback = true; // If there's need goes to RequestCallback
-                boolean shouldShowRationale = shouldShowRequestPermissionRationale(accessBackgroundLocation);
-                // If explainReasonCallback is not null and there're denied permissions. Try the ExplainReasonCallback.
-                if ((pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) && shouldShowRationale) {
-                    goesToRequestCallback = false; // No need cause ExplainReasonCallback handles it
-                    List<String> permissionsToExplain = new ArrayList<>();
-                    permissionsToExplain.add(accessBackgroundLocation);
-                    if (pb.explainReasonCallbackWithBeforeParam != null) {
-                        // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
-                        pb.explainReasonCallbackWithBeforeParam.onExplainReason(cb.getExplainScope(), permissionsToExplain, false);
-                    } else {
-                        pb.explainReasonCallback.onExplainReason(cb.getExplainScope(), permissionsToExplain);
-                    }
+        if (PermissionX.isGranted(getContext(), ACCESS_BACKGROUND_LOCATION)) {
+            pb.grantedPermissions.add(ACCESS_BACKGROUND_LOCATION);
+            // Remove granted permissions from deniedPermissions and permanentDeniedPermissions set in PermissionBuilder.
+            pb.deniedPermissions.remove(ACCESS_BACKGROUND_LOCATION);
+            pb.permanentDeniedPermissions.remove(ACCESS_BACKGROUND_LOCATION);
+            task.finish();
+        } else {
+            boolean goesToRequestCallback = true; // Indicate if we should finish the task
+            boolean shouldShowRationale = shouldShowRequestPermissionRationale(ACCESS_BACKGROUND_LOCATION);
+            // If explainReasonCallback is not null and we should show rationale. Try the ExplainReasonCallback.
+            if ((pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) && shouldShowRationale) {
+                goesToRequestCallback = false; // shouldn't because ExplainReasonCallback handles it
+                List<String> permissionsToExplain = new ArrayList<>();
+                permissionsToExplain.add(ACCESS_BACKGROUND_LOCATION);
+                if (pb.explainReasonCallbackWithBeforeParam != null) {
+                    // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
+                    pb.explainReasonCallbackWithBeforeParam.onExplainReason(task.getExplainScope(), permissionsToExplain, false);
+                } else {
+                    pb.explainReasonCallback.onExplainReason(task.getExplainScope(), permissionsToExplain);
                 }
-                // If forwardToSettingsCallback is not null and there're permanently denied permissions. Try the ForwardToSettingsCallback.
-                else if (pb.forwardToSettingsCallback != null && !pb.permanentDeniedPermissions.isEmpty()) {
-                    goesToRequestCallback = false; // No need cause ForwardToSettingsCallback handles it
-                    List<String> permissionsToForward = new ArrayList<>();
-                    permissionsToForward.add(accessBackgroundLocation);
-                    pb.forwardToSettingsCallback.onForwardToSettings(cb.getForwardScope(), permissionsToForward);
-                }
-                // If showRequestReasonDialog or showForwardToSettingsDialog is not called. Try the RequestCallback.
-                // There's case that ExplainReasonCallback or ForwardToSettingsCallback is called, but developer didn't invoke
-                // showRequestReasonDialog or showForwardToSettingsDialog in the callback.
-                // At this case and all other cases, RequestCallback will be called.
-                if (goesToRequestCallback || !pb.showDialogCalled) {
-                    cb.onResult();
-                }
+            }
+            // If forwardToSettingsCallback is not null and we shouldn't show rationale. Try the ForwardToSettingsCallback.
+            else if (pb.forwardToSettingsCallback != null && !shouldShowRationale) {
+                goesToRequestCallback = false; // shouldn't because ForwardToSettingsCallback handles it
+                List<String> permissionsToForward = new ArrayList<>();
+                permissionsToForward.add(ACCESS_BACKGROUND_LOCATION);
+                pb.forwardToSettingsCallback.onForwardToSettings(task.getForwardScope(), permissionsToForward);
+            }
+            // If showRequestReasonDialog or showForwardToSettingsDialog is not called. We should finish the task.
+            // There's case that ExplainReasonCallback or ForwardToSettingsCallback is called, but developer didn't invoke
+            // showRequestReasonDialog or showForwardToSettingsDialog in the callback.
+            // At this case and all other cases, task should be finished.
+            if (goesToRequestCallback || !pb.showDialogCalled) {
+                task.finish();
             }
         }
     }

@@ -1,57 +1,43 @@
 package com.permissionx.guolindev.request;
 
-import com.permissionx.guolindev.callback.ChainedRequestCallback;
-
-import java.util.ArrayList;
 import java.util.List;
 
-abstract class ChainTask implements ChainedRequestCallback {
-
-    protected ChainTask next;
-
-    protected PermissionBuilder pb;
+/**
+ * Define a task interface to request permissions.
+ * Not all permissions can be requested at one time. Some permissions need to request separately.
+ * So each permission request need to implement this interface, and do the request logic in their implementations.
+ *
+ * @author guolin
+ * @since 2020/6/10
+ */
+public interface ChainTask {
 
     /**
-     * Provide specific scopes for explainReasonCallback for specific functions to call.
+     * Get the ExplainScope for showing RequestReasonDialog.
+     * @return Instance of ExplainScope.
      */
-    ExplainScope explainReasonScope;
+    ExplainScope getExplainScope();
 
     /**
-     * Provide specific scopes for forwardToSettingsCallback for specific functions to call.
+     * Get the ForwardScope for showing ForwardToSettingsDialog.
+     * @return Instance of ForwardScope.
      */
-    ForwardScope forwardToSettingsScope ;
+    ForwardScope getForwardScope();
 
-    ChainTask(PermissionBuilder permissionBuilder) {
-        pb = permissionBuilder;
-        explainReasonScope = new ExplainScope(pb, this);
-        forwardToSettingsScope = new ForwardScope(pb, this);
-    }
+    /**
+     * Do the request logic.
+     */
+    void request();
 
-    @Override
-    public ExplainScope getExplainScope() {
-        return explainReasonScope;
-    }
+    /**
+     * Request permissions again when user denied.
+     * @param permissions
+     *          Permissions to request again.
+     */
+    void requestAgain(List<String> permissions);
 
-    @Override
-    public ForwardScope getForwardScope() {
-        return forwardToSettingsScope;
-    }
-
-    @Override
-    public void onResult() {
-        if (next != null) {
-            next.onRequest();
-        } else {
-            List<String> deniedList = new ArrayList<>();
-            deniedList.addAll(pb.deniedPermissions);
-            deniedList.addAll(pb.permanentDeniedPermissions);
-            deniedList.addAll(pb.permissionsWontRequest);
-            if (pb.requestCallback != null) {
-                pb.requestCallback.onResult(deniedList.isEmpty(), new ArrayList<>(pb.grantedPermissions), deniedList);
-            }
-        }
-    }
-
-    abstract void onRequest();
-
+    /**
+     * Finish this task and notify the request result.
+     */
+    void finish();
 }
