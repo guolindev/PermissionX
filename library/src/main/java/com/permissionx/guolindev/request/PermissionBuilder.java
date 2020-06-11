@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-
 package com.permissionx.guolindev.request;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -207,6 +207,10 @@ public class PermissionBuilder {
      */
     void showHandlePermissionDialog(final ChainTask chainTask, final boolean showReasonOrGoSettings, final List<String> permissions, String message, String positiveText, String negativeText) {
         showDialogCalled = true;
+        if (permissions == null || permissions.isEmpty()) {
+            chainTask.finish();
+            return;
+        }
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setMessage(message);
         builder.setCancelable(!TextUtils.isEmpty(negativeText));
@@ -228,7 +232,9 @@ public class PermissionBuilder {
                 }
             });
         }
-        builder.show();
+        Dialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
     }
 
     /**

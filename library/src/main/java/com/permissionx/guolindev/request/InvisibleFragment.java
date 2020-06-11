@@ -1,6 +1,23 @@
+/*
+ * Copyright (C)  guolin, PermissionX Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.permissionx.guolindev.request;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -77,7 +94,7 @@ public class InvisibleFragment extends Fragment {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_NORMAL_PERMISSIONS) {
-            onRequestNormalPermissionsResult();
+            onRequestNormalPermissionsResult(permissions, grantResults);
         } else if (requestCode == REQUEST_BACKGROUND_LOCATION_PERMISSION) {
             onRequestBackgroundLocationPermissionResult();
         }
@@ -102,12 +119,15 @@ public class InvisibleFragment extends Fragment {
     /**
      * Handle result of normal permissions request.
      */
-    private void onRequestNormalPermissionsResult() {
+    private void onRequestNormalPermissionsResult(@NonNull String[] permissions, @NonNull int[] grantResults) {
         // We can never holds granted permissions for safety, because user may turn some permissions off in settings.
         // So every time request, must request the already granted permissions again and refresh the granted permission set.
         pb.grantedPermissions.clear();
-        for (String permission : pb.normalPermissions) {
-            if (PermissionX.isGranted(getContext(), permission)) {
+        List<String> showReasonList = new ArrayList<>(); // holds denied permissions in the request permissions.
+        List<String> forwardList = new ArrayList<>(); // hold permanently denied permissions in the request permissions.
+        for (int i = 0; i < permissions.length; i++) {
+            String permission = permissions[i];
+            if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
                 pb.grantedPermissions.add(permission);
                 // Remove granted permissions from deniedPermissions and permanentDeniedPermissions set in PermissionBuilder.
                 pb.deniedPermissions.remove(permission);
@@ -116,13 +136,25 @@ public class InvisibleFragment extends Fragment {
                 // Denied permission can turn into permanent denied permissions, but permanent denied permission can not turn into denied permissions.
                 boolean shouldShowRationale = shouldShowRequestPermissionRationale(permission);
                 if (shouldShowRationale) {
+                    showReasonList.add(permissions[i]);
                     pb.deniedPermissions.add(permission);
                     // So there's no need to remove the current permission from permanentDeniedPermissions because it won't be there.
                 } else {
+                    forwardList.add(permissions[i]);
                     pb.permanentDeniedPermissions.add(permission);
                     // We must remove the current permission from deniedPermissions because it is permanent denied permission now.
                     pb.deniedPermissions.remove(permission);
                 }
+            }
+        }
+        List<String> deniedPermissions = new ArrayList<>();
+        deniedPermissions.addAll(pb.deniedPermissions);
+        deniedPermissions.addAll(pb.permanentDeniedPermissions);
+        // maybe user can turn some permissions on in settings that we didn't request, so check the denied permissions again for safety.
+        for (String permission : deniedPermissions) {
+            if (PermissionX.isGranted(getContext(), permission)) {
+                pb.deniedPermissions.remove(permission);
+                pb.grantedPermissions.add(permission);
             }
         }
         boolean allGranted = pb.grantedPermissions.size() == pb.normalPermissions.size();
@@ -131,7 +163,7 @@ public class InvisibleFragment extends Fragment {
         } else {
             boolean shouldFinishTheTask = true; // Indicate if we should finish the task
             // If explainReasonCallback is not null and there're denied permissions. Try the ExplainReasonCallback.
-            if ((pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) && !pb.deniedPermissions.isEmpty()) {
+            if ((pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) && !showReasonList.isEmpty()) {
                 shouldFinishTheTask = false; // shouldn't because ExplainReasonCallback handles it
                 if (pb.explainReasonCallbackWithBeforeParam != null) {
                     // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
@@ -141,7 +173,7 @@ public class InvisibleFragment extends Fragment {
                 }
             }
             // If forwardToSettingsCallback is not null and there're permanently denied permissions. Try the ForwardToSettingsCallback.
-            else if (pb.forwardToSettingsCallback != null && !pb.permanentDeniedPermissions.isEmpty()) {
+            else if (pb.forwardToSettingsCallback != null && !forwardList.isEmpty()) {
                 shouldFinishTheTask = false; // shouldn't because ForwardToSettingsCallback handles it
                 pb.forwardToSettingsCallback.onForwardToSettings(task.getForwardScope(), new ArrayList<>(pb.permanentDeniedPermissions));
             }
