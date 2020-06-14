@@ -48,6 +48,7 @@ public class PermissionCollection {
     /**
      * All permissions that you want to request.
      * @param permissions A vararg param to pass permissions.
+     * @return PermissionBuilder itself.
      */
     public PermissionBuilder permissions(String... permissions)  {
         return permissions(new ArrayList<>(Arrays.asList(permissions)));
@@ -56,6 +57,7 @@ public class PermissionCollection {
     /**
      * All permissions that you want to request.
      * @param permissions A vararg param to pass permissions.
+     * @return PermissionBuilder itself.
      */
     public PermissionBuilder permissions(List<String> permissions)  {
         Set<String> permissionSet = new HashSet<>(permissions);

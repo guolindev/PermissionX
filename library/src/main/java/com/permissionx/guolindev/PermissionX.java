@@ -43,6 +43,7 @@ public class PermissionX {
      * Init PermissionX to make everything prepare to work.
      *
      * @param activity An instance of FragmentActivity
+     * @return PermissionCollection instance.
      */
     public static PermissionCollection init(FragmentActivity activity) {
         return new PermissionCollection(activity);

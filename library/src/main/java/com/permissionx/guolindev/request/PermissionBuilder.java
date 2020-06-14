@@ -136,6 +136,7 @@ public class PermissionBuilder {
      * If you chained {@link #explainReasonBeforeRequest()}, this method might run before permission request.
      *
      * @param callback Callback with permissions denied by user.
+     * @return PermissionBuilder itself.
      */
     public PermissionBuilder onExplainRequestReason(ExplainReasonCallback callback) {
         explainReasonCallback = callback;
@@ -149,6 +150,7 @@ public class PermissionBuilder {
      * beforeRequest param would tell you this method is currently before or after permission request.
      *
      * @param callback Callback with permissions denied by user.
+     * @return PermissionBuilder itself.
      */
     public PermissionBuilder onExplainRequestReason(ExplainReasonCallbackWithBeforeParam callback) {
         explainReasonCallbackWithBeforeParam = callback;
@@ -162,6 +164,7 @@ public class PermissionBuilder {
      * If {@link #onExplainRequestReason(ExplainReasonCallback)} is called, this method will not be called in the same request time.
      *
      * @param callback Callback with permissions denied and checked never ask again by user.
+     * @return PermissionBuilder itself.
      */
     public PermissionBuilder onForwardToSettings(ForwardToSettingsCallback callback) {
         forwardToSettingsCallback = callback;
@@ -171,6 +174,8 @@ public class PermissionBuilder {
     /**
      * If you need to show request permission rationale, chain this method in your request syntax.
      * {@link #onExplainRequestReason(ExplainReasonCallback)} will be called before permission request.
+     *
+     * @return PermissionBuilder itself.
      */
     public PermissionBuilder explainReasonBeforeRequest() {
         explainReasonBeforeRequest = true;
