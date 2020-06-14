@@ -1,11 +1,11 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
 
@@ -27,5 +27,24 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-
 }
+
+//apply plugin: 'com.novoda.bintray-release'
+//
+//buildscript {
+//    repositories {
+//        jcenter()
+//    }
+//    dependencies {
+//        classpath 'com.novoda:bintray-release:0.9.1'
+//    }
+//}
+//
+//publish {
+//    userOrg = 'guolindev'
+//    groupId = 'com.permissionx.guolindev'
+//    artifactId = 'permission-support'
+//    publishVersion = '1.1.2'
+//    desc = 'Make Android runtime permission request easy.'
+//    website = 'https://github.com/guolindev/PermissionX'
+//}

@@ -17,8 +17,7 @@
 package com.permissionx.guolindev;
 
 import android.os.Build;
-
-import androidx.fragment.app.FragmentActivity;
+import android.support.v4.app.FragmentActivity;
 
 import com.permissionx.guolindev.request.PermissionBuilder;
 
