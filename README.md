@@ -10,7 +10,7 @@ Edit your build.gradle file and add below dependency.
 
 ```groovy
 dependencies {
-    implementation 'com.permissionx.guolindev:permissionx:1.1.1'
+    implementation 'com.permissionx.guolindev:permissionx:1.2.2'
 }
 ```
 
@@ -64,8 +64,8 @@ To simplify this process, PermissionX provide **onExplainRequestReason** method.
 ```kotlin
 PermissionX.init(activity)
     .permissions(Manifest.permission.READ_CONTACTS, Manifest.permission.CAMERA, Manifest.permission.CALL_PHONE)
-    .onExplainRequestReason { deniedList ->
-        showRequestReasonDialog(deniedList, "Core fundamental are based on these permissions", "OK", "Cancel")
+    .onExplainRequestReason { scope, deniedList ->
+        scope.showRequestReasonDialog(deniedList, "Core fundamental are based on these permissions", "OK", "Cancel")
     }
     .request { allGranted, grantedList, deniedList ->
         if (allGranted) {
@@ -89,11 +89,11 @@ PermissionX provide **onForwardToSettings** method for handling this occasion. C
 ```kotlin
 PermissionX.init(activity)
     .permissions(Manifest.permission.READ_CONTACTS, Manifest.permission.CAMERA, Manifest.permission.CALL_PHONE)
-    .onExplainRequestReason { deniedList ->
-        showRequestReasonDialog(deniedList, "Core fundamental are based on these permissions", "OK", "Cancel")
+    .onExplainRequestReason { scope, deniedList ->
+        scope.showRequestReasonDialog(deniedList, "Core fundamental are based on these permissions", "OK", "Cancel")
     }
-    .onForwardToSettings { deniedList ->
-        showForwardToSettingsDialog(deniedList, "You need to allow necessary permissions in Settings manually", "OK", "Cancel")
+    .onForwardToSettings { scope, deniedList ->
+        scope.showForwardToSettingsDialog(deniedList, "You need to allow necessary permissions in Settings manually", "OK", "Cancel")
     }
     .request { allGranted, grantedList, deniedList ->
         if (allGranted) {
@@ -114,11 +114,11 @@ One more thing. If you want to show rationale dialog before request which might 
 PermissionX.init(activity)
     .permissions(Manifest.permission.READ_CONTACTS, Manifest.permission.CAMERA, Manifest.permission.CALL_PHONE)
 	.explainReasonBeforeRequest()
-    .onExplainRequestReason { deniedList ->
-        showRequestReasonDialog(deniedList, "Core fundamental are based on these permissions", "OK", "Cancel")
+    .onExplainRequestReason { scope, deniedList ->
+        scope.showRequestReasonDialog(deniedList, "Core fundamental are based on these permissions", "OK", "Cancel")
     }
-    .onForwardToSettings { deniedList ->
-        showForwardToSettingsDialog(deniedList, "You need to allow these permissions in Settings $deniedList", "OK", "Cancel")
+    .onForwardToSettings { scope, deniedList ->
+        scope.showForwardToSettingsDialog(deniedList, "You need to allow these permissions in Settings $deniedList", "OK", "Cancel")
     }
     .request { allGranted, grantedList, deniedList ->
         if (allGranted) {
@@ -135,7 +135,7 @@ If your app is still not ready for AndroidX, you need to use Permission-Support 
 
 ```groovy
 dependencies {
-    implementation 'com.permissionx.guolindev:permission-support:1.1.1'
+    implementation 'com.permissionx.guolindev:permission-support:1.2.2'
 }
 ```
 
