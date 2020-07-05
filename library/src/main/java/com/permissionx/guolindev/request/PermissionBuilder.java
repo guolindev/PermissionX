@@ -23,7 +23,10 @@ import android.content.Intent;
 import android.net.Uri;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -248,6 +251,47 @@ public class PermissionBuilder {
             });
         }
         Dialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+    }
+
+    /**
+     * This method is internal, and should not be called by developer.
+     * <p>
+     * Show a dialog to user and  explain why these permissions are necessary.
+     *
+     * @param chainTask Instance of current task.
+     * @param showReasonOrGoSettings Indicates should show explain reason or forward to Settings.
+     * @param permissions            Permissions to request again.
+     * @param dialog                 Dialog to explain to user why these permissions are necessary.
+     * @param positiveButton         Positive button on the dialog to request again.
+     * @param negativeButton         Negative button to finish request. Maybe null if this dialog should not be canceled.
+     */
+    void showHandlePermissionDialog(final ChainTask chainTask, final boolean showReasonOrGoSettings, final List<String> permissions, @NonNull Dialog dialog, @NonNull View positiveButton, @Nullable View negativeButton) {
+        showDialogCalled = true;
+        if (permissions == null || permissions.isEmpty()) {
+            chainTask.finish();
+            return;
+        }
+        positiveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (showReasonOrGoSettings) {
+                    chainTask.requestAgain(permissions);
+                } else {
+                    forwardToSettings(permissions);
+                }
+            }
+        });
+        if (negativeButton != null) {
+            negativeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    chainTask.finish();
+                }
+            });
+        }
+        dialog.setCancelable(negativeButton != null);
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
     }
