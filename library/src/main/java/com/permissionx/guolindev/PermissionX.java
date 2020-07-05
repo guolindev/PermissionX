@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
 /**
@@ -47,6 +48,16 @@ public class PermissionX {
      */
     public static PermissionCollection init(FragmentActivity activity) {
         return new PermissionCollection(activity);
+    }
+
+    /**
+     * Init PermissionX to make everything prepare to work.
+     *
+     * @param fragment An instance of Fragment
+     * @return PermissionCollection instance.
+     */
+    public static PermissionCollection init(Fragment fragment) {
+        return new PermissionCollection(fragment);
     }
 
     /**

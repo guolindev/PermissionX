@@ -3,11 +3,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <fragment
-        android:id="@+id/mainFragment"
-        android:name="com.permissionx.app.MainFragment"
+    <Button
+        android:id="@+id/makeCallBtn"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+        android:layout_height="wrap_content"
+        android:text="Make Call1" />
 
 </LinearLayout>

@@ -56,6 +56,11 @@ public class PermissionBuilder {
     FragmentActivity activity;
 
     /**
+     * Instance of fragment for everything as an alternative choice for activity.
+     */
+    Fragment fragment;
+
+    /**
      * Normal runtime permissions that app want to request.
      */
     Set<String> normalPermissions;
@@ -123,8 +128,13 @@ public class PermissionBuilder {
      */
     ForwardToSettingsCallback forwardToSettingsCallback;
 
-    public PermissionBuilder(FragmentActivity activity, Set<String> normalPermissions, boolean requireBackgroundLocationPermission, Set<String> permissionsWontRequest) {
+    public PermissionBuilder(FragmentActivity activity, Fragment fragment, Set<String> normalPermissions, boolean requireBackgroundLocationPermission, Set<String> permissionsWontRequest) {
+        // activity and fragment must not be null at same time
         this.activity = activity;
+        this.fragment = fragment;
+        if (activity == null && fragment != null) {
+            this.activity = fragment.getActivity();
+        }
         this.normalPermissions = normalPermissions;
         this.requireBackgroundLocationPermission = requireBackgroundLocationPermission;
         this.permissionsWontRequest = permissionsWontRequest;
@@ -266,13 +276,18 @@ public class PermissionBuilder {
      * Don't worry. This is very lightweight.
      */
     private InvisibleFragment getInvisibleFragment() {
-        FragmentManager fragmentManager = activity.getSupportFragmentManager();
+        FragmentManager fragmentManager;
+        if (fragment != null) {
+            fragmentManager = fragment.getChildFragmentManager();
+        } else {
+            fragmentManager = activity.getSupportFragmentManager();
+        }
         Fragment existedFragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG);
         if (existedFragment != null) {
             return (InvisibleFragment) existedFragment;
         } else {
             InvisibleFragment invisibleFragment = new InvisibleFragment();
-            fragmentManager.beginTransaction().add(invisibleFragment, FRAGMENT_TAG).commitNow();
+            fragmentManager.beginTransaction().add(invisibleFragment, FRAGMENT_TAG).commitNowAllowingStateLoss();
             return invisibleFragment;
         }
     }
