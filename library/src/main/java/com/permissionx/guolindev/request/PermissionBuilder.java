@@ -273,6 +273,7 @@ public class PermissionBuilder {
             chainTask.finish();
             return;
         }
+        positiveButton.setClickable(true);
         positiveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -284,6 +285,7 @@ public class PermissionBuilder {
             }
         });
         if (negativeButton != null) {
+            negativeButton.setClickable(true);
             negativeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
