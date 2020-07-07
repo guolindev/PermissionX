@@ -16,8 +16,9 @@
 
 package com.permissionx.guolindev.request;
 
-import android.app.Dialog;
-import android.view.View;
+import androidx.annotation.NonNull;
+
+import com.permissionx.guolindev.RationaleDialog;
 
 import java.util.List;
 
@@ -71,26 +72,9 @@ public class ExplainScope {
      *          Permissions that to request.
      * @param dialog
      *          Dialog to explain to user why these permissions are necessary.
-     * @param positiveButton
-     *          Positive button on the dialog. When user click, PermissionX will request permissions again.
-     * @param negativeButton
-     *          Negative button on the dialog. When user click, PermissionX will finish request.
      */
-    public void showRequestReasonDialog(List<String> permissions, Dialog dialog, View positiveButton, View negativeButton) {
-        pb.showHandlePermissionDialog(chainTask, true, permissions, dialog, positiveButton, negativeButton);
-    }
-
-    /**
-     * Show a rationale dialog to explain to user why you need these permissions.
-     * @param permissions
-     *          Permissions that to request.
-     * @param dialog
-     *          Dialog to explain to user why these permissions are necessary.
-     * @param positiveButton
-     *          Positive button on the dialog. When user click, PermissionX will request permissions again.
-     */
-    public void showRequestReasonDialog(List<String> permissions, Dialog dialog, View positiveButton) {
-        showRequestReasonDialog(permissions, dialog, positiveButton, null);
+    public void showRequestReasonDialog(List<String> permissions, @NonNull RationaleDialog dialog) {
+        pb.showHandlePermissionDialog(chainTask, true, permissions, dialog);
     }
 
 }

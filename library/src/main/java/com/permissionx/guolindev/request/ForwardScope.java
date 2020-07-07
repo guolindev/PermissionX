@@ -19,6 +19,11 @@ package com.permissionx.guolindev.request;
 import android.app.Dialog;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.permissionx.guolindev.RationaleDialog;
+
 import java.util.List;
 
 /**
@@ -71,26 +76,8 @@ public class ForwardScope {
      *          Permissions that to request.
      * @param dialog
      *          Dialog to explain to user why these permissions are necessary.
-     * @param positiveButton
-     *          Positive button on the dialog. When user click, PermissionX will forward to settings page of your app.
-     * @param negativeButton
-     *          Negative button on the dialog. When user click, PermissionX will finish request.
      */
-    public void showForwardToSettingsDialog(List<String> permissions, Dialog dialog, View positiveButton, View negativeButton) {
-        pb.showHandlePermissionDialog(chainTask, false, permissions, dialog, positiveButton, negativeButton);
+    public void showForwardToSettingsDialog(List<String> permissions, @NonNull RationaleDialog dialog) {
+        pb.showHandlePermissionDialog(chainTask, false, permissions, dialog);
     }
-
-    /**
-     * Show a rationale dialog to tell user to allow these permissions in settings.
-     * @param permissions
-     *          Permissions that to request.
-     * @param dialog
-     *          Dialog to explain to user why these permissions are necessary.
-     * @param positiveButton
-     *          Positive button on the dialog. When user click, PermissionX will forward to settings page of your app.
-     */
-    public void showForwardToSettingsDialog(List<String> permissions, Dialog dialog, View positiveButton) {
-        showForwardToSettingsDialog(permissions, dialog, positiveButton, null);
-    }
-
 }
