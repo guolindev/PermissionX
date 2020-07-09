@@ -265,7 +265,7 @@ public class PermissionBuilder {
      */
     void showHandlePermissionDialog(final ChainTask chainTask, final boolean showReasonOrGoSettings, @NonNull final RationaleDialog dialog) {
         showDialogCalled = true;
-        final List<String> permissions = dialog.permissions;
+        final List<String> permissions = dialog.getPermissions();
         if (permissions == null || permissions.isEmpty()) {
             chainTask.finish();
             return;

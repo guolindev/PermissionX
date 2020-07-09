@@ -34,24 +34,16 @@ import java.util.List;
  */
 public abstract class RationaleDialog extends Dialog {
 
-    /**
-     * Permissions to request.
-     */
-    protected final List<String> permissions;
-
-    public RationaleDialog(List<String> permissions, @NonNull Context context) {
+    public RationaleDialog(@NonNull Context context) {
         super(context);
-        this.permissions = permissions;
     }
 
-    public RationaleDialog(List<String> permissions, @NonNull Context context, int themeResId) {
+    public RationaleDialog(@NonNull Context context, int themeResId) {
         super(context, themeResId);
-        this.permissions = permissions;
     }
 
-    protected RationaleDialog(List<String> permissions, @NonNull Context context, boolean cancelable, @Nullable OnCancelListener cancelListener) {
+    protected RationaleDialog(@NonNull Context context, boolean cancelable, @Nullable OnCancelListener cancelListener) {
         super(context, cancelable, cancelListener);
-        this.permissions = permissions;
     }
 
     /**
@@ -67,5 +59,11 @@ public abstract class RationaleDialog extends Dialog {
      * @return The instance of positive button on the dialog, or null if your dialog has no negative button.
      */
     abstract public @Nullable View getNegativeButton();
+
+    /**
+     * Provide permissions to request. These permissions should be the ones that shows on your rationale dialog.
+     * @return Permissions list to request.
+     */
+    abstract public List<String> getPermissions();
 
 }
