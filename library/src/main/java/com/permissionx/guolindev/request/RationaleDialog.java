@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.permissionx.guolindev;
+package com.permissionx.guolindev.request;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -22,6 +22,8 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import java.util.List;
 
 /**
  *  Base Dialog class to inherits to display a rationale dialog and show user why you need the permissions that you asked.
@@ -32,16 +34,24 @@ import androidx.annotation.Nullable;
  */
 public abstract class RationaleDialog extends Dialog {
 
-    public RationaleDialog(@NonNull Context context) {
+    /**
+     * Permissions to request.
+     */
+    protected final List<String> permissions;
+
+    public RationaleDialog(List<String> permissions, @NonNull Context context) {
         super(context);
+        this.permissions = permissions;
     }
 
-    public RationaleDialog(@NonNull Context context, int themeResId) {
+    public RationaleDialog(List<String> permissions, @NonNull Context context, int themeResId) {
         super(context, themeResId);
+        this.permissions = permissions;
     }
 
-    protected RationaleDialog(@NonNull Context context, boolean cancelable, @Nullable OnCancelListener cancelListener) {
+    protected RationaleDialog(List<String> permissions, @NonNull Context context, boolean cancelable, @Nullable OnCancelListener cancelListener) {
         super(context, cancelable, cancelListener);
+        this.permissions = permissions;
     }
 
     /**

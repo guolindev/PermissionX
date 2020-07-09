@@ -30,7 +30,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
-import com.permissionx.guolindev.RationaleDialog;
 import com.permissionx.guolindev.callback.ExplainReasonCallback;
 import com.permissionx.guolindev.callback.ExplainReasonCallbackWithBeforeParam;
 import com.permissionx.guolindev.callback.ForwardToSettingsCallback;
@@ -262,11 +261,11 @@ public class PermissionBuilder {
      *
      * @param chainTask              Instance of current task.
      * @param showReasonOrGoSettings Indicates should show explain reason or forward to Settings.
-     * @param permissions            Permissions to request again.
      * @param dialog                 Dialog to explain to user why these permissions are necessary.
      */
-    void showHandlePermissionDialog(final ChainTask chainTask, final boolean showReasonOrGoSettings, final List<String> permissions, @NonNull final RationaleDialog dialog) {
+    void showHandlePermissionDialog(final ChainTask chainTask, final boolean showReasonOrGoSettings, @NonNull final RationaleDialog dialog) {
         showDialogCalled = true;
+        final List<String> permissions = dialog.permissions;
         if (permissions == null || permissions.isEmpty()) {
             chainTask.finish();
             return;

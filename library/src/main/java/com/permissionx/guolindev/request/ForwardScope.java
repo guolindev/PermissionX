@@ -16,13 +16,7 @@
 
 package com.permissionx.guolindev.request;
 
-import android.app.Dialog;
-import android.view.View;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import com.permissionx.guolindev.RationaleDialog;
 
 import java.util.List;
 
@@ -72,12 +66,10 @@ public class ForwardScope {
 
     /**
      * Show a rationale dialog to tell user to allow these permissions in settings.
-     * @param permissions
-     *          Permissions that to request.
      * @param dialog
      *          Dialog to explain to user why these permissions are necessary.
      */
-    public void showForwardToSettingsDialog(List<String> permissions, @NonNull RationaleDialog dialog) {
-        pb.showHandlePermissionDialog(chainTask, false, permissions, dialog);
+    public void showForwardToSettingsDialog(@NonNull RationaleDialog dialog) {
+        pb.showHandlePermissionDialog(chainTask, false, dialog);
     }
 }
