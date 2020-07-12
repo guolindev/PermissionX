@@ -72,7 +72,12 @@ public class PermissionCollection {
         Set<String> permissionsWontRequest = new HashSet<>();
         if (permissionSet.contains(ACCESS_BACKGROUND_LOCATION)) {
             int osVersion = Build.VERSION.SDK_INT;
-            int targetSdkVersion = activity.getApplicationInfo().targetSdkVersion;
+            int targetSdkVersion;
+            if (fragment != null && fragment.getContext() != null) {
+                targetSdkVersion = fragment.getContext().getApplicationInfo().targetSdkVersion;
+            } else {
+                targetSdkVersion = activity.getApplicationInfo().targetSdkVersion;
+            }
             if (osVersion >= 30 && targetSdkVersion >= 30) {
                 requireBackgroundLocationPermission = true;
                 permissionSet.remove(ACCESS_BACKGROUND_LOCATION);
