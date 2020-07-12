@@ -64,6 +64,6 @@ public abstract class RationaleDialog extends Dialog {
      * Provide permissions to request. These permissions should be the ones that shows on your rationale dialog.
      * @return Permissions list to request.
      */
-    abstract public List<String> getPermissions();
+    abstract public List<String> getPermissionsToRequest();
 
 }
