@@ -20,20 +20,17 @@ class MainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         makeCallBtn.setOnClickListener {
             PermissionX.init(this)
-                .permissions(Manifest.permission.CAMERA, Manifest.permission.READ_CONTACTS, Manifest.permission.CALL_PHONE)
+                .permissions(Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_CONTACTS, Manifest.permission.READ_EXTERNAL_STORAGE)
                 .explainReasonBeforeRequest()
                 .onExplainRequestReason { scope, deniedList, beforeRequest ->
-//                    if (beforeRequest) {
-                    scope.showRequestReasonDialog(deniedList, "为了保证程序正常工作，请您同意以下权限申请", "我已明白")
-//                    } else {
-//                        val filteredList = deniedList.filter {
-//                            it == Manifest.permission.CAMERA
-//                        }
-//                        scope.showRequestReasonDialog(filteredList, "摄像机权限是程序必须依赖的权限", "我已明白")
-//                    }
+                    val message = "PermissionX需要您同意以下权限才能正常使用"
+                    val dialog = CustomDialog(context!!, message, deniedList)
+                    scope.showRequestReasonDialog(dialog)
                 }
                 .onForwardToSettings { scope, deniedList ->
-                    scope.showForwardToSettingsDialog(deniedList, "您需要去应用程序设置当中手动开启权限", "我已明白")
+                    val message = "您需要去设置中手动开启以下权限"
+                    val dialog = CustomDialog(context!!, message, deniedList)
+                    scope.showForwardToSettingsDialog(dialog)
                 }
                 .request { allGranted, grantedList, deniedList ->
                     if (allGranted) {

@@ -32,17 +32,7 @@ public class MainJavaActivity extends AppCompatActivity {
                         .onExplainRequestReason(new ExplainReasonCallbackWithBeforeParam() {
                             @Override
                             public void onExplainReason(ExplainScope scope, List<String> deniedList, boolean beforeRequest) {
-//                                if (beforeRequest) {
-                                    scope.showRequestReasonDialog(deniedList, "为了保证程序正常工作，请您同意以下权限申请" + deniedList, "我已明白");
-//                                } else {
-//                                    List<String> filteredList = new ArrayList<>();
-//                                    for (String permission : deniedList) {
-//                                        if (permission.equals(Manifest.permission.CAMERA)) {
-//                                            filteredList.add(permission);
-//                                        }
-//                                    }
-//                                    scope.showRequestReasonDialog(filteredList, "摄像机权限是程序必须依赖的权限" + deniedList, "我已明白");
-//                                }
+                                scope.showRequestReasonDialog(deniedList, "为了保证程序正常工作，请您同意以下权限申请" + deniedList, "我已明白");
                             }
                         })
                         .onForwardToSettings(new ForwardToSettingsCallback() {
