@@ -66,7 +66,7 @@ public class InvisibleFragment extends Fragment {
     private ChainTask task;
 
     /**
-     * Request permissions at once by calling {@link Fragment#requestPermissions(String[], int)}, and handle request result in {@link #onRequestPermissionsResult(int, String[], int[])}.
+     * Request permissions at once by calling {@link Fragment#requestPermissions(String[], int)}, and handle request result in ActivityCompat.OnRequestPermissionsResultCallback.
      *
      * @param permissionBuilder The instance of PermissionBuilder.
      * @param permissions       Permissions that you want to request.
@@ -79,7 +79,7 @@ public class InvisibleFragment extends Fragment {
     }
 
     /**
-     * Request ACCESS_BACKGROUND_LOCATION at once by calling {@link Fragment#requestPermissions(String[], int)}, and handle request result in {@link #onRequestPermissionsResult(int, String[], int[])}.
+     * Request ACCESS_BACKGROUND_LOCATION at once by calling {@link Fragment#requestPermissions(String[], int)}, and handle request result in ActivityCompat.OnRequestPermissionsResultCallback.
      *
      * @param permissionBuilder The instance of PermissionBuilder.
      * @param chainTask         Instance of current task.

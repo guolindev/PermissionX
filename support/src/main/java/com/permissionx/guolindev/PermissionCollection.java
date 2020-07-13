@@ -17,6 +17,7 @@
 package com.permissionx.guolindev;
 
 import android.os.Build;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
 import com.permissionx.guolindev.request.PermissionBuilder;
@@ -40,13 +41,20 @@ public class PermissionCollection {
 
     private FragmentActivity activity;
 
+    private Fragment fragment;
+
     public PermissionCollection(FragmentActivity activity) {
         this.activity = activity;
+    }
+
+    public PermissionCollection(Fragment fragment) {
+        this.fragment = fragment;
     }
 
     /**
      * All permissions that you want to request.
      * @param permissions A vararg param to pass permissions.
+     * @return PermissionBuilder itself.
      */
     public PermissionBuilder permissions(String... permissions)  {
         return permissions(new ArrayList<>(Arrays.asList(permissions)));
@@ -55,6 +63,7 @@ public class PermissionCollection {
     /**
      * All permissions that you want to request.
      * @param permissions A vararg param to pass permissions.
+     * @return PermissionBuilder itself.
      */
     public PermissionBuilder permissions(List<String> permissions)  {
         Set<String> permissionSet = new HashSet<>(permissions);
@@ -62,7 +71,12 @@ public class PermissionCollection {
         Set<String> permissionsWontRequest = new HashSet<>();
         if (permissionSet.contains(ACCESS_BACKGROUND_LOCATION)) {
             int osVersion = Build.VERSION.SDK_INT;
-            int targetSdkVersion = activity.getApplicationInfo().targetSdkVersion;
+            int targetSdkVersion;
+            if (fragment != null && fragment.getContext() != null) {
+                targetSdkVersion = fragment.getContext().getApplicationInfo().targetSdkVersion;
+            } else {
+                targetSdkVersion = activity.getApplicationInfo().targetSdkVersion;
+            }
             if (osVersion >= 30 && targetSdkVersion >= 30) {
                 requireBackgroundLocationPermission = true;
                 permissionSet.remove(ACCESS_BACKGROUND_LOCATION);
@@ -73,7 +87,7 @@ public class PermissionCollection {
                 permissionsWontRequest.add(ACCESS_BACKGROUND_LOCATION);
             }
         }
-        return new PermissionBuilder(activity, permissionSet, requireBackgroundLocationPermission, permissionsWontRequest);
+        return new PermissionBuilder(activity, fragment, permissionSet, requireBackgroundLocationPermission, permissionsWontRequest);
     }
 
 }

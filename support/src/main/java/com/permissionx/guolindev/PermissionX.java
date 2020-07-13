@@ -18,6 +18,7 @@ package com.permissionx.guolindev;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 
@@ -42,9 +43,20 @@ public class PermissionX {
      * Init PermissionX to make everything prepare to work.
      *
      * @param activity An instance of FragmentActivity
+     * @return PermissionCollection instance.
      */
     public static PermissionCollection init(FragmentActivity activity) {
         return new PermissionCollection(activity);
+    }
+
+    /**
+     * Init PermissionX to make everything prepare to work.
+     *
+     * @param fragment An instance of Fragment
+     * @return PermissionCollection instance.
+     */
+    public static PermissionCollection init(Fragment fragment) {
+        return new PermissionCollection(fragment);
     }
 
     /**

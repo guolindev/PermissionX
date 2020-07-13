@@ -22,10 +22,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
+import android.view.View;
 
 import com.permissionx.guolindev.callback.ExplainReasonCallback;
 import com.permissionx.guolindev.callback.ExplainReasonCallbackWithBeforeParam;
@@ -53,6 +55,11 @@ public class PermissionBuilder {
      * Instance of activity for everything.
      */
     FragmentActivity activity;
+
+    /**
+     * Instance of fragment for everything as an alternative choice for activity.
+     */
+    Fragment fragment;
 
     /**
      * Normal runtime permissions that app want to request.
@@ -122,8 +129,13 @@ public class PermissionBuilder {
      */
     ForwardToSettingsCallback forwardToSettingsCallback;
 
-    public PermissionBuilder(FragmentActivity activity, Set<String> normalPermissions, boolean requireBackgroundLocationPermission, Set<String> permissionsWontRequest) {
+    public PermissionBuilder(FragmentActivity activity, Fragment fragment, Set<String> normalPermissions, boolean requireBackgroundLocationPermission, Set<String> permissionsWontRequest) {
+        // activity and fragment must not be null at same time
         this.activity = activity;
+        this.fragment = fragment;
+        if (activity == null && fragment != null) {
+            this.activity = fragment.getActivity();
+        }
         this.normalPermissions = normalPermissions;
         this.requireBackgroundLocationPermission = requireBackgroundLocationPermission;
         this.permissionsWontRequest = permissionsWontRequest;
@@ -135,6 +147,7 @@ public class PermissionBuilder {
      * If you chained {@link #explainReasonBeforeRequest()}, this method might run before permission request.
      *
      * @param callback Callback with permissions denied by user.
+     * @return PermissionBuilder itself.
      */
     public PermissionBuilder onExplainRequestReason(ExplainReasonCallback callback) {
         explainReasonCallback = callback;
@@ -148,6 +161,7 @@ public class PermissionBuilder {
      * beforeRequest param would tell you this method is currently before or after permission request.
      *
      * @param callback Callback with permissions denied by user.
+     * @return PermissionBuilder itself.
      */
     public PermissionBuilder onExplainRequestReason(ExplainReasonCallbackWithBeforeParam callback) {
         explainReasonCallbackWithBeforeParam = callback;
@@ -161,6 +175,7 @@ public class PermissionBuilder {
      * If {@link #onExplainRequestReason(ExplainReasonCallback)} is called, this method will not be called in the same request time.
      *
      * @param callback Callback with permissions denied and checked never ask again by user.
+     * @return PermissionBuilder itself.
      */
     public PermissionBuilder onForwardToSettings(ForwardToSettingsCallback callback) {
         forwardToSettingsCallback = callback;
@@ -170,6 +185,8 @@ public class PermissionBuilder {
     /**
      * If you need to show request permission rationale, chain this method in your request syntax.
      * {@link #onExplainRequestReason(ExplainReasonCallback)} will be called before permission request.
+     *
+     * @return PermissionBuilder itself.
      */
     public PermissionBuilder explainReasonBeforeRequest() {
         explainReasonBeforeRequest = true;
@@ -197,7 +214,7 @@ public class PermissionBuilder {
      * <p>
      * Show a dialog to user and  explain why these permissions are necessary.
      *
-     * @param chainTask Instance of current task.
+     * @param chainTask              Instance of current task.
      * @param showReasonOrGoSettings Indicates should show explain reason or forward to Settings.
      * @param permissions            Permissions to request again.
      * @param message                Message that explain to user why these permissions are necessary.
@@ -212,7 +229,7 @@ public class PermissionBuilder {
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setMessage(message);
-        builder.setCancelable(!TextUtils.isEmpty(negativeText));
+        builder.setCancelable(false);
         builder.setPositiveButton(positiveText, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -237,10 +254,55 @@ public class PermissionBuilder {
     }
 
     /**
+     * This method is internal, and should not be called by developer.
+     * <p>
+     * Show a dialog to user and  explain why these permissions are necessary.
+     *
+     * @param chainTask              Instance of current task.
+     * @param showReasonOrGoSettings Indicates should show explain reason or forward to Settings.
+     * @param dialog                 Dialog to explain to user why these permissions are necessary.
+     */
+    void showHandlePermissionDialog(final ChainTask chainTask, final boolean showReasonOrGoSettings, @NonNull final RationaleDialog dialog) {
+        showDialogCalled = true;
+        final List<String> permissions = dialog.getPermissionsToRequest();
+        if (permissions == null || permissions.isEmpty()) {
+            chainTask.finish();
+            return;
+        }
+        dialog.show();
+        View positiveButton = dialog.getPositiveButton();
+        View negativeButton = dialog.getNegativeButton();
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+        positiveButton.setClickable(true);
+        positiveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+                if (showReasonOrGoSettings) {
+                    chainTask.requestAgain(permissions);
+                } else {
+                    forwardToSettings(permissions);
+                }
+            }
+        });
+        if (negativeButton != null) {
+            negativeButton.setClickable(true);
+            negativeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialog.dismiss();
+                    chainTask.finish();
+                }
+            });
+        }
+    }
+
+    /**
      * Request permissions at once in the fragment.
      *
      * @param permissions Permissions that you want to request.
-     * @param chainTask Instance of current task.
+     * @param chainTask   Instance of current task.
      */
     void requestNow(Set<String> permissions, ChainTask chainTask) {
         getInvisibleFragment().requestNow(this, permissions, chainTask);
@@ -248,6 +310,7 @@ public class PermissionBuilder {
 
     /**
      * Request ACCESS_BACKGROUND_LOCATION at once in the fragment.
+     *
      * @param chainTask Instance of current task.
      */
     void requestAccessBackgroundLocationNow(ChainTask chainTask) {
@@ -260,13 +323,18 @@ public class PermissionBuilder {
      * Don't worry. This is very lightweight.
      */
     private InvisibleFragment getInvisibleFragment() {
-        FragmentManager fragmentManager = activity.getSupportFragmentManager();
+        FragmentManager fragmentManager;
+        if (fragment != null) {
+            fragmentManager = fragment.getChildFragmentManager();
+        } else {
+            fragmentManager = activity.getSupportFragmentManager();
+        }
         Fragment existedFragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG);
         if (existedFragment != null) {
             return (InvisibleFragment) existedFragment;
         } else {
             InvisibleFragment invisibleFragment = new InvisibleFragment();
-            fragmentManager.beginTransaction().add(invisibleFragment, FRAGMENT_TAG).commitNow();
+            fragmentManager.beginTransaction().add(invisibleFragment, FRAGMENT_TAG).commitNowAllowingStateLoss();
             return invisibleFragment;
         }
     }
