@@ -18,18 +18,18 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val context = context!!
         makeCallBtn.setOnClickListener {
             PermissionX.init(this)
-                .permissions(Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_CONTACTS, Manifest.permission.READ_EXTERNAL_STORAGE)
-                .explainReasonBeforeRequest()
+                .permissions(Manifest.permission.CAMERA, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.RECORD_AUDIO)
                 .onExplainRequestReason { scope, deniedList, beforeRequest ->
                     val message = "PermissionX需要您同意以下权限才能正常使用"
-                    val dialog = CustomDialog(context!!, message, deniedList)
+                    val dialog = CustomDialog(context, message, deniedList)
                     scope.showRequestReasonDialog(dialog)
                 }
                 .onForwardToSettings { scope, deniedList ->
                     val message = "您需要去设置中手动开启以下权限"
-                    val dialog = CustomDialog(context!!, message, deniedList)
+                    val dialog = CustomDialog(context, message, deniedList)
                     scope.showForwardToSettingsDialog(dialog)
                 }
                 .request { allGranted, grantedList, deniedList ->

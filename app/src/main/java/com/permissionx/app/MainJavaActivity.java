@@ -22,7 +22,7 @@ public class MainJavaActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main2);
+        setContentView(R.layout.activity_main_java);
         Button makeCallBtn = findViewById(R.id.makeCallBtn);
         makeCallBtn.setOnClickListener(new View.OnClickListener() {
             @Override

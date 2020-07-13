@@ -32,27 +32,20 @@ class CustomDialog(context: Context, val message: String, val permissions: List<
         Manifest.permission.ANSWER_PHONE_CALLS to Manifest.permission_group.PHONE,
         Manifest.permission.ADD_VOICEMAIL to Manifest.permission_group.PHONE,
         Manifest.permission.USE_SIP to Manifest.permission_group.PHONE,
+        Manifest.permission.ACCEPT_HANDOVER to Manifest.permission_group.PHONE,
         Manifest.permission.BODY_SENSORS to Manifest.permission_group.SENSORS,
+        Manifest.permission.ACTIVITY_RECOGNITION to Manifest.permission_group.ACTIVITY_RECOGNITION,
         Manifest.permission.SEND_SMS to Manifest.permission_group.SMS,
         Manifest.permission.RECEIVE_SMS to Manifest.permission_group.SMS,
         Manifest.permission.READ_SMS to Manifest.permission_group.SMS,
         Manifest.permission.RECEIVE_WAP_PUSH to Manifest.permission_group.SMS,
         Manifest.permission.RECEIVE_MMS to Manifest.permission_group.SMS,
         Manifest.permission.READ_EXTERNAL_STORAGE to Manifest.permission_group.STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE to Manifest.permission_group.STORAGE
+        Manifest.permission.WRITE_EXTERNAL_STORAGE to Manifest.permission_group.STORAGE,
+        Manifest.permission.ACCESS_MEDIA_LOCATION to Manifest.permission_group.STORAGE
     )
 
-    private val groupMap = mapOf(Manifest.permission_group.CALENDAR to "日历权限",
-        Manifest.permission_group.CALL_LOG to "通话记录权限",
-        Manifest.permission_group.CAMERA to "摄像头权限",
-        Manifest.permission_group.CONTACTS to "联系人权限",
-        Manifest.permission_group.LOCATION to "定位权限",
-        Manifest.permission_group.MICROPHONE to "麦克风权限",
-        Manifest.permission_group.PHONE to "管理通话权限",
-        Manifest.permission_group.SENSORS to "传感器权限",
-        Manifest.permission_group.SMS to "短彩信权限",
-        Manifest.permission_group.STORAGE to "存储权限"
-    )
+    private val groupSet = HashSet<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,10 +75,11 @@ class CustomDialog(context: Context, val message: String, val permissions: List<
     private fun buildPermissionsLayout() {
         for (permission in permissions) {
             val permissionGroup = permissionMap[permission]
-            if (permissionGroup != null) {
+            if (permissionGroup != null && !groupSet.contains(permissionGroup)) {
                 val textView = LayoutInflater.from(context).inflate(R.layout.permissions_item, permissionsLayout, false) as TextView
-                textView.text = groupMap[permissionGroup]
+                textView.text = context.packageManager.getPermissionGroupInfo(permissionGroup, 0).loadLabel(context.packageManager)
                 permissionsLayout.addView(textView)
+                groupSet.add(permissionGroup)
             }
         }
     }
