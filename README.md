@@ -10,7 +10,7 @@ Edit your build.gradle file and add below dependency.
 
 ```groovy
 dependencies {
-    implementation 'com.permissionx.guolindev:permissionx:1.2.2'
+    implementation 'com.permissionx.guolindev:permissionx:1.3.0'
 }
 ```
 
@@ -135,7 +135,7 @@ If your app is still not ready for AndroidX, you need to use Permission-Support 
 
 ```groovy
 dependencies {
-    implementation 'com.permissionx.guolindev:permission-support:1.2.2'
+    implementation 'com.permissionx.guolindev:permission-support:1.3.0'
 }
 ```
 
