@@ -63,6 +63,11 @@ public class PermissionBuilder {
     Fragment fragment;
 
     /**
+     * Instance of the current dialog that shows to user. We need to dismiss this dialog when InvisibleFragment destroyed.
+     */
+    Dialog currentDialog;
+
+    /**
      * Normal runtime permissions that app want to request.
      */
     Set<String> normalPermissions;
@@ -249,9 +254,9 @@ public class PermissionBuilder {
                 }
             });
         }
-        Dialog dialog = builder.create();
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
+        currentDialog = builder.create();
+        currentDialog.setCanceledOnTouchOutside(false);
+        currentDialog.show();
     }
 
     /**
@@ -270,6 +275,7 @@ public class PermissionBuilder {
             chainTask.finish();
             return;
         }
+        currentDialog = dialog;
         dialog.show();
         View positiveButton = dialog.getPositiveButton();
         View negativeButton = dialog.getNegativeButton();

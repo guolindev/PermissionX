@@ -114,6 +114,17 @@ public class InvisibleFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (checkForGC()) {
+            // Dismiss the showing dialog when InvisibleFragment destroyed for avoiding window leak problem.
+            if (pb.currentDialog != null && pb.currentDialog.isShowing()) {
+                pb.currentDialog.dismiss();
+            }
+        }
+    }
+
     /**
      * Handle result of normal permissions request.
      */
