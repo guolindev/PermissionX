@@ -257,6 +257,12 @@ public class PermissionBuilder {
         currentDialog = builder.create();
         currentDialog.setCanceledOnTouchOutside(false);
         currentDialog.show();
+        currentDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                currentDialog = null;
+            }
+        });
     }
 
     /**
@@ -303,6 +309,12 @@ public class PermissionBuilder {
                 }
             });
         }
+        currentDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                currentDialog = null;
+            }
+        });
     }
 
     /**
