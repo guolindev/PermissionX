@@ -110,6 +110,13 @@ public class PermissionBuilder {
     Set<String> permanentDeniedPermissions = new HashSet<>();
 
     /**
+     * When we request multiple permissions. Some are denied, some are permanently denied. Denied permissions will be callback first.
+     * And the permanently denied permissions will store in this tempPermanentDeniedPermissions. They will be callback once no more
+     * denied permissions exist.
+     */
+    Set<String> tempPermanentDeniedPermissions = new HashSet<>();
+
+    /**
      * Holds permissions which should forward to Settings to allow them.
      * Not all permanently denied permissions should forward to Settings. Only the ones developer think they are necessary should.
      */
