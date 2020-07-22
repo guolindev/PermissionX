@@ -197,6 +197,10 @@ public class InvisibleFragment extends Fragment {
                 if (shouldFinishTheTask || !pb.showDialogCalled) {
                     task.finish();
                 }
+                // Reset this value after each request. If we don't do this, developer invoke showRequestReasonDialog in ExplainReasonCallback
+                // but didn't invoke showForwardToSettingsDialog in ForwardToSettingsCallback, the request process will be lost. Because the
+                // previous showDialogCalled affect the next request logic.
+                pb.showDialogCalled = false;
             }
         }
     }
