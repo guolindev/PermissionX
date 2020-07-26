@@ -113,6 +113,17 @@ public class InvisibleFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (checkForGC()) {
+            // Dismiss the showing dialog when InvisibleFragment destroyed for avoiding window leak problem.
+            if (pb.currentDialog != null && pb.currentDialog.isShowing()) {
+                pb.currentDialog.dismiss();
+            }
+        }
+    }
+
     /**
      * Handle result of normal permissions request.
      */
@@ -145,7 +156,7 @@ public class InvisibleFragment extends Fragment {
                     }
                 }
             }
-            List<String> deniedPermissions = new ArrayList<>();
+            List<String> deniedPermissions = new ArrayList<>(); // used to validate the deniedPermissions and permanentDeniedPermissions
             deniedPermissions.addAll(pb.deniedPermissions);
             deniedPermissions.addAll(pb.permanentDeniedPermissions);
             // maybe user can turn some permissions on in settings that we didn't request, so check the denied permissions again for safety.
@@ -169,10 +180,13 @@ public class InvisibleFragment extends Fragment {
                     } else {
                         pb.explainReasonCallback.onExplainReason(task.getExplainScope(), new ArrayList<>(pb.deniedPermissions));
                     }
+                    // store these permanently denied permissions or they will be lost when request again.
+                    pb.tempPermanentDeniedPermissions.addAll(forwardList);
                 }
                 // If forwardToSettingsCallback is not null and there're permanently denied permissions. Try the ForwardToSettingsCallback.
-                else if (pb.forwardToSettingsCallback != null && !forwardList.isEmpty()) {
+                else if (pb.forwardToSettingsCallback != null && (!forwardList.isEmpty() || !pb.tempPermanentDeniedPermissions.isEmpty())) {
                     shouldFinishTheTask = false; // shouldn't because ForwardToSettingsCallback handles it
+                    pb.tempPermanentDeniedPermissions.clear(); // no need to store them anymore once onForwardToSettings callback.
                     pb.forwardToSettingsCallback.onForwardToSettings(task.getForwardScope(), new ArrayList<>(pb.permanentDeniedPermissions));
                 }
                 // If showRequestReasonDialog or showForwardToSettingsDialog is not called. We should finish the task.
@@ -182,6 +196,10 @@ public class InvisibleFragment extends Fragment {
                 if (shouldFinishTheTask || !pb.showDialogCalled) {
                     task.finish();
                 }
+                // Reset this value after each request. If we don't do this, developer invoke showRequestReasonDialog in ExplainReasonCallback
+                // but didn't invoke showForwardToSettingsDialog in ForwardToSettingsCallback, the request process will be lost. Because the
+                // previous showDialogCalled affect the next request logic.
+                pb.showDialogCalled = false;
             }
         }
     }

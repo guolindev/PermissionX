@@ -62,6 +62,11 @@ public class PermissionBuilder {
     Fragment fragment;
 
     /**
+     * Instance of the current dialog that shows to user. We need to dismiss this dialog when InvisibleFragment destroyed.
+     */
+    Dialog currentDialog;
+
+    /**
      * Normal runtime permissions that app want to request.
      */
     Set<String> normalPermissions;
@@ -102,6 +107,13 @@ public class PermissionBuilder {
      * Holds permissions that have been permanently denied in the requested permissions. (Deny and never ask again)
      */
     Set<String> permanentDeniedPermissions = new HashSet<>();
+
+    /**
+     * When we request multiple permissions. Some are denied, some are permanently denied. Denied permissions will be callback first.
+     * And the permanently denied permissions will store in this tempPermanentDeniedPermissions. They will be callback once no more
+     * denied permissions exist.
+     */
+    Set<String> tempPermanentDeniedPermissions = new HashSet<>();
 
     /**
      * Holds permissions which should forward to Settings to allow them.
@@ -248,9 +260,15 @@ public class PermissionBuilder {
                 }
             });
         }
-        Dialog dialog = builder.create();
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
+        currentDialog = builder.create();
+        currentDialog.setCanceledOnTouchOutside(false);
+        currentDialog.show();
+        currentDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                currentDialog = null;
+            }
+        });
     }
 
     /**
@@ -269,6 +287,7 @@ public class PermissionBuilder {
             chainTask.finish();
             return;
         }
+        currentDialog = dialog;
         dialog.show();
         View positiveButton = dialog.getPositiveButton();
         View negativeButton = dialog.getNegativeButton();
@@ -296,6 +315,12 @@ public class PermissionBuilder {
                 }
             });
         }
+        currentDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                currentDialog = null;
+            }
+        });
     }
 
     /**
