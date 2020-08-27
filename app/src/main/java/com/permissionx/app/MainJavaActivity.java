@@ -28,26 +28,26 @@ public class MainJavaActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 PermissionX.init(MainJavaActivity.this)
-                        .permissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        .permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         .onExplainRequestReason(new ExplainReasonCallbackWithBeforeParam() {
                             @Override
                             public void onExplainReason(ExplainScope scope, List<String> deniedList, boolean beforeRequest) {
-                                scope.showRequestReasonDialog(deniedList, "为了保证程序正常工作，请您同意以下权限申请" + deniedList, "我已明白");
+                                scope.showRequestReasonDialog(deniedList, "PermissionX need following permissions for further usage", "Allow");
                             }
                         })
                         .onForwardToSettings(new ForwardToSettingsCallback() {
                             @Override
                             public void onForwardToSettings(ForwardScope scope, List<String> deniedList) {
-                                scope.showForwardToSettingsDialog(deniedList, "您需要去应用程序设置当中手动开启权限" + deniedList, "我已明白");
+                                scope.showForwardToSettingsDialog(deniedList, "Please allow the following permissions in settings", "Allow");
                             }
                         })
                         .request(new RequestCallback() {
                             @Override
                             public void onResult(boolean allGranted, List<String> grantedList, List<String> deniedList) {
                                 if (allGranted) {
-                                    Toast.makeText(MainJavaActivity.this, "所有申请的权限都已通过", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(MainJavaActivity.this, "All permissions are granted", Toast.LENGTH_SHORT).show();
                                 } else {
-                                    Toast.makeText(MainJavaActivity.this, "您拒绝了如下权限：" + deniedList, Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(MainJavaActivity.this, "The following permissions are denied：" + deniedList, Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });

@@ -1,8 +1,7 @@
 package com.permissionx.guolindev.dialog
 
-import android.Manifest
-import android.annotation.TargetApi
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -13,49 +12,19 @@ import com.permissionx.guolindev.request.RationaleDialog
 import kotlinx.android.synthetic.main.permissionx_default_dialog_layout.*
 import kotlinx.android.synthetic.main.permissionx_permission_item.view.*
 
+
 /**
  * Default rationale dialog to show if developers did not implement their own custom rationale dialog.
  *
  * @author guolin
  * @since 2020/8/27
  */
-@TargetApi(23)
-class DefaultDialog(context: Context, val permissions: List<String>, val message: String, val positiveText: String, val negativeText: String?) : RationaleDialog(context, R.style.PermissionXDefaultDialog) {
-
-    private val permissionMap = mapOf(
-        Manifest.permission.READ_CALENDAR to Manifest.permission_group.CALENDAR,
-        Manifest.permission.WRITE_CALENDAR to Manifest.permission_group.CALENDAR,
-        Manifest.permission.READ_CALL_LOG to Manifest.permission_group.CALL_LOG,
-        Manifest.permission.WRITE_CALL_LOG to Manifest.permission_group.CALL_LOG,
-        Manifest.permission.PROCESS_OUTGOING_CALLS to Manifest.permission_group.CALL_LOG,
-        Manifest.permission.CAMERA to Manifest.permission_group.CAMERA,
-        Manifest.permission.READ_CONTACTS to Manifest.permission_group.CONTACTS,
-        Manifest.permission.WRITE_CONTACTS to Manifest.permission_group.CONTACTS,
-        Manifest.permission.GET_ACCOUNTS to Manifest.permission_group.CONTACTS,
-        Manifest.permission.ACCESS_FINE_LOCATION to Manifest.permission_group.LOCATION,
-        Manifest.permission.ACCESS_COARSE_LOCATION to Manifest.permission_group.LOCATION,
-        Manifest.permission.ACCESS_BACKGROUND_LOCATION to Manifest.permission_group.LOCATION,
-        Manifest.permission.RECORD_AUDIO to Manifest.permission_group.MICROPHONE,
-        Manifest.permission.READ_PHONE_STATE to Manifest.permission_group.PHONE,
-        Manifest.permission.READ_PHONE_NUMBERS to Manifest.permission_group.PHONE,
-        Manifest.permission.CALL_PHONE to Manifest.permission_group.PHONE,
-        Manifest.permission.ANSWER_PHONE_CALLS to Manifest.permission_group.PHONE,
-        Manifest.permission.ADD_VOICEMAIL to Manifest.permission_group.PHONE,
-        Manifest.permission.USE_SIP to Manifest.permission_group.PHONE,
-        Manifest.permission.ACCEPT_HANDOVER to Manifest.permission_group.PHONE,
-        Manifest.permission.BODY_SENSORS to Manifest.permission_group.SENSORS,
-        Manifest.permission.ACTIVITY_RECOGNITION to Manifest.permission_group.ACTIVITY_RECOGNITION,
-        Manifest.permission.SEND_SMS to Manifest.permission_group.SMS,
-        Manifest.permission.RECEIVE_SMS to Manifest.permission_group.SMS,
-        Manifest.permission.READ_SMS to Manifest.permission_group.SMS,
-        Manifest.permission.RECEIVE_WAP_PUSH to Manifest.permission_group.SMS,
-        Manifest.permission.RECEIVE_MMS to Manifest.permission_group.SMS,
-        Manifest.permission.READ_EXTERNAL_STORAGE to Manifest.permission_group.STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE to Manifest.permission_group.STORAGE,
-        Manifest.permission.ACCESS_MEDIA_LOCATION to Manifest.permission_group.STORAGE
-    )
-
-    private val groupSet = HashSet<String>()
+class DefaultDialog(context: Context,
+    private val permissions: List<String>,
+    private val message: String,
+    private val positiveText: String,
+    private val negativeText: String?
+) : RationaleDialog(context, R.style.PermissionXDefaultDialog) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,8 +73,21 @@ class DefaultDialog(context: Context, val permissions: List<String>, val message
      * But we only need to add the permission group. So if there're two permissions belong to one group, only one item will be added to the dialog.
      */
     private fun buildPermissionsLayout() {
+        val groupSet = HashSet<String>()
+        val currentVersion = Build.VERSION.SDK_INT
         for (permission in permissions) {
-            val permissionGroup = permissionMap[permission]
+            val permissionGroup = when(currentVersion) {
+                Build.VERSION_CODES.Q -> {
+                    getPermissionMapOnQ()[permission]
+                }
+                Build.VERSION_CODES.R -> {
+                    getPermissionMapOnR()[permission]
+                }
+                else -> {
+                    val permissionInfo = context.packageManager.getPermissionInfo(permission, 0)
+                    permissionInfo.group
+                }
+            }
             if (permissionGroup != null && !groupSet.contains(permissionGroup)) {
                 val layout = LayoutInflater.from(context).inflate(R.layout.permissionx_permission_item, permissionsLayout, false) as LinearLayout
                 layout.permissionText.text = context.getString(context.packageManager.getPermissionGroupInfo(permissionGroup, 0).labelRes)

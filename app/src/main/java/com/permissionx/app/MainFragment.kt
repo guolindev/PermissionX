@@ -21,34 +21,33 @@ class MainFragment : Fragment() {
         val context = context!!
         makeCallBtn.setOnClickListener {
             PermissionX.init(this)
-                .permissions(Manifest.permission.CAMERA,
+                .permissions(
+                Manifest.permission.CAMERA,
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.RECORD_AUDIO,
-//                    Manifest.permission.READ_CALENDAR,
-//                    Manifest.permission.READ_CALL_LOG,
-//                    Manifest.permission.READ_CONTACTS,
-//                    Manifest.permission.GET_ACCOUNTS,
-//                    Manifest.permission.READ_PHONE_STATE,
-//                    Manifest.permission.BODY_SENSORS,
-//                    Manifest.permission.ACTIVITY_RECOGNITION,
-//                    Manifest.permission.SEND_SMS,
-//                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_CALENDAR,
+                    Manifest.permission.READ_CALL_LOG,
+                    Manifest.permission.READ_CONTACTS,
+                    Manifest.permission.READ_PHONE_STATE,
+                    Manifest.permission.BODY_SENSORS,
+                    Manifest.permission.ACTIVITY_RECOGNITION,
+                    Manifest.permission.SEND_SMS,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
                 )
                 .onExplainRequestReason { scope, deniedList, beforeRequest ->
-                    val message = "PermissionX需要您同意以下权限才能正常使用"
+                    val message = "PermissionX need following permissions for further usage"
+                    scope.showRequestReasonDialog(deniedList, message, "Allow", "Deny")
+                }
+//                .onForwardToSettings { scope, deniedList ->
+//                    val message = "Please allow the following permissions in settings"
 //                    val dialog = CustomDialog(context, message, deniedList)
-                    scope.showRequestReasonDialog(deniedList, message, "允许", "拒绝")
-                }
-                .onForwardToSettings { scope, deniedList ->
-                    val message = "您需要去设置中手动开启以下权限"
-                    val dialog = CustomDialog(context, message, deniedList)
-                    scope.showForwardToSettingsDialog(dialog)
-                }
+//                    scope.showForwardToSettingsDialog(dialog)
+//                }
                 .request { allGranted, grantedList, deniedList ->
                     if (allGranted) {
-                        Toast.makeText(activity, "所有申请的权限都已通过", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(activity, "All permissions are granted", Toast.LENGTH_SHORT).show()
                     } else {
-                        Toast.makeText(activity, "您拒绝了如下权限：$deniedList", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(activity, "The following permissions are denied：$deniedList", Toast.LENGTH_SHORT).show()
                     }
                 }
         }
