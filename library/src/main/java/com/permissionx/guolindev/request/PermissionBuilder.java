@@ -16,13 +16,11 @@
 
 package com.permissionx.guolindev.request;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.Settings;
-import android.text.TextUtils;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -34,6 +32,7 @@ import com.permissionx.guolindev.callback.ExplainReasonCallback;
 import com.permissionx.guolindev.callback.ExplainReasonCallbackWithBeforeParam;
 import com.permissionx.guolindev.callback.ForwardToSettingsCallback;
 import com.permissionx.guolindev.callback.RequestCallback;
+import com.permissionx.guolindev.dialog.DefaultDialog;
 
 import java.util.HashSet;
 import java.util.List;
@@ -235,41 +234,8 @@ public class PermissionBuilder {
      * @param negativeText           Negative text on the negative button. Maybe null if this dialog should not be canceled.
      */
     void showHandlePermissionDialog(final ChainTask chainTask, final boolean showReasonOrGoSettings, final List<String> permissions, String message, String positiveText, String negativeText) {
-        showDialogCalled = true;
-        if (permissions == null || permissions.isEmpty()) {
-            chainTask.finish();
-            return;
-        }
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setMessage(message);
-        builder.setCancelable(false);
-        builder.setPositiveButton(positiveText, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (showReasonOrGoSettings) {
-                    chainTask.requestAgain(permissions);
-                } else {
-                    forwardToSettings(permissions);
-                }
-            }
-        });
-        if (!TextUtils.isEmpty(negativeText)) {
-            builder.setNegativeButton(negativeText, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    chainTask.finish();
-                }
-            });
-        }
-        currentDialog = builder.create();
-        currentDialog.setCanceledOnTouchOutside(false);
-        currentDialog.show();
-        currentDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialogInterface) {
-                currentDialog = null;
-            }
-        });
+        DefaultDialog defaultDialog = new DefaultDialog(activity, permissions, message, positiveText, negativeText);
+        showHandlePermissionDialog(chainTask, showReasonOrGoSettings, defaultDialog);
     }
 
     /**
