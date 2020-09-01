@@ -18,6 +18,9 @@ package com.permissionx.guolindev.request;
 
 import androidx.annotation.NonNull;
 
+import com.permissionx.guolindev.dialog.RationaleDialog;
+import com.permissionx.guolindev.dialog.RationaleDialogFragment;
+
 import java.util.List;
 
 /**
@@ -71,5 +74,14 @@ public class ForwardScope {
      */
     public void showForwardToSettingsDialog(@NonNull RationaleDialog dialog) {
         pb.showHandlePermissionDialog(chainTask, false, dialog);
+    }
+
+    /**
+     * Show a rationale dialog to tell user to allow these permissions in settings.
+     * @param dialogFragment
+     *          DialogFragment to explain to user why these permissions are necessary.
+     */
+    public void showForwardToSettingsDialog(@NonNull RationaleDialogFragment dialogFragment) {
+        pb.showHandlePermissionDialog(chainTask, false, dialogFragment);
     }
 }

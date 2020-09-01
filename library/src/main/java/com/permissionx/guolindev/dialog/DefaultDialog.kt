@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
 import com.permissionx.guolindev.R
-import com.permissionx.guolindev.request.RationaleDialog
 import kotlinx.android.synthetic.main.permissionx_default_dialog_layout.*
 import kotlinx.android.synthetic.main.permissionx_permission_item.view.*
 

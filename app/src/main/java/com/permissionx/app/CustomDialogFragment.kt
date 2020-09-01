@@ -2,16 +2,28 @@ package com.permissionx.app
 
 import android.Manifest
 import android.annotation.TargetApi
-import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.Message
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
-import com.permissionx.guolindev.dialog.RationaleDialog
+import com.permissionx.guolindev.dialog.RationaleDialogFragment
 import kotlinx.android.synthetic.main.custom_dialog_layout.*
 
 @TargetApi(30)
-class CustomDialog(context: Context, val message: String, val permissions: List<String>) : RationaleDialog(context, R.style.CustomDialog) {
+class CustomDialogFragment() : RationaleDialogFragment() {
+
+    var mMessage: String = ""
+
+    var mPermissions: List<String> = emptyList()
+
+    constructor(message: String, permissions: List<String>): this() {
+        mMessage = message
+        mPermissions = permissions
+    }
 
     private val permissionMap = mapOf(Manifest.permission.READ_CALENDAR to Manifest.permission_group.CALENDAR,
         Manifest.permission.WRITE_CALENDAR to Manifest.permission_group.CALENDAR,
@@ -47,17 +59,19 @@ class CustomDialog(context: Context, val message: String, val permissions: List<
 
     private val groupSet = HashSet<String>()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.custom_dialog_layout)
-        messageText.text = message
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        return LayoutInflater.from(context).inflate(R.layout.custom_dialog_layout, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        messageText.text = mMessage
         buildPermissionsLayout()
-        window?.let {
-            val param = it.attributes
-            val width = (context.resources.displayMetrics.widthPixels * 0.8).toInt()
-            val height = param.height
-            it.setLayout(width, height)
-        }
     }
 
     override fun getNegativeButton(): View? {
@@ -69,15 +83,17 @@ class CustomDialog(context: Context, val message: String, val permissions: List<
     }
 
     override fun getPermissionsToRequest(): List<String> {
-        return permissions;
+        return mPermissions
     }
 
     private fun buildPermissionsLayout() {
-        for (permission in permissions) {
+        for (permission in mPermissions) {
             val permissionGroup = permissionMap[permission]
             if (permissionGroup != null && !groupSet.contains(permissionGroup)) {
                 val textView = LayoutInflater.from(context).inflate(R.layout.permissions_item, permissionsLayout, false) as TextView
-                textView.text = context.packageManager.getPermissionGroupInfo(permissionGroup, 0).loadLabel(context.packageManager)
+                textView.text = context?.let {
+                    it.packageManager.getPermissionGroupInfo(permissionGroup, 0).loadLabel(it.packageManager)
+                }
                 permissionsLayout.addView(textView)
                 groupSet.add(permissionGroup)
             }

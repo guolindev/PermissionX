@@ -33,6 +33,8 @@ import com.permissionx.guolindev.callback.ExplainReasonCallbackWithBeforeParam;
 import com.permissionx.guolindev.callback.ForwardToSettingsCallback;
 import com.permissionx.guolindev.callback.RequestCallback;
 import com.permissionx.guolindev.dialog.DefaultDialog;
+import com.permissionx.guolindev.dialog.RationaleDialog;
+import com.permissionx.guolindev.dialog.RationaleDialogFragment;
 
 import java.util.HashSet;
 import java.util.List;
@@ -291,6 +293,50 @@ public class PermissionBuilder {
     }
 
     /**
+     * This method is internal, and should not be called by developer.
+     * <p>
+     * Show a DialogFragment to user and  explain why these permissions are necessary.
+     *
+     * @param chainTask              Instance of current task.
+     * @param showReasonOrGoSettings Indicates should show explain reason or forward to Settings.
+     * @param dialogFragment         DialogFragment to explain to user why these permissions are necessary.
+     */
+    void showHandlePermissionDialog(final ChainTask chainTask, final boolean showReasonOrGoSettings, @NonNull final RationaleDialogFragment dialogFragment) {
+        showDialogCalled = true;
+        final List<String> permissions = dialogFragment.getPermissionsToRequest();
+        if (permissions.isEmpty()) {
+            chainTask.finish();
+            return;
+        }
+        dialogFragment.showNow(getFragmentManager(), "PermissionXRationaleDialogFragment");
+        View positiveButton = dialogFragment.getPositiveButton();
+        View negativeButton = dialogFragment.getNegativeButton();
+        dialogFragment.setCancelable(false);
+        positiveButton.setClickable(true);
+        positiveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialogFragment.dismiss();
+                if (showReasonOrGoSettings) {
+                    chainTask.requestAgain(permissions);
+                } else {
+                    forwardToSettings(permissions);
+                }
+            }
+        });
+        if (negativeButton != null) {
+            negativeButton.setClickable(true);
+            negativeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialogFragment.dismiss();
+                    chainTask.finish();
+                }
+            });
+        }
+    }
+
+    /**
      * Request permissions at once in the fragment.
      *
      * @param permissions Permissions that you want to request.
@@ -310,17 +356,26 @@ public class PermissionBuilder {
     }
 
     /**
-     * Get the invisible fragment in activity for request permissions.
-     * If there is no invisible fragment, add one into activity.
-     * Don't worry. This is very lightweight.
+     * Get the FragmentManager if it's in Activity, or the ChildFragmentManager if it's in Fragment.
+     * @return The FragmentManager to operate Fragment.
      */
-    private InvisibleFragment getInvisibleFragment() {
+    FragmentManager getFragmentManager() {
         FragmentManager fragmentManager;
         if (fragment != null) {
             fragmentManager = fragment.getChildFragmentManager();
         } else {
             fragmentManager = activity.getSupportFragmentManager();
         }
+        return fragmentManager;
+    }
+
+    /**
+     * Get the invisible fragment in activity for request permissions.
+     * If there is no invisible fragment, add one into activity.
+     * Don't worry. This is very lightweight.
+     */
+    private InvisibleFragment getInvisibleFragment() {
+        FragmentManager fragmentManager = getFragmentManager();
         Fragment existedFragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG);
         if (existedFragment != null) {
             return (InvisibleFragment) existedFragment;
