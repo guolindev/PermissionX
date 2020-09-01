@@ -19,6 +19,7 @@ package com.permissionx.guolindev.request;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.provider.Settings;
 import android.view.View;
@@ -94,6 +95,16 @@ public class PermissionBuilder {
      * If not called, requestCallback will be called by PermissionX automatically.
      */
     boolean showDialogCalled = false;
+
+    /**
+     * The custom tint color to set on the DefaultDialog in light theme.
+     */
+    int lightColor = -1;
+
+    /**
+     * The custom tint color to set on the DefaultDialog in dark theme.
+     */
+    int darkColor = -1;
 
     /**
      * Holds permissions that have already granted in the requested permissions.
@@ -208,6 +219,20 @@ public class PermissionBuilder {
     }
 
     /**
+     * Set the tint color to the default rationale dialog.
+     * @param lightColor
+     *          Used in light theme. A color value in the form 0xAARRGGBB. Do not pass a resource ID. To get a color value from a resource ID, call getColor.
+     * @param darkColor
+     *          Used in dark theme. A color value in the form 0xAARRGGBB. Do not pass a resource ID. To get a color value from a resource ID, call getColor.
+     * @return PermissionBuilder itself.
+     */
+    public PermissionBuilder setDialogTintColor(int lightColor, int darkColor) {
+        this.lightColor = lightColor;
+        this.darkColor = darkColor;
+        return this;
+    }
+
+    /**
      * Request permissions at once, and handle request result in the callback.
      *
      * @param callback Callback with 3 params. allGranted, grantedList, deniedList.
@@ -236,7 +261,7 @@ public class PermissionBuilder {
      * @param negativeText           Negative text on the negative button. Maybe null if this dialog should not be canceled.
      */
     void showHandlePermissionDialog(final ChainTask chainTask, final boolean showReasonOrGoSettings, final List<String> permissions, String message, String positiveText, String negativeText) {
-        DefaultDialog defaultDialog = new DefaultDialog(activity, permissions, message, positiveText, negativeText);
+        DefaultDialog defaultDialog = new DefaultDialog(activity, permissions, message, positiveText, negativeText, lightColor, darkColor);
         showHandlePermissionDialog(chainTask, showReasonOrGoSettings, defaultDialog);
     }
 

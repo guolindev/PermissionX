@@ -1,6 +1,8 @@
 package com.permissionx.guolindev.dialog
 
 import android.content.Context
+import android.content.res.Configuration
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
@@ -10,7 +12,6 @@ import android.widget.LinearLayout
 import com.permissionx.guolindev.R
 import kotlinx.android.synthetic.main.permissionx_default_dialog_layout.*
 import kotlinx.android.synthetic.main.permissionx_permission_item.view.*
-
 
 /**
  * Default rationale dialog to show if developers did not implement their own custom rationale dialog.
@@ -22,20 +23,15 @@ class DefaultDialog(context: Context,
     private val permissions: List<String>,
     private val message: String,
     private val positiveText: String,
-    private val negativeText: String?
+    private val negativeText: String?,
+    private val lightColor: Int,
+    private val darkColor: Int
 ) : RationaleDialog(context, R.style.PermissionXDefaultDialog) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.permissionx_default_dialog_layout)
-        messageText.text = message
-        positiveBtn.text = positiveText
-        if (negativeText != null) {
-            negativeLayout.visibility = View.VISIBLE
-            negativeBtn.text = negativeText
-        } else {
-            negativeLayout.visibility = View.GONE
-        }
+        setupText()
         buildPermissionsLayout()
         setupWindow()
     }
@@ -68,6 +64,31 @@ class DefaultDialog(context: Context,
     }
 
     /**
+     * Setup text and text color on the dialog.
+     */
+    private fun setupText() {
+        messageText.text = message
+        positiveBtn.text = positiveText
+        if (negativeText != null) {
+            negativeLayout.visibility = View.VISIBLE
+            negativeBtn.text = negativeText
+        } else {
+            negativeLayout.visibility = View.GONE
+        }
+        if (isDarkTheme()) {
+            if (darkColor != -1) {
+                positiveBtn.setTextColor(darkColor)
+                negativeBtn.setTextColor(darkColor)
+            }
+        } else {
+            if (lightColor != -1) {
+                positiveBtn.setTextColor(lightColor)
+                negativeBtn.setTextColor(lightColor)
+            }
+        }
+    }
+
+    /**
      * Add every permission that need to explain the request reason to the dialog.
      * But we only need to add the permission group. So if there're two permissions belong to one group, only one item will be added to the dialog.
      */
@@ -91,6 +112,15 @@ class DefaultDialog(context: Context,
                 val layout = LayoutInflater.from(context).inflate(R.layout.permissionx_permission_item, permissionsLayout, false) as LinearLayout
                 layout.permissionText.text = context.getString(context.packageManager.getPermissionGroupInfo(permissionGroup, 0).labelRes)
                 layout.permissionIcon.setImageResource(context.packageManager.getPermissionGroupInfo(permissionGroup, 0).icon)
+                if (isDarkTheme()) {
+                    if (darkColor != -1) {
+                        layout.permissionIcon.setColorFilter(darkColor)
+                    }
+                } else {
+                    if (lightColor != -1) {
+                        layout.permissionIcon.setColorFilter(lightColor)
+                    }
+                }
                 permissionsLayout.addView(layout)
                 groupSet.add(permissionGroup)
             }
@@ -120,6 +150,14 @@ class DefaultDialog(context: Context,
                 it.attributes = param
             }
         }
+    }
+
+    /**
+     * Currently we are in dark theme or not.
+     */
+    private fun isDarkTheme(): Boolean {
+        val flag = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        return flag == Configuration.UI_MODE_NIGHT_YES
     }
 
 }
