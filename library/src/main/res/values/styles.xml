@@ -1,6 +1,6 @@
 <resources>
 
-    <style name="PermissionXDefaultDialog" parent="android:style/Theme.Dialog">
+    <style name="PermissionXDefaultDialog" parent="Theme.AppCompat.DayNight.Dialog.Alert">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFrame">@null</item>

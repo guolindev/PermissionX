@@ -55,9 +55,10 @@
             android:id="@+id/positiveBtn"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:background="@null"
+            android:background="?android:attr/selectableItemBackground"
             android:textSize="14sp"
             android:textColor="@color/permissionx_tint_color"
+            android:textAllCaps="false"
             tools:text="允许"/>
 
     </LinearLayout>
@@ -79,11 +80,11 @@
             android:id="@+id/negativeBtn"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:background="@null"
+            android:background="?android:attr/selectableItemBackground"
             android:textSize="14sp"
             android:textColor="@color/permissionx_tint_color"
+            android:textAllCaps="false"
             tools:text="拒绝"/>
-
 
     </LinearLayout>
 

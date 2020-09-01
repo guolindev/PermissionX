@@ -32,13 +32,13 @@ public class MainJavaActivity extends AppCompatActivity {
                         .onExplainRequestReason(new ExplainReasonCallbackWithBeforeParam() {
                             @Override
                             public void onExplainReason(ExplainScope scope, List<String> deniedList, boolean beforeRequest) {
-                                scope.showRequestReasonDialog(deniedList, "PermissionX need following permissions for further usage", "Allow");
+                                scope.showRequestReasonDialog(deniedList, "PermissionX needs following permissions to continue", "Allow");
                             }
                         })
                         .onForwardToSettings(new ForwardToSettingsCallback() {
                             @Override
                             public void onForwardToSettings(ForwardScope scope, List<String> deniedList) {
-                                scope.showForwardToSettingsDialog(deniedList, "Please allow the following permissions in settings", "Allow");
+                                scope.showForwardToSettingsDialog(deniedList, "Please allow following permissions in settings", "Allow");
                             }
                         })
                         .request(new RequestCallback() {

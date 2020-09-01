@@ -35,14 +35,14 @@ class MainFragment : Fragment() {
                     Manifest.permission.READ_EXTERNAL_STORAGE
                 )
                 .onExplainRequestReason { scope, deniedList, beforeRequest ->
-//                    val message = "PermissionX need following permissions for further usage"
-//                    scope.showRequestReasonDialog(deniedList, message, "Allow", "Deny")
-                    val message = "Please allow the following permissions in settings"
-                    val dialog = CustomDialogFragment(message, deniedList)
-                    scope.showRequestReasonDialog(dialog)
+                    val message = "PermissionX needs following permissions to continue"
+                    scope.showRequestReasonDialog(deniedList, message, "Allow", "Deny")
+//                    val message = "Please allow the following permissions in settings"
+//                    val dialog = CustomDialogFragment(message, deniedList)
+//                    scope.showRequestReasonDialog(dialog)
                 }
                 .onForwardToSettings { scope, deniedList ->
-                    val message = "Please allow the following permissions in settings"
+                    val message = "Please allow following permissions in settings"
                     val dialog = CustomDialogFragment(message, deniedList)
                     scope.showForwardToSettingsDialog(dialog)
                 }
