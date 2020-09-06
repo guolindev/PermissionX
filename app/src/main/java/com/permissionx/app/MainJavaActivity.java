@@ -23,8 +23,8 @@ public class MainJavaActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_java);
-        Button makeCallBtn = findViewById(R.id.makeCallBtn);
-        makeCallBtn.setOnClickListener(new View.OnClickListener() {
+        Button makeRequestBtn = findViewById(R.id.makeRequestBtn);
+        makeRequestBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 PermissionX.init(MainJavaActivity.this)

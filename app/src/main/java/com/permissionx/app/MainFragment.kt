@@ -19,7 +19,7 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val context = context!!
-        makeCallBtn.setOnClickListener {
+        makeRequestBtn.setOnClickListener {
             PermissionX.init(this)
                 .permissions(
                 Manifest.permission.CAMERA,
