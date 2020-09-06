@@ -16,7 +16,6 @@
 
 package com.permissionx.guolindev.request;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -26,13 +25,15 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.text.TextUtils;
 import android.view.View;
 
 import com.permissionx.guolindev.callback.ExplainReasonCallback;
 import com.permissionx.guolindev.callback.ExplainReasonCallbackWithBeforeParam;
 import com.permissionx.guolindev.callback.ForwardToSettingsCallback;
 import com.permissionx.guolindev.callback.RequestCallback;
+import com.permissionx.guolindev.dialog.DefaultDialog;
+import com.permissionx.guolindev.dialog.RationaleDialog;
+import com.permissionx.guolindev.dialog.RationaleDialogFragment;
 
 import java.util.HashSet;
 import java.util.List;
@@ -92,6 +93,16 @@ public class PermissionBuilder {
      * If not called, requestCallback will be called by PermissionX automatically.
      */
     boolean showDialogCalled = false;
+
+    /**
+     * The custom tint color to set on the DefaultDialog in light theme.
+     */
+    int lightColor = -1;
+
+    /**
+     * The custom tint color to set on the DefaultDialog in dark theme.
+     */
+    int darkColor = -1;
 
     /**
      * Holds permissions that have already granted in the requested permissions.
@@ -206,6 +217,20 @@ public class PermissionBuilder {
     }
 
     /**
+     * Set the tint color to the default rationale dialog.
+     * @param lightColor
+     *          Used in light theme. A color value in the form 0xAARRGGBB. Do not pass a resource ID. To get a color value from a resource ID, call getColor.
+     * @param darkColor
+     *          Used in dark theme. A color value in the form 0xAARRGGBB. Do not pass a resource ID. To get a color value from a resource ID, call getColor.
+     * @return PermissionBuilder itself.
+     */
+    public PermissionBuilder setDialogTintColor(int lightColor, int darkColor) {
+        this.lightColor = lightColor;
+        this.darkColor = darkColor;
+        return this;
+    }
+
+    /**
      * Request permissions at once, and handle request result in the callback.
      *
      * @param callback Callback with 3 params. allGranted, grantedList, deniedList.
@@ -234,41 +259,8 @@ public class PermissionBuilder {
      * @param negativeText           Negative text on the negative button. Maybe null if this dialog should not be canceled.
      */
     void showHandlePermissionDialog(final ChainTask chainTask, final boolean showReasonOrGoSettings, final List<String> permissions, String message, String positiveText, String negativeText) {
-        showDialogCalled = true;
-        if (permissions == null || permissions.isEmpty()) {
-            chainTask.finish();
-            return;
-        }
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setMessage(message);
-        builder.setCancelable(false);
-        builder.setPositiveButton(positiveText, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (showReasonOrGoSettings) {
-                    chainTask.requestAgain(permissions);
-                } else {
-                    forwardToSettings(permissions);
-                }
-            }
-        });
-        if (!TextUtils.isEmpty(negativeText)) {
-            builder.setNegativeButton(negativeText, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    chainTask.finish();
-                }
-            });
-        }
-        currentDialog = builder.create();
-        currentDialog.setCanceledOnTouchOutside(false);
-        currentDialog.show();
-        currentDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialogInterface) {
-                currentDialog = null;
-            }
-        });
+        DefaultDialog defaultDialog = new DefaultDialog(activity, permissions, message, positiveText, negativeText, lightColor, darkColor);
+        showHandlePermissionDialog(chainTask, showReasonOrGoSettings, defaultDialog);
     }
 
     /**
@@ -324,6 +316,50 @@ public class PermissionBuilder {
     }
 
     /**
+     * This method is internal, and should not be called by developer.
+     * <p>
+     * Show a DialogFragment to user and  explain why these permissions are necessary.
+     *
+     * @param chainTask              Instance of current task.
+     * @param showReasonOrGoSettings Indicates should show explain reason or forward to Settings.
+     * @param dialogFragment         DialogFragment to explain to user why these permissions are necessary.
+     */
+    void showHandlePermissionDialog(final ChainTask chainTask, final boolean showReasonOrGoSettings, @NonNull final RationaleDialogFragment dialogFragment) {
+        showDialogCalled = true;
+        final List<String> permissions = dialogFragment.getPermissionsToRequest();
+        if (permissions.isEmpty()) {
+            chainTask.finish();
+            return;
+        }
+        dialogFragment.showNow(getFragmentManager(), "PermissionXRationaleDialogFragment");
+        View positiveButton = dialogFragment.getPositiveButton();
+        View negativeButton = dialogFragment.getNegativeButton();
+        dialogFragment.setCancelable(false);
+        positiveButton.setClickable(true);
+        positiveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialogFragment.dismiss();
+                if (showReasonOrGoSettings) {
+                    chainTask.requestAgain(permissions);
+                } else {
+                    forwardToSettings(permissions);
+                }
+            }
+        });
+        if (negativeButton != null) {
+            negativeButton.setClickable(true);
+            negativeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialogFragment.dismiss();
+                    chainTask.finish();
+                }
+            });
+        }
+    }
+
+    /**
      * Request permissions at once in the fragment.
      *
      * @param permissions Permissions that you want to request.
@@ -343,17 +379,26 @@ public class PermissionBuilder {
     }
 
     /**
-     * Get the invisible fragment in activity for request permissions.
-     * If there is no invisible fragment, add one into activity.
-     * Don't worry. This is very lightweight.
+     * Get the FragmentManager if it's in Activity, or the ChildFragmentManager if it's in Fragment.
+     * @return The FragmentManager to operate Fragment.
      */
-    private InvisibleFragment getInvisibleFragment() {
+    FragmentManager getFragmentManager() {
         FragmentManager fragmentManager;
         if (fragment != null) {
             fragmentManager = fragment.getChildFragmentManager();
         } else {
             fragmentManager = activity.getSupportFragmentManager();
         }
+        return fragmentManager;
+    }
+
+    /**
+     * Get the invisible fragment in activity for request permissions.
+     * If there is no invisible fragment, add one into activity.
+     * Don't worry. This is very lightweight.
+     */
+    private InvisibleFragment getInvisibleFragment() {
+        FragmentManager fragmentManager = getFragmentManager();
         Fragment existedFragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG);
         if (existedFragment != null) {
             return (InvisibleFragment) existedFragment;
