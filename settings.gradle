@@ -1,3 +1,4 @@
+include ':appsupport'
 include ':app'
 include ':library'
 include ':support'
