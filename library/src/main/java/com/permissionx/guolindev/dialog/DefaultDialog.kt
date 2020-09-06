@@ -2,7 +2,7 @@ package com.permissionx.guolindev.dialog
 
 import android.content.Context
 import android.content.res.Configuration
-import android.graphics.Color
+import android.graphics.PorterDuff
 import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
@@ -114,11 +114,11 @@ class DefaultDialog(context: Context,
                 layout.permissionIcon.setImageResource(context.packageManager.getPermissionGroupInfo(permissionGroup, 0).icon)
                 if (isDarkTheme()) {
                     if (darkColor != -1) {
-                        layout.permissionIcon.setColorFilter(darkColor)
+                        layout.permissionIcon.setColorFilter(darkColor, PorterDuff.Mode.SRC_ATOP)
                     }
                 } else {
                     if (lightColor != -1) {
-                        layout.permissionIcon.setColorFilter(lightColor)
+                        layout.permissionIcon.setColorFilter(lightColor, PorterDuff.Mode.SRC_ATOP)
                     }
                 }
                 permissionsLayout.addView(layout)
