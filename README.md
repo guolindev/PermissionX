@@ -117,7 +117,7 @@ To do that with PermissionX is quite simple. Just use **explainReasonBeforeReque
 ```kotlin
 PermissionX.init(activity)
     .permissions(Manifest.permission.READ_CONTACTS, Manifest.permission.CAMERA, Manifest.permission.CALL_PHONE)
-	.explainReasonBeforeRequest()
+    .explainReasonBeforeRequest()
     ...
 ```
 
