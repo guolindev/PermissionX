@@ -1,6 +1,6 @@
 # PermissionX
 
-[中文文档](https://guolin.blog.csdn.net/article/details/106181780)
+[中文文档](https://blog.csdn.net/sinyu890807/category_10108528.html)
 
 PermissionX is an extension Android library that makes Android runtime permission request extremely easy.  You can use it for basic permission request occasions or handle more complex conditions, like showing rationale dialog or go to app settings for allowance manually.
 
@@ -10,13 +10,13 @@ Edit your build.gradle file and add below dependency.
 
 ```groovy
 dependencies {
-    implementation 'com.permissionx.guolindev:permissionx:1.3.0'
+    implementation 'com.permissionx.guolindev:permissionx:1.4.0'
 }
 ```
 
 That's all. Now you are ready to go.
 
-## Basic usage
+## Basic Usage
 
 Use PermissionX to request Android runtime permissions is extremely simple.
 
@@ -55,7 +55,7 @@ The request result will be callback in the request lambda. **allGranted** means 
 
 Now you can write your own logic in the request lambda to handle the specific cases of your app.
 
-## More usage
+## More Usage
 
 As you know, Android provide **shouldShowRequestPermissionRationale** method to indicate us if we should show a rationale dialog to explain to user why we need this permission. Otherwise user may deny the permissions we requested and checked **never ask again** option.
 
@@ -108,26 +108,28 @@ The parameters in **showRequestReasonDialog** method are similar with **showRequ
 
 <img src="screenshots/3.gif" width="32%" />
 
-One more thing. If you want to show rationale dialog before request which might be a very good experience for users, you can chain **explainReasonBeforeRequest** method like below.
+## Explain Before Request
+
+It is always a good manner to show the rationale dialog and explain to users why you need these permissions before you actually request them.
+
+To do that with PermissionX is quite simple. Just use **explainReasonBeforeRequest** method like below.
 
 ```kotlin
 PermissionX.init(activity)
     .permissions(Manifest.permission.READ_CONTACTS, Manifest.permission.CAMERA, Manifest.permission.CALL_PHONE)
 	.explainReasonBeforeRequest()
-    .onExplainRequestReason { scope, deniedList ->
-        scope.showRequestReasonDialog(deniedList, "Core fundamental are based on these permissions", "OK", "Cancel")
-    }
-    .onForwardToSettings { scope, deniedList ->
-        scope.showForwardToSettingsDialog(deniedList, "You need to allow these permissions in Settings $deniedList", "OK", "Cancel")
-    }
-    .request { allGranted, grantedList, deniedList ->
-        if (allGranted) {
-            Toast.makeText(this, "All permissions are granted", Toast.LENGTH_LONG).show()
-        } else {
-            Toast.makeText(this, "These permissions are denied: $deniedList", Toast.LENGTH_LONG).show()
-        }
-    }
+    ...
 ```
+
+Now everything works like charm.
+
+<img src="screenshots/4.gif" width="32%" />
+
+## Dark Theme
+
+The rationale dialog provided by PermissionsX support Android dark theme automatically. If you change your device into dark theme, everything just works great.
+
+<img src="screenshots/5.gif" width="32%" />
 
 ## Permission-Support
 
@@ -135,7 +137,7 @@ If your app is still not ready for AndroidX, you need to use Permission-Support 
 
 ```groovy
 dependencies {
-    implementation 'com.permissionx.guolindev:permission-support:1.3.0'
+    implementation 'com.permissionx.guolindev:permission-support:1.4.0'
 }
 ```
 

@@ -18,14 +18,14 @@ class MainActivity : AppCompatActivity() {
                 .permissions(Manifest.permission.CAMERA, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.RECORD_AUDIO)
                 .setDialogTintColor(Color.parseColor("#008577"), Color.parseColor("#83e8dd"))
                 .onExplainRequestReason { scope, deniedList ->
-                    val message = "PermissionX需要您同意以下权限才能正常使用"
-                    scope.showRequestReasonDialog(deniedList, message, "确定", "取消")
+                    val message = "PermissionX needs following permissions to continue"
+                    scope.showRequestReasonDialog(deniedList, message, "Allow", "Deny")
                 }
                 .request { allGranted, grantedList, deniedList ->
                     if (allGranted) {
-                        Toast.makeText(this, "所有申请的权限都已通过", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "All permissions are granted", Toast.LENGTH_SHORT).show()
                     } else {
-                        Toast.makeText(this, "您拒绝了如下权限：$deniedList", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "The following permissions are denied:$deniedList", Toast.LENGTH_SHORT).show()
                     }
                 }
         }
