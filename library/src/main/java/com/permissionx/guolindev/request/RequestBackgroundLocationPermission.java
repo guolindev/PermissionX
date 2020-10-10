@@ -61,7 +61,7 @@ public class RequestBackgroundLocationPermission extends BaseTask {
                 return;
             }
         }
-        // shouldn't request ACCESS_BACKGROUND_LOCATION at this time, so we call onResult() to finish this task.
+        // shouldn't request ACCESS_BACKGROUND_LOCATION at this time, so we call finish() to finish this task.
         finish();
     }
 
