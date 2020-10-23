@@ -50,6 +50,3 @@ dependencies {
 //    desc = 'Make Android runtime permission request easy.'
 //    website = 'https://github.com/guolindev/PermissionX'
 //}
-//repositories {
-//    mavenCentral()
-//}
