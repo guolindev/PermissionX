@@ -19,7 +19,6 @@ package com.permissionx.guolindev.request;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.provider.Settings;
 import android.view.View;
@@ -239,6 +238,15 @@ public class PermissionBuilder {
      */
     public void request(RequestCallback callback) {
         requestCallback = callback;
+        Fragment existedFragment = getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+        if (existedFragment != null) {
+            buildAndRunTask();
+        } else {
+
+        }
+    }
+
+    void buildAndRunTask() {
         // Build the request chain.
         // RequestNormalPermissions runs first.
         // Then RequestBackgroundLocationPermission runs.
