@@ -238,15 +238,6 @@ public class PermissionBuilder {
      */
     public void request(RequestCallback callback) {
         requestCallback = callback;
-        Fragment existedFragment = getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
-        if (existedFragment != null) {
-            buildAndRunTask();
-        } else {
-
-        }
-    }
-
-    void buildAndRunTask() {
         // Build the request chain.
         // RequestNormalPermissions runs first.
         // Then RequestBackgroundLocationPermission runs.
