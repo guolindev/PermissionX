@@ -13,7 +13,7 @@ import android.os.Build
  * @since 2020/8/27
  */
 @TargetApi(Build.VERSION_CODES.Q)
-fun getPermissionMapOnQ() = mapOf(
+fun getPermissionMapOnQ(): Map<String, String> = mapOf(
     Manifest.permission.READ_CALENDAR to Manifest.permission_group.CALENDAR,
     Manifest.permission.WRITE_CALENDAR to Manifest.permission_group.CALENDAR,
     Manifest.permission.READ_CALL_LOG to Manifest.permission_group.CALL_LOG,
@@ -50,4 +50,4 @@ fun getPermissionMapOnQ() = mapOf(
  * Thankfully Android R has no permission added or removed than Android Q.
  */
 @TargetApi(Build.VERSION_CODES.R)
-fun getPermissionMapOnR() = getPermissionMapOnQ()
+fun getPermissionMapOnR(): Map<String, String> = getPermissionMapOnQ()

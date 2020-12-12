@@ -12,17 +12,20 @@ import kotlinx.android.synthetic.main.fragment_main.*
 
 class MainFragment : Fragment() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_main, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val context = context!!
         makeRequestBtn.setOnClickListener {
             PermissionX.init(this)
                 .permissions(
-                Manifest.permission.CAMERA,
+                    Manifest.permission.CAMERA,
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.RECORD_AUDIO,
 //                    Manifest.permission.READ_CALENDAR,
@@ -34,7 +37,7 @@ class MainFragment : Fragment() {
 //                    Manifest.permission.SEND_SMS,
 //                    Manifest.permission.READ_EXTERNAL_STORAGE
                 )
-                .onExplainRequestReason { scope, deniedList, beforeRequest ->
+                .onExplainRequestReason { scope, deniedList, _ ->
                     val message = "PermissionX needs following permissions to continue"
                     scope.showRequestReasonDialog(deniedList, message, "Allow", "Deny")
 //                    val message = "Please allow the following permissions in settings"
@@ -46,11 +49,16 @@ class MainFragment : Fragment() {
                     val dialog = CustomDialogFragment(message, deniedList)
                     scope.showForwardToSettingsDialog(dialog)
                 }
-                .request { allGranted, grantedList, deniedList ->
+                .request { allGranted, _, deniedList ->
                     if (allGranted) {
-                        Toast.makeText(activity, "All permissions are granted", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(activity, "All permissions are granted", Toast.LENGTH_SHORT)
+                            .show()
                     } else {
-                        Toast.makeText(activity, "The following permissions are denied：$deniedList", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            activity,
+                            "The following permissions are denied：$deniedList",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
         }

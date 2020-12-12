@@ -87,7 +87,7 @@ public class InvisibleFragment extends Fragment {
     void requestAccessBackgroundLocationNow(PermissionBuilder permissionBuilder, ChainTask chainTask) {
         pb = permissionBuilder;
         task = chainTask;
-        requestPermissions(new String[]{ ACCESS_BACKGROUND_LOCATION }, REQUEST_BACKGROUND_LOCATION_PERMISSION);
+        requestPermissions(new String[]{ACCESS_BACKGROUND_LOCATION}, REQUEST_BACKGROUND_LOCATION_PERMISSION);
     }
 
     @Override
@@ -251,6 +251,7 @@ public class InvisibleFragment extends Fragment {
     /**
      * On some phones, PermissionBuilder and ChainTask may become null under unpredictable occasions such as GC.
      * They should not be null at this time, so we can do nothing in this case.
+     *
      * @return PermissionBuilder and ChainTask are still alive or not. If not, we should not do any further logic.
      */
     private boolean checkForGC() {

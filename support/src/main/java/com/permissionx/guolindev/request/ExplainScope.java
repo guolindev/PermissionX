@@ -25,14 +25,15 @@ import java.util.List;
 
 /**
  * Provide specific scopes for {@link com.permissionx.guolindev.callback.ExplainReasonCallback} and {@link com.permissionx.guolindev.callback.ExplainReasonCallbackWithBeforeParam} to give it specific functions to call.
+ *
  * @author guolin
  * @since 2020/3/18
  */
 public class ExplainScope {
 
-    private PermissionBuilder pb;
+    private final PermissionBuilder pb;
 
-    private ChainTask chainTask;
+    private final ChainTask chainTask;
 
     ExplainScope(PermissionBuilder pb, ChainTask chainTask) {
         this.pb = pb;
@@ -41,14 +42,11 @@ public class ExplainScope {
 
     /**
      * Show a rationale dialog to explain to user why you need these permissions.
-     * @param permissions
-     *          Permissions that to request.
-     * @param message
-     *          Message that show to user.
-     * @param positiveText
-     *          Text on the positive button. When user click, PermissionX will request permissions again.
-     * @param negativeText
-     *          Text on the negative button. When user click, PermissionX will finish request.
+     *
+     * @param permissions  Permissions that to request.
+     * @param message      Message that show to user.
+     * @param positiveText Text on the positive button. When user click, PermissionX will request permissions again.
+     * @param negativeText Text on the negative button. When user click, PermissionX will finish request.
      */
     public void showRequestReasonDialog(List<String> permissions, String message, String positiveText, String negativeText) {
         pb.showHandlePermissionDialog(chainTask, true, permissions, message, positiveText, negativeText);
@@ -56,12 +54,10 @@ public class ExplainScope {
 
     /**
      * Show a rationale dialog to explain to user why you need these permissions.
-     * @param permissions
-     *          Permissions that to request.
-     * @param message
-     *          Message that show to user.
-     * @param positiveText
-     *          Text on the positive button. When user click, PermissionX will request permissions again.
+     *
+     * @param permissions  Permissions that to request.
+     * @param message      Message that show to user.
+     * @param positiveText Text on the positive button. When user click, PermissionX will request permissions again.
      */
     public void showRequestReasonDialog(List<String> permissions, String message, String positiveText) {
         showRequestReasonDialog(permissions, message, positiveText, null);
@@ -69,8 +65,8 @@ public class ExplainScope {
 
     /**
      * Show a rationale dialog to explain to user why you need these permissions.
-     * @param dialog
-     *          Dialog to explain to user why these permissions are necessary.
+     *
+     * @param dialog Dialog to explain to user why these permissions are necessary.
      */
     public void showRequestReasonDialog(@NonNull RationaleDialog dialog) {
         pb.showHandlePermissionDialog(chainTask, true, dialog);
@@ -78,8 +74,8 @@ public class ExplainScope {
 
     /**
      * Show a rationale dialog to explain to user why you need these permissions.
-     * @param dialogFragment
-     *          DialogFragment to explain to user why these permissions are necessary.
+     *
+     * @param dialogFragment DialogFragment to explain to user why these permissions are necessary.
      */
     public void showRequestReasonDialog(@NonNull RationaleDialogFragment dialogFragment) {
         pb.showHandlePermissionDialog(chainTask, true, dialogFragment);

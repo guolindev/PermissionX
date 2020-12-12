@@ -9,7 +9,7 @@
         android:id="@+id/makeRequestBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAllCaps="false"
-        android:text="Make Request" />
+        android:text="Make Request"
+        android:textAllCaps="false" />
 
 </LinearLayout>

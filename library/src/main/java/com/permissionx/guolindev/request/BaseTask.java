@@ -32,24 +32,21 @@ import static com.permissionx.guolindev.request.RequestBackgroundLocationPermiss
 abstract class BaseTask implements ChainTask {
 
     /**
-     * Point to the next task. When this task finish will run next task. If there's no next task, the request process end.
-     */
-    protected ChainTask next;
-
-    /**
      * Instance of PermissionBuilder.
      */
-    protected PermissionBuilder pb;
-
+    protected final PermissionBuilder pb;
     /**
      * Provide specific scopes for explainReasonCallback for specific functions to call.
      */
-    ExplainScope explainReasonScope;
-
+    final ExplainScope explainReasonScope;
     /**
      * Provide specific scopes for forwardToSettingsCallback for specific functions to call.
      */
-    ForwardScope forwardToSettingsScope;
+    final ForwardScope forwardToSettingsScope;
+    /**
+     * Point to the next task. When this task finish will run next task. If there's no next task, the request process end.
+     */
+    protected ChainTask next;
 
     BaseTask(PermissionBuilder permissionBuilder) {
         pb = permissionBuilder;

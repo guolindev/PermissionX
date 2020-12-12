@@ -3,33 +3,30 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/custom_dialog_bg"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/messageText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textColor="#fff"
         android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
         android:layout_marginTop="20dp"
-        />
+        android:layout_marginRight="20dp"
+        android:textColor="#fff"
+        android:textSize="20sp" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="20dp"
-        android:scrollbars="none"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:scrollbars="none">
 
         <LinearLayout
             android:id="@+id/permissionsLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            />
+            android:orientation="vertical" />
 
     </ScrollView>
 
@@ -46,8 +43,8 @@
             android:layout_width="120dp"
             android:layout_height="46dp"
             android:background="@drawable/negative_button_bg"
-            android:textColor="#fff"
-            android:text="拒绝"/>
+            android:text="拒绝"
+            android:textColor="#fff" />
 
         <Button
             android:id="@+id/positiveBtn"
@@ -56,8 +53,8 @@
             android:layout_marginStart="30dp"
             android:layout_marginLeft="30dp"
             android:background="@drawable/positive_button_bg"
-            android:textColor="#fff"
-            android:text="开启"/>
+            android:text="开启"
+            android:textColor="#fff" />
 
     </LinearLayout>
 

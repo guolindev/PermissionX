@@ -52,7 +52,8 @@ object PermissionX {
      *  @param permission Specific permission name to check. e.g. [android.Manifest.permission.CAMERA].
      *  @return True if this permission is granted, False otherwise.
      */
-    fun isGranted(context: Context, permission: String) = ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+    fun isGranted(context: Context, permission: String) =
+        ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
 
 }
 

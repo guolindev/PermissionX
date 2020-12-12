@@ -32,6 +32,7 @@ import static com.permissionx.guolindev.request.RequestBackgroundLocationPermiss
 
 /**
  * An internal class to provide specific scope for passing permissions param.
+ *
  * @author guolin
  * @since 2019/11/2
  */
@@ -53,19 +54,21 @@ public class PermissionCollection {
 
     /**
      * All permissions that you want to request.
+     *
      * @param permissions A vararg param to pass permissions.
      * @return PermissionBuilder itself.
      */
-    public PermissionBuilder permissions(String... permissions)  {
+    public PermissionBuilder permissions(String... permissions) {
         return permissions(new ArrayList<>(Arrays.asList(permissions)));
     }
 
     /**
      * All permissions that you want to request.
+     *
      * @param permissions A vararg param to pass permissions.
      * @return PermissionBuilder itself.
      */
-    public PermissionBuilder permissions(List<String> permissions)  {
+    public PermissionBuilder permissions(List<String> permissions) {
         Set<String> permissionSet = new HashSet<>(permissions);
         boolean requireBackgroundLocationPermission = false;
         Set<String> permissionsWontRequest = new HashSet<>();

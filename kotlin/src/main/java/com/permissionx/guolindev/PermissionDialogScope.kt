@@ -23,8 +23,19 @@ package com.permissionx.guolindev
  */
 class ExplainReasonScope(private val permissionBuilder: PermissionBuilder) {
 
-    fun showRequestReasonDialog(permissions: List<String>, message: String, positiveText: String, negativeText: String? = null) {
-        permissionBuilder.showHandlePermissionDialog(true, permissions, message, positiveText, negativeText)
+    fun showRequestReasonDialog(
+        permissions: List<String>,
+        message: String,
+        positiveText: String,
+        negativeText: String? = null
+    ) {
+        permissionBuilder.showHandlePermissionDialog(
+            true,
+            permissions,
+            message,
+            positiveText,
+            negativeText
+        )
     }
 
 }
@@ -36,8 +47,19 @@ class ExplainReasonScope(private val permissionBuilder: PermissionBuilder) {
  */
 class ForwardToSettingsScope(private val permissionBuilder: PermissionBuilder) {
 
-    fun showForwardToSettingsDialog(permissions: List<String>, message: String, positiveText: String, negativeText: String? = null) {
-        permissionBuilder.showHandlePermissionDialog(false, permissions, message, positiveText, negativeText)
+    fun showForwardToSettingsDialog(
+        permissions: List<String>,
+        message: String,
+        positiveText: String,
+        negativeText: String? = null
+    ) {
+        permissionBuilder.showHandlePermissionDialog(
+            false,
+            permissions,
+            message,
+            positiveText,
+            negativeText
+        )
     }
 
 }

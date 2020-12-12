@@ -52,87 +52,71 @@ public class PermissionBuilder {
      * TAG of InvisibleFragment to find and create.
      */
     private static final String FRAGMENT_TAG = "InvisibleFragment";
-
-    /**
-     * Instance of activity for everything.
-     */
-    FragmentActivity activity;
-
     /**
      * Instance of fragment for everything as an alternative choice for activity.
      */
-    Fragment fragment;
-
-    /**
-     * Instance of the current dialog that shows to user. We need to dismiss this dialog when InvisibleFragment destroyed.
-     */
-    Dialog currentDialog;
-
+    final Fragment fragment;
     /**
      * Normal runtime permissions that app want to request.
      */
-    Set<String> normalPermissions;
-
+    final Set<String> normalPermissions;
     /**
      * Some permissions shouldn't request will be stored here. And notify back to user when request finished.
      */
-    Set<String> permissionsWontRequest;
-
+    final Set<String> permissionsWontRequest;
     /**
      * Indicate if we should require background location permission alone.
      * If app run on Android R and targetSdkVersion is R, when request ACCESS_BACKGROUND_LOCATION, this should be true.
      */
-    boolean requireBackgroundLocationPermission;
-
-    /**
-     * Indicates should PermissionX explain request reason before request.
-     */
-    boolean explainReasonBeforeRequest = false;
-
-    /**
-     * Indicates {@link ExplainScope#showRequestReasonDialog(List, String, String)} or {@link ForwardScope#showForwardToSettingsDialog(List, String, String)} is called in {@link #onExplainRequestReason(ExplainReasonCallback)} or {@link #onForwardToSettings(ForwardToSettingsCallback)} callback.
-     * If not called, requestCallback will be called by PermissionX automatically.
-     */
-    boolean showDialogCalled = false;
-
-    /**
-     * The custom tint color to set on the DefaultDialog in light theme.
-     */
-    int lightColor = -1;
-
-    /**
-     * The custom tint color to set on the DefaultDialog in dark theme.
-     */
-    int darkColor = -1;
-
+    final boolean requireBackgroundLocationPermission;
     /**
      * Holds permissions that have already granted in the requested permissions.
      */
-    Set<String> grantedPermissions = new HashSet<>();
-
+    final Set<String> grantedPermissions = new HashSet<>();
     /**
      * Holds permissions that have been denied in the requested permissions.
      */
-    Set<String> deniedPermissions = new HashSet<>();
-
+    final Set<String> deniedPermissions = new HashSet<>();
     /**
      * Holds permissions that have been permanently denied in the requested permissions. (Deny and never ask again)
      */
-    Set<String> permanentDeniedPermissions = new HashSet<>();
-
+    final Set<String> permanentDeniedPermissions = new HashSet<>();
     /**
      * When we request multiple permissions. Some are denied, some are permanently denied. Denied permissions will be callback first.
      * And the permanently denied permissions will store in this tempPermanentDeniedPermissions. They will be callback once no more
      * denied permissions exist.
      */
-    Set<String> tempPermanentDeniedPermissions = new HashSet<>();
-
+    final Set<String> tempPermanentDeniedPermissions = new HashSet<>();
     /**
      * Holds permissions which should forward to Settings to allow them.
      * Not all permanently denied permissions should forward to Settings. Only the ones developer think they are necessary should.
      */
-    Set<String> forwardPermissions = new HashSet<>();
-
+    final Set<String> forwardPermissions = new HashSet<>();
+    /**
+     * Instance of activity for everything.
+     */
+    FragmentActivity activity;
+    /**
+     * Instance of the current dialog that shows to user. We need to dismiss this dialog when InvisibleFragment destroyed.
+     */
+    Dialog currentDialog;
+    /**
+     * Indicates should PermissionX explain request reason before request.
+     */
+    boolean explainReasonBeforeRequest = false;
+    /**
+     * Indicates {@link ExplainScope#showRequestReasonDialog(List, String, String)} or {@link ForwardScope#showForwardToSettingsDialog(List, String, String)} is called in {@link #onExplainRequestReason(ExplainReasonCallback)} or {@link #onForwardToSettings(ForwardToSettingsCallback)} callback.
+     * If not called, requestCallback will be called by PermissionX automatically.
+     */
+    boolean showDialogCalled = false;
+    /**
+     * The custom tint color to set on the DefaultDialog in light theme.
+     */
+    int lightColor = -1;
+    /**
+     * The custom tint color to set on the DefaultDialog in dark theme.
+     */
+    int darkColor = -1;
     /**
      * The callback for {@link #request(RequestCallback)} method. Can not be null.
      */
@@ -219,10 +203,9 @@ public class PermissionBuilder {
 
     /**
      * Set the tint color to the default rationale dialog.
-     * @param lightColor
-     *          Used in light theme. A color value in the form 0xAARRGGBB. Do not pass a resource ID. To get a color value from a resource ID, call getColor.
-     * @param darkColor
-     *          Used in dark theme. A color value in the form 0xAARRGGBB. Do not pass a resource ID. To get a color value from a resource ID, call getColor.
+     *
+     * @param lightColor Used in light theme. A color value in the form 0xAARRGGBB. Do not pass a resource ID. To get a color value from a resource ID, call getColor.
+     * @param darkColor  Used in dark theme. A color value in the form 0xAARRGGBB. Do not pass a resource ID. To get a color value from a resource ID, call getColor.
      * @return PermissionBuilder itself.
      */
     public PermissionBuilder setDialogTintColor(int lightColor, int darkColor) {
@@ -381,6 +364,7 @@ public class PermissionBuilder {
 
     /**
      * Get the FragmentManager if it's in Activity, or the ChildFragmentManager if it's in Fragment.
+     *
      * @return The FragmentManager to operate Fragment.
      */
     FragmentManager getFragmentManager() {

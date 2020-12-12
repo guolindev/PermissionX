@@ -18,6 +18,7 @@ package com.permissionx.guolindev.request;
 
 /**
  * Maintain the task chain of permission request process.
+ *
  * @author guolin
  * @since 2020/6/10
  */
@@ -35,7 +36,8 @@ public class RequestChain {
 
     /**
      * Add a task into task chain.
-     * @param task  task to add.
+     *
+     * @param task task to add.
      */
     public void addTaskToChain(BaseTask task) {
         if (headTask == null) {

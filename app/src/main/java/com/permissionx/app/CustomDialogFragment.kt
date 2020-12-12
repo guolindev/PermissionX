@@ -5,7 +5,6 @@ import android.annotation.TargetApi
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.os.Message
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,12 +19,13 @@ class CustomDialogFragment() : RationaleDialogFragment() {
 
     var mPermissions: List<String> = emptyList()
 
-    constructor(message: String, permissions: List<String>): this() {
+    constructor(message: String, permissions: List<String>) : this() {
         mMessage = message
         mPermissions = permissions
     }
 
-    private val permissionMap = mapOf(Manifest.permission.READ_CALENDAR to Manifest.permission_group.CALENDAR,
+    private val permissionMap = mapOf(
+        Manifest.permission.READ_CALENDAR to Manifest.permission_group.CALENDAR,
         Manifest.permission.WRITE_CALENDAR to Manifest.permission_group.CALENDAR,
         Manifest.permission.READ_CALL_LOG to Manifest.permission_group.CALL_LOG,
         Manifest.permission.WRITE_CALL_LOG to Manifest.permission_group.CALL_LOG,
@@ -74,30 +74,29 @@ class CustomDialogFragment() : RationaleDialogFragment() {
         buildPermissionsLayout()
     }
 
-    override fun getNegativeButton(): View? {
-        return negativeBtn
-    }
+    override fun getNegativeButton(): View? = negativeBtn
 
-    override fun getPositiveButton(): View {
-        return positiveBtn
-    }
+    override fun getPositiveButton(): View = positiveBtn
 
-    override fun getPermissionsToRequest(): List<String> {
-        return mPermissions
-    }
+    override fun getPermissionsToRequest(): List<String> = mPermissions
 
     private fun buildPermissionsLayout() {
         for (permission in mPermissions) {
             val permissionGroup = permissionMap[permission]
             if (permissionGroup != null && !groupSet.contains(permissionGroup)) {
-                val textView = LayoutInflater.from(context).inflate(R.layout.permissions_item, permissionsLayout, false) as TextView
-                textView.text = context?.let {
-                    it.packageManager.getPermissionGroupInfo(permissionGroup, 0).loadLabel(it.packageManager)
+                (LayoutInflater.from(context).inflate(
+                    R.layout.permissions_item,
+                    permissionsLayout,
+                    false
+                ) as TextView).also { tv ->
+                    tv.text = context?.let {
+                        it.packageManager.getPermissionGroupInfo(permissionGroup, 0)
+                            .loadLabel(it.packageManager)
+                    }
+                    permissionsLayout.addView(tv)
                 }
-                permissionsLayout.addView(textView)
                 groupSet.add(permissionGroup)
             }
         }
     }
-
 }

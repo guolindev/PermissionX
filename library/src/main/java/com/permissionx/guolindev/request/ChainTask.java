@@ -30,12 +30,14 @@ public interface ChainTask {
 
     /**
      * Get the ExplainScope for showing RequestReasonDialog.
+     *
      * @return Instance of ExplainScope.
      */
     ExplainScope getExplainScope();
 
     /**
      * Get the ForwardScope for showing ForwardToSettingsDialog.
+     *
      * @return Instance of ForwardScope.
      */
     ForwardScope getForwardScope();
@@ -47,8 +49,8 @@ public interface ChainTask {
 
     /**
      * Request permissions again when user denied.
-     * @param permissions
-     *          Permissions to request again.
+     *
+     * @param permissions Permissions to request again.
      */
     void requestAgain(List<String> permissions);
 

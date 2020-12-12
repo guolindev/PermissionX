@@ -25,7 +25,7 @@ import androidx.fragment.app.FragmentActivity;
 
 /**
  * An open source Android library that makes handling runtime permissions extremely easy.
- *
+ * <p>
  * The following snippet shows the simple usage:
  * <pre>
  *   PermissionX.init(activity)
@@ -33,7 +33,7 @@ import androidx.fragment.app.FragmentActivity;
  *      .request { allGranted, grantedList, deniedList ->
  *          // handling the logic
  *      }
- *</pre>
+ * </pre>
  *
  * @author guolin
  * @since 2019/11/2
@@ -61,11 +61,11 @@ public class PermissionX {
     }
 
     /**
-     *  A helper function to check a permission is granted or not.
+     * A helper function to check a permission is granted or not.
      *
-     *  @param context Any context, will not be retained.
-     *  @param permission Specific permission name to check. e.g. [android.Manifest.permission.CAMERA].
-     *  @return True if this permission is granted, False otherwise.
+     * @param context    Any context, will not be retained.
+     * @param permission Specific permission name to check. e.g. [android.Manifest.permission.CAMERA].
+     * @return True if this permission is granted, False otherwise.
      */
     public static boolean isGranted(Context context, String permission) {
         return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;

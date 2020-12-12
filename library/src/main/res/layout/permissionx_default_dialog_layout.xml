@@ -4,37 +4,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/permissionx_default_dialog_bg"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/messageText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textColor="@color/permissionx_text_color"
-        android:gravity="center"
         android:layout_marginLeft="28dp"
-        android:layout_marginRight="28dp"
         android:layout_marginTop="28dp"
-        />
+        android:layout_marginRight="28dp"
+        android:gravity="center"
+        android:textColor="@color/permissionx_text_color"
+        android:textSize="20sp" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginLeft="28dp"
-        android:layout_marginRight="28dp"
         android:layout_marginTop="16dp"
+        android:layout_marginRight="28dp"
         android:layout_marginBottom="20dp"
-        android:scrollbars="none"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:scrollbars="none">
 
         <LinearLayout
             android:id="@+id/permissionsLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            />
+            android:orientation="vertical" />
 
     </ScrollView>
 
@@ -42,24 +39,22 @@
         android:id="@+id/positiveLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
 
         <View
             android:layout_width="match_parent"
             android:layout_height="0.8dp"
-            android:background="@color/permissionx_split_line"
-            />
+            android:background="@color/permissionx_split_line" />
 
         <Button
             android:id="@+id/positiveBtn"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:background="?android:attr/selectableItemBackground"
-            android:textSize="14sp"
-            android:textColor="@color/permissionx_tint_color"
             android:textAllCaps="false"
-            tools:text="允许"/>
+            android:textColor="@color/permissionx_tint_color"
+            android:textSize="14sp"
+            tools:text="允许" />
 
     </LinearLayout>
 
@@ -67,24 +62,22 @@
         android:id="@+id/negativeLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
 
         <View
             android:layout_width="match_parent"
             android:layout_height="0.8dp"
-            android:background="@color/permissionx_split_line"
-            />
+            android:background="@color/permissionx_split_line" />
 
         <Button
             android:id="@+id/negativeBtn"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:background="?android:attr/selectableItemBackground"
-            android:textSize="14sp"
-            android:textColor="@color/permissionx_tint_color"
             android:textAllCaps="false"
-            tools:text="拒绝"/>
+            android:textColor="@color/permissionx_tint_color"
+            android:textSize="14sp"
+            tools:text="拒绝" />
 
     </LinearLayout>
 

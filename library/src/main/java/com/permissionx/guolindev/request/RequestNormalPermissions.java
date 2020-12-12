@@ -25,6 +25,7 @@ import java.util.Set;
 
 /**
  * Implementation for request normal permissions.
+ *
  * @author guolin
  * @since 2020/6/10
  */
@@ -66,7 +67,8 @@ public class RequestNormalPermissions extends BaseTask {
     /**
      * If permission is denied by user and {@link ExplainScope#showRequestReasonDialog(List, String, String)} or {@link ForwardScope#showForwardToSettingsDialog(List, String, String)} is called,
      * when user clicked positive button, will call this method.
-     * @param permissions   permissions to request again.
+     *
+     * @param permissions permissions to request again.
      */
     @Override
     public void requestAgain(List<String> permissions) {
