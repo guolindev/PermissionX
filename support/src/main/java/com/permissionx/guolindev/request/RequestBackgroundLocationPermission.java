@@ -46,7 +46,7 @@ public class RequestBackgroundLocationPermission extends BaseTask {
             boolean accessCoarseLocationGranted = PermissionX.isGranted(pb.activity, Manifest.permission.ACCESS_COARSE_LOCATION);
             if (accessFindLocationGranted || accessCoarseLocationGranted) {
                 if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
-                    List<String> requestList =  new ArrayList<>();
+                    List<String> requestList = new ArrayList<>();
                     requestList.add(ACCESS_BACKGROUND_LOCATION);
                     if (pb.explainReasonCallbackWithBeforeParam != null) {
                         // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
