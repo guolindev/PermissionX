@@ -18,7 +18,7 @@ fun getPermissionMapOnQ() = mapOf(
     Manifest.permission.WRITE_CALENDAR to Manifest.permission_group.CALENDAR,
     Manifest.permission.READ_CALL_LOG to Manifest.permission_group.CALL_LOG,
     Manifest.permission.WRITE_CALL_LOG to Manifest.permission_group.CALL_LOG,
-    Manifest.permission.PROCESS_OUTGOING_CALLS to Manifest.permission_group.CALL_LOG,
+    "android.permission.PROCESS_OUTGOING_CALLS" to Manifest.permission_group.CALL_LOG,
     Manifest.permission.CAMERA to Manifest.permission_group.CAMERA,
     Manifest.permission.READ_CONTACTS to Manifest.permission_group.CONTACTS,
     Manifest.permission.WRITE_CONTACTS to Manifest.permission_group.CONTACTS,
