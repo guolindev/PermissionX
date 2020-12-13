@@ -24,18 +24,18 @@ public class MainJavaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_java);
         Button makeRequestBtn = findViewById(R.id.makeRequestBtn);
-//        makeRequestBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
+        makeRequestBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 PermissionX.init(MainJavaActivity.this)
                         .permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         .explainReasonBeforeRequest()
                         .onExplainRequestReason(new ExplainReasonCallbackWithBeforeParam() {
                             @Override
                             public void onExplainReason(ExplainScope scope, List<String> deniedList, boolean beforeRequest) {
-                                CustomDialog customDialog = new CustomDialog(MainJavaActivity.this, "PermissionX needs following permissions to continue", deniedList);
-                                scope.showRequestReasonDialog(customDialog);
-//                                scope.showRequestReasonDialog(deniedList, "PermissionX needs following permissions to continue", "Allow");
+//                                CustomDialog customDialog = new CustomDialog(MainJavaActivity.this, "PermissionX needs following permissions to continue", deniedList);
+//                                scope.showRequestReasonDialog(customDialog);
+                                scope.showRequestReasonDialog(deniedList, "PermissionX needs following permissions to continue", "Allow");
                             }
                         })
                         .onForwardToSettings(new ForwardToSettingsCallback() {
@@ -54,7 +54,7 @@ public class MainJavaActivity extends AppCompatActivity {
                                 }
                             }
                         });
-//            }
-//        });
+            }
+        });
     }
 }

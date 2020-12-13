@@ -6,12 +6,10 @@ import android.graphics.PorterDuff
 import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.View
-import android.widget.LinearLayout
 import com.permissionx.guolindev.R
-import kotlinx.android.synthetic.main.permissionx_default_dialog_layout.*
-import kotlinx.android.synthetic.main.permissionx_permission_item.view.*
+import com.permissionx.guolindev.databinding.PermissionxDefaultDialogLayoutBinding
+import com.permissionx.guolindev.databinding.PermissionxPermissionItemBinding
 
 /**
  * Default rationale dialog to show if developers did not implement their own custom rationale dialog.
@@ -28,9 +26,12 @@ class DefaultDialog(context: Context,
     private val darkColor: Int
 ) : RationaleDialog(context, R.style.PermissionXDefaultDialog) {
 
+    private lateinit var binding: PermissionxDefaultDialogLayoutBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.permissionx_default_dialog_layout)
+        binding = PermissionxDefaultDialogLayoutBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         setupText()
         buildPermissionsLayout()
         setupWindow()
@@ -41,7 +42,7 @@ class DefaultDialog(context: Context,
      * @return Positive button instance to continue requesting.
      */
     override fun getPositiveButton(): View {
-        return positiveBtn
+        return binding.positiveBtn
     }
 
     /**
@@ -51,7 +52,7 @@ class DefaultDialog(context: Context,
      */
     override fun getNegativeButton(): View? {
         return negativeText?.let {
-            return negativeBtn
+            return binding.negativeBtn
         }
     }
 
@@ -67,23 +68,23 @@ class DefaultDialog(context: Context,
      * Setup text and text color on the dialog.
      */
     private fun setupText() {
-        messageText.text = message
-        positiveBtn.text = positiveText
+        binding.messageText.text = message
+        binding.positiveBtn.text = positiveText
         if (negativeText != null) {
-            negativeLayout.visibility = View.VISIBLE
-            negativeBtn.text = negativeText
+            binding.negativeLayout.visibility = View.VISIBLE
+            binding.negativeBtn.text = negativeText
         } else {
-            negativeLayout.visibility = View.GONE
+            binding.negativeLayout.visibility = View.GONE
         }
         if (isDarkTheme()) {
             if (darkColor != -1) {
-                positiveBtn.setTextColor(darkColor)
-                negativeBtn.setTextColor(darkColor)
+                binding.positiveBtn.setTextColor(darkColor)
+                binding.negativeBtn.setTextColor(darkColor)
             }
         } else {
             if (lightColor != -1) {
-                positiveBtn.setTextColor(lightColor)
-                negativeBtn.setTextColor(lightColor)
+                binding.positiveBtn.setTextColor(lightColor)
+                binding.negativeBtn.setTextColor(lightColor)
             }
         }
     }
@@ -109,19 +110,19 @@ class DefaultDialog(context: Context,
                 }
             }
             if (permissionGroup != null && !groupSet.contains(permissionGroup)) {
-                val layout = LayoutInflater.from(context).inflate(R.layout.permissionx_permission_item, permissionsLayout, false) as LinearLayout
-                layout.permissionText.text = context.getString(context.packageManager.getPermissionGroupInfo(permissionGroup, 0).labelRes)
-                layout.permissionIcon.setImageResource(context.packageManager.getPermissionGroupInfo(permissionGroup, 0).icon)
+                val itemBinding = PermissionxPermissionItemBinding.inflate(layoutInflater, binding.permissionsLayout, false)
+                itemBinding.permissionText.text = context.getString(context.packageManager.getPermissionGroupInfo(permissionGroup, 0).labelRes)
+                itemBinding.permissionIcon.setImageResource(context.packageManager.getPermissionGroupInfo(permissionGroup, 0).icon)
                 if (isDarkTheme()) {
                     if (darkColor != -1) {
-                        layout.permissionIcon.setColorFilter(darkColor, PorterDuff.Mode.SRC_ATOP)
+                        itemBinding.permissionIcon.setColorFilter(darkColor, PorterDuff.Mode.SRC_ATOP)
                     }
                 } else {
                     if (lightColor != -1) {
-                        layout.permissionIcon.setColorFilter(lightColor, PorterDuff.Mode.SRC_ATOP)
+                        itemBinding.permissionIcon.setColorFilter(lightColor, PorterDuff.Mode.SRC_ATOP)
                     }
                 }
-                permissionsLayout.addView(layout)
+                binding.permissionsLayout.addView(itemBinding.root)
                 groupSet.add(permissionGroup)
             }
         }
