@@ -3,11 +3,11 @@ package com.permissionx.app;
 import android.Manifest;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.permissionx.app.databinding.ActivityMainJavaBinding;
 import com.permissionx.guolindev.PermissionX;
 import com.permissionx.guolindev.callback.ExplainReasonCallbackWithBeforeParam;
 import com.permissionx.guolindev.callback.ForwardToSettingsCallback;
@@ -22,9 +22,9 @@ public class MainJavaActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_java);
-        Button makeRequestBtn = findViewById(R.id.makeRequestBtn);
-        makeRequestBtn.setOnClickListener(new View.OnClickListener() {
+        ActivityMainJavaBinding binding = ActivityMainJavaBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        binding.makeRequestBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 PermissionX.init(MainJavaActivity.this)

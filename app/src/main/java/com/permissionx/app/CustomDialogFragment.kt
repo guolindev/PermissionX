@@ -5,13 +5,13 @@ import android.annotation.TargetApi
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.os.Message
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.permissionx.app.databinding.CustomDialogLayoutBinding
+import com.permissionx.app.databinding.PermissionsItemBinding
 import com.permissionx.guolindev.dialog.RationaleDialogFragment
-import kotlinx.android.synthetic.main.custom_dialog_layout.*
 
 @TargetApi(30)
 class CustomDialogFragment() : RationaleDialogFragment() {
@@ -59,27 +59,33 @@ class CustomDialogFragment() : RationaleDialogFragment() {
 
     private val groupSet = HashSet<String>()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    private var _binding: CustomDialogLayoutBinding? = null
+
+    private val binding get() = _binding!!
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        return LayoutInflater.from(context).inflate(R.layout.custom_dialog_layout, container, false)
+        _binding = CustomDialogLayoutBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        messageText.text = mMessage
+        binding.messageText.text = mMessage
         buildPermissionsLayout()
     }
 
-    override fun getNegativeButton(): View? {
-        return negativeBtn
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    override fun getNegativeButton(): View {
+        return binding.negativeBtn
     }
 
     override fun getPositiveButton(): View {
-        return positiveBtn
+        return binding.positiveBtn
     }
 
     override fun getPermissionsToRequest(): List<String> {
@@ -90,11 +96,11 @@ class CustomDialogFragment() : RationaleDialogFragment() {
         for (permission in mPermissions) {
             val permissionGroup = permissionMap[permission]
             if (permissionGroup != null && !groupSet.contains(permissionGroup)) {
-                val textView = LayoutInflater.from(context).inflate(R.layout.permissions_item, permissionsLayout, false) as TextView
-                textView.text = context?.let {
+                val itemBinding = PermissionsItemBinding.inflate(layoutInflater, binding.permissionsLayout, false)
+                itemBinding.root.text = context?.let {
                     it.packageManager.getPermissionGroupInfo(permissionGroup, 0).loadLabel(it.packageManager)
                 }
-                permissionsLayout.addView(textView)
+                binding.permissionsLayout.addView(itemBinding.root)
                 groupSet.add(permissionGroup)
             }
         }

@@ -4,14 +4,13 @@ import android.Manifest
 import android.annotation.TargetApi
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.widget.TextView
+import com.permissionx.app.databinding.CustomDialogLayoutBinding
+import com.permissionx.app.databinding.PermissionsItemBinding
 import com.permissionx.guolindev.dialog.RationaleDialog
-import kotlinx.android.synthetic.main.custom_dialog_layout.*
 
 @TargetApi(30)
-class CustomDialog(context: Context, val message: String, val permissions: List<String>) : RationaleDialog(context, R.style.CustomDialog) {
+class CustomDialog(context: Context, private val message: String, private val permissions: List<String>) : RationaleDialog(context, R.style.CustomDialog) {
 
     private val permissionMap = mapOf(Manifest.permission.READ_CALENDAR to Manifest.permission_group.CALENDAR,
         Manifest.permission.WRITE_CALENDAR to Manifest.permission_group.CALENDAR,
@@ -47,10 +46,13 @@ class CustomDialog(context: Context, val message: String, val permissions: List<
 
     private val groupSet = HashSet<String>()
 
+    private lateinit var binding: CustomDialogLayoutBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.custom_dialog_layout)
-        messageText.text = message
+        binding = CustomDialogLayoutBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        binding.messageText.text = message
         buildPermissionsLayout()
         window?.let {
             val param = it.attributes
@@ -60,25 +62,25 @@ class CustomDialog(context: Context, val message: String, val permissions: List<
         }
     }
 
-    override fun getNegativeButton(): View? {
-        return negativeBtn
+    override fun getNegativeButton(): View {
+        return binding.negativeBtn
     }
 
     override fun getPositiveButton(): View {
-        return positiveBtn
+        return binding.positiveBtn
     }
 
     override fun getPermissionsToRequest(): List<String> {
-        return permissions;
+        return permissions
     }
 
     private fun buildPermissionsLayout() {
         for (permission in permissions) {
             val permissionGroup = permissionMap[permission]
             if (permissionGroup != null && !groupSet.contains(permissionGroup)) {
-                val textView = LayoutInflater.from(context).inflate(R.layout.permissions_item, permissionsLayout, false) as TextView
-                textView.text = context.packageManager.getPermissionGroupInfo(permissionGroup, 0).loadLabel(context.packageManager)
-                permissionsLayout.addView(textView)
+                val itemBinding = PermissionsItemBinding.inflate(layoutInflater, binding.permissionsLayout, false)
+                itemBinding.root.text = context.packageManager.getPermissionGroupInfo(permissionGroup, 0).loadLabel(context.packageManager)
+                binding.permissionsLayout.addView(itemBinding.root)
                 groupSet.add(permissionGroup)
             }
         }
