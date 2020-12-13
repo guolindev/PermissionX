@@ -1,5 +1,5 @@
-include ':appsupport'
 include ':app'
 include ':library'
-include ':support'
+//include ':appsupport'
+//include ':support'
 rootProject.name='PermissionX'
