@@ -219,10 +219,9 @@ public class PermissionBuilder {
 
     /**
      * Set the tint color to the default rationale dialog.
-     * @param lightColor
-     *          Used in light theme. A color value in the form 0xAARRGGBB. Do not pass a resource ID. To get a color value from a resource ID, call getColor.
-     * @param darkColor
-     *          Used in dark theme. A color value in the form 0xAARRGGBB. Do not pass a resource ID. To get a color value from a resource ID, call getColor.
+     *
+     * @param lightColor Used in light theme. A color value in the form 0xAARRGGBB. Do not pass a resource ID. To get a color value from a resource ID, call getColor.
+     * @param darkColor  Used in dark theme. A color value in the form 0xAARRGGBB. Do not pass a resource ID. To get a color value from a resource ID, call getColor.
      * @return PermissionBuilder itself.
      */
     public PermissionBuilder setDialogTintColor(int lightColor, int darkColor) {
@@ -294,7 +293,7 @@ public class PermissionBuilder {
                 if (showReasonOrGoSettings) {
                     chainTask.requestAgain(permissions);
                 } else {
-                    forwardToSettings(permissions);
+                    forwardToSettings(permissions, chainTask);
                 }
             }
         });
@@ -344,7 +343,7 @@ public class PermissionBuilder {
                 if (showReasonOrGoSettings) {
                     chainTask.requestAgain(permissions);
                 } else {
-                    forwardToSettings(permissions);
+                    forwardToSettings(permissions, chainTask);
                 }
             }
         });
@@ -415,13 +414,13 @@ public class PermissionBuilder {
      *
      * @param permissions Permissions which are necessary.
      */
-    private void forwardToSettings(List<String> permissions) {
+    private void forwardToSettings(List<String> permissions, ChainTask task) {
         forwardPermissions.clear();
         forwardPermissions.addAll(permissions);
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         Uri uri = Uri.fromParts("package", activity.getPackageName(), null);
         intent.setData(uri);
-        getInvisibleFragment().startActivityForResult(intent, InvisibleFragment.FORWARD_TO_SETTINGS);
+        getInvisibleFragment().requestToSettingPage(intent, InvisibleFragment.FORWARD_TO_SETTINGS, this, task);
     }
 
 }

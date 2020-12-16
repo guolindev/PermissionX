@@ -27,7 +27,9 @@ import androidx.fragment.app.Fragment;
 import com.permissionx.guolindev.PermissionX;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static com.permissionx.guolindev.request.RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION;
@@ -52,19 +54,20 @@ public class InvisibleFragment extends Fragment {
     public static final int REQUEST_BACKGROUND_LOCATION_PERMISSION = 2;
 
     /**
+     * the permission requests. requestXX(...) may be invoked more than once,
+     * and the field pb/task will be override by behind call.So we need a map to
+     * save request
+     */
+    private final Map<Integer, RequestInfo> requestInfoMap = new HashMap<>();
+
+    private int version = 0;
+
+    /**
      * Code for forward to settings page of current app.
      */
-    public static final int FORWARD_TO_SETTINGS = 2;
+    public static final int FORWARD_TO_SETTINGS = 3;
 
-    /**
-     * Instance of PermissionBuilder.
-     */
-    private PermissionBuilder pb;
-
-    /**
-     * Instance of current task.
-     */
-    private ChainTask task;
+    public static final int REQUEST_MASK = 10;
 
     /**
      * Request permissions at once by calling {@link Fragment#requestPermissions(String[], int)}, and handle request result in ActivityCompat.OnRequestPermissionsResultCallback.
@@ -74,9 +77,9 @@ public class InvisibleFragment extends Fragment {
      * @param chainTask         Instance of current task.
      */
     void requestNow(PermissionBuilder permissionBuilder, Set<String> permissions, ChainTask chainTask) {
-        pb = permissionBuilder;
-        task = chainTask;
-        requestPermissions(permissions.toArray(new String[0]), REQUEST_NORMAL_PERMISSIONS);
+        int requestCode = getRequestCode(REQUEST_NORMAL_PERMISSIONS);
+        requestInfoMap.put(requestCode, new RequestInfo(permissionBuilder, chainTask));
+        requestPermissions(permissions.toArray(new String[0]), requestCode);
     }
 
     /**
@@ -86,17 +89,24 @@ public class InvisibleFragment extends Fragment {
      * @param chainTask         Instance of current task.
      */
     void requestAccessBackgroundLocationNow(PermissionBuilder permissionBuilder, ChainTask chainTask) {
-        pb = permissionBuilder;
-        task = chainTask;
-        requestPermissions(new String[]{ ACCESS_BACKGROUND_LOCATION }, REQUEST_BACKGROUND_LOCATION_PERMISSION);
+        int requestCode = getRequestCode(REQUEST_BACKGROUND_LOCATION_PERMISSION);
+        requestInfoMap.put(requestCode, new RequestInfo(permissionBuilder, chainTask));
+        requestPermissions(new String[]{ACCESS_BACKGROUND_LOCATION}, requestCode);
+    }
+
+    void requestToSettingPage(Intent intent, int requestType, PermissionBuilder pb, ChainTask task) {
+        int requestCode = getRequestCode(requestType);
+        requestInfoMap.put(requestCode, new RequestInfo(pb, task));
+        startActivityForResult(intent, requestCode);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_NORMAL_PERMISSIONS) {
-            onRequestNormalPermissionsResult(permissions, grantResults);
-        } else if (requestCode == REQUEST_BACKGROUND_LOCATION_PERMISSION) {
-            onRequestBackgroundLocationPermissionResult();
+        int requestType = getRequestType(requestCode);
+        if (requestType == REQUEST_NORMAL_PERMISSIONS) {
+            onRequestNormalPermissionsResult(permissions, grantResults, requestCode);
+        } else if (requestType == REQUEST_BACKGROUND_LOCATION_PERMISSION) {
+            onRequestBackgroundLocationPermissionResult(requestCode);
         }
     }
 
@@ -106,9 +116,14 @@ public class InvisibleFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == FORWARD_TO_SETTINGS) {
-            if (checkForGC()) {
-                // When user switch back from settings, just request again.
+        int requestType = getRequestType(requestCode);
+        if (requestType == FORWARD_TO_SETTINGS) {
+            RequestInfo requestInfo = requestInfoMap.get(requestCode);
+            if (requestInfo == null) {
+                Log.w("PermissionX", "PermissionBuilder and ChainTask should not be null at this time, so we can do nothing in this case.");
+            } else {
+                ChainTask task = requestInfo.getTask();
+                PermissionBuilder pb = requestInfo.getPb();
                 task.requestAgain(new ArrayList<>(pb.forwardPermissions));
             }
         }
@@ -117,10 +132,13 @@ public class InvisibleFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (checkForGC()) {
-            // Dismiss the showing dialog when InvisibleFragment destroyed for avoiding window leak problem.
-            if (pb.currentDialog != null && pb.currentDialog.isShowing()) {
-                pb.currentDialog.dismiss();
+        for (Integer key : requestInfoMap.keySet()) {
+            RequestInfo info = requestInfoMap.get(key);
+            if (info != null) {
+                PermissionBuilder pb = info.getPb();
+                if (pb.currentDialog != null && pb.currentDialog.isShowing()) {
+                    pb.currentDialog.dismiss();
+                }
             }
         }
     }
@@ -128,10 +146,15 @@ public class InvisibleFragment extends Fragment {
     /**
      * Handle result of normal permissions request.
      */
-    private void onRequestNormalPermissionsResult(@NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (checkForGC()) {
+    private void onRequestNormalPermissionsResult(@NonNull String[] permissions, @NonNull int[] grantResults, int requestCode) {
+        RequestInfo requestInfo = requestInfoMap.get(requestCode);
+        if (requestInfo == null) {
+            Log.w("PermissionX", "PermissionBuilder and ChainTask should not be null at this time, so we can do nothing in this case.");
+        } else {
             // We can never holds granted permissions for safety, because user may turn some permissions off in settings.
             // So every time request, must request the already granted permissions again and refresh the granted permission set.
+            PermissionBuilder pb = requestInfo.getPb();
+            ChainTask task = requestInfo.getTask();
             pb.grantedPermissions.clear();
             List<String> showReasonList = new ArrayList<>(); // holds denied permissions in the request permissions.
             List<String> forwardList = new ArrayList<>(); // hold permanently denied permissions in the request permissions.
@@ -208,8 +231,13 @@ public class InvisibleFragment extends Fragment {
     /**
      * Handle result of ACCESS_BACKGROUND_LOCATION permission request.
      */
-    private void onRequestBackgroundLocationPermissionResult() {
-        if (checkForGC()) {
+    private void onRequestBackgroundLocationPermissionResult(int requestCode) {
+        RequestInfo requestInfo = requestInfoMap.get(requestCode);
+        if (requestInfo == null) {
+            Log.w("PermissionX", "PermissionBuilder and ChainTask should not be null at this time, so we can do nothing in this case.");
+        } else {
+            PermissionBuilder pb = requestInfo.getPb();
+            ChainTask task = requestInfo.getTask();
             if (PermissionX.isGranted(getContext(), ACCESS_BACKGROUND_LOCATION)) {
                 pb.grantedPermissions.add(ACCESS_BACKGROUND_LOCATION);
                 // Remove granted permissions from deniedPermissions and permanentDeniedPermissions set in PermissionBuilder.
@@ -249,17 +277,19 @@ public class InvisibleFragment extends Fragment {
         }
     }
 
-    /**
-     * On some phones, PermissionBuilder and ChainTask may become null under unpredictable occasions such as GC.
-     * They should not be null at this time, so we can do nothing in this case.
-     * @return PermissionBuilder and ChainTask are still alive or not. If not, we should not do any further logic.
-     */
-    private boolean checkForGC() {
-        if (pb == null || task == null) {
-            Log.w("PermissionX", "PermissionBuilder and ChainTask should not be null at this time, so we can do nothing in this case.");
-            return false;
+    private int getRequestCode(int requestType) {
+        int requestCode;
+        if (requestType == REQUEST_NORMAL_PERMISSIONS) {
+            requestCode = (REQUEST_NORMAL_PERMISSIONS << REQUEST_MASK) + version++;
+        } else if (requestType == REQUEST_BACKGROUND_LOCATION_PERMISSION) {
+            requestCode = (REQUEST_BACKGROUND_LOCATION_PERMISSION << REQUEST_MASK) + version++;
+        } else {
+            requestCode = (FORWARD_TO_SETTINGS << REQUEST_MASK) + version++;
         }
-        return true;
+        return requestCode;
     }
 
+    private int getRequestType(int requestCode) {
+        return requestCode >> REQUEST_MASK;
+    }
 }
