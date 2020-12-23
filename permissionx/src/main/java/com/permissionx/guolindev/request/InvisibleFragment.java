@@ -108,6 +108,10 @@ public class InvisibleFragment extends Fragment {
         } else if (requestType == REQUEST_BACKGROUND_LOCATION_PERMISSION) {
             onRequestBackgroundLocationPermissionResult(requestCode);
         }
+        requestInfoMap.remove(requestCode);
+        if (requestInfoMap.isEmpty() && getFragmentManager() != null) {
+            getFragmentManager().beginTransaction().remove(this).commitNowAllowingStateLoss();
+        }
     }
 
     /**
