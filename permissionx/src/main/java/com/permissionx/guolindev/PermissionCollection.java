@@ -16,20 +16,21 @@
 
 package com.permissionx.guolindev;
 
+import android.Manifest;
 import android.os.Build;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
 import com.permissionx.guolindev.request.PermissionBuilder;
+import com.permissionx.guolindev.request.RequestBackgroundLocationPermission;
+import com.permissionx.guolindev.request.RequestSystemAlertWindowPermission;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static com.permissionx.guolindev.request.RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION;
 
 /**
  * An internal class to provide specific scope for passing permissions param.
@@ -69,26 +70,33 @@ public class PermissionCollection {
     public PermissionBuilder permissions(List<String> permissions)  {
         Set<String> permissionSet = new HashSet<>(permissions);
         boolean requireBackgroundLocationPermission = false;
+        boolean requireSystemAlertWindowPermission = false;
         Set<String> permissionsWontRequest = new HashSet<>();
-        if (permissionSet.contains(ACCESS_BACKGROUND_LOCATION)) {
-            int osVersion = Build.VERSION.SDK_INT;
-            int targetSdkVersion;
-            if (fragment != null && fragment.getContext() != null) {
-                targetSdkVersion = fragment.getContext().getApplicationInfo().targetSdkVersion;
-            } else {
-                targetSdkVersion = activity.getApplicationInfo().targetSdkVersion;
-            }
-            if (osVersion >= 30 && targetSdkVersion >= 30) {
+        int osVersion = Build.VERSION.SDK_INT;
+        int targetSdkVersion;
+        if (fragment != null && fragment.getContext() != null) {
+            targetSdkVersion = fragment.getContext().getApplicationInfo().targetSdkVersion;
+        } else {
+            targetSdkVersion = activity.getApplicationInfo().targetSdkVersion;
+        }
+        if (permissionSet.contains(RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION)) {
+            if (osVersion >= Build.VERSION_CODES.R && targetSdkVersion >= Build.VERSION_CODES.R) {
                 requireBackgroundLocationPermission = true;
-                permissionSet.remove(ACCESS_BACKGROUND_LOCATION);
-            } else if (osVersion < 29) {
+                permissionSet.remove(RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION);
+            } else if (osVersion < Build.VERSION_CODES.Q) {
                 // If app runs under Android Q, there's no ACCESS_BACKGROUND_LOCATION permissions.
                 // We remove it from request list, but will append it to the request callback as denied permission.
-                permissionSet.remove(ACCESS_BACKGROUND_LOCATION);
-                permissionsWontRequest.add(ACCESS_BACKGROUND_LOCATION);
+                permissionSet.remove(RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION);
+                permissionsWontRequest.add(RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION);
             }
         }
-        return new PermissionBuilder(activity, fragment, permissionSet, requireBackgroundLocationPermission, permissionsWontRequest);
+        if (permissionSet.contains(Manifest.permission.SYSTEM_ALERT_WINDOW)) {
+            if (osVersion >= Build.VERSION_CODES.M && targetSdkVersion >= Build.VERSION_CODES.M) {
+                requireSystemAlertWindowPermission = true;
+                permissionSet.remove(Manifest.permission.SYSTEM_ALERT_WINDOW);
+            }
+        }
+        return new PermissionBuilder(activity, fragment, permissionSet, permissionsWontRequest, requireBackgroundLocationPermission, requireSystemAlertWindowPermission);
     }
 
 }

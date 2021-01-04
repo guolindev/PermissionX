@@ -42,6 +42,11 @@ public class RequestBackgroundLocationPermission extends BaseTask {
     @Override
     public void request() {
         if (pb.requireBackgroundLocationPermission) {
+            if (PermissionX.isGranted(pb.activity, ACCESS_BACKGROUND_LOCATION)) {
+                // ACCESS_BACKGROUND_LOCATION has already granted, we can finish this task now.
+                finish();
+                return;
+            }
             boolean accessFindLocationGranted = PermissionX.isGranted(pb.activity, Manifest.permission.ACCESS_FINE_LOCATION);
             boolean accessCoarseLocationGranted = PermissionX.isGranted(pb.activity, Manifest.permission.ACCESS_COARSE_LOCATION);
             if (accessFindLocationGranted || accessCoarseLocationGranted) {
@@ -55,13 +60,13 @@ public class RequestBackgroundLocationPermission extends BaseTask {
                         pb.explainReasonCallback.onExplainReason(explainReasonScope, requestList);
                     }
                 } else {
-                    // no implementation of explainReasonCallback, so we have to request ACCESS_BACKGROUND_LOCATION without explanation.
+                    // No implementation of explainReasonCallback, so we have to request ACCESS_BACKGROUND_LOCATION without explanation.
                     requestAgain(null);
                 }
                 return;
             }
         }
-        // shouldn't request ACCESS_BACKGROUND_LOCATION at this time, so we call finish() to finish this task.
+        // Shouldn't request ACCESS_BACKGROUND_LOCATION at this time, so we call finish() to finish this task.
         finish();
     }
 

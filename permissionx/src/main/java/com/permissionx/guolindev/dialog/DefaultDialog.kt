@@ -97,6 +97,7 @@ class DefaultDialog(context: Context,
         val groupSet = HashSet<String>()
         val currentVersion = Build.VERSION.SDK_INT
         for (permission in permissions) {
+            // TODO Add support for SYSTEM_ALERT_WINDOW permissions by making a specific icon for it and define translatable strings label.
             val permissionGroup = when(currentVersion) {
                 Build.VERSION_CODES.Q -> {
                     getPermissionMapOnQ()[permission]

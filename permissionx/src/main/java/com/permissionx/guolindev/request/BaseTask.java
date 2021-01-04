@@ -16,12 +16,14 @@
 
 package com.permissionx.guolindev.request;
 
+import android.Manifest;
+import android.os.Build;
+import android.provider.Settings;
+
 import com.permissionx.guolindev.PermissionX;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.permissionx.guolindev.request.RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION;
 
 /**
  * Define a BaseTask to implement the duplicate logic codes. No need to implement them in every task.
@@ -77,10 +79,17 @@ abstract class BaseTask implements ChainTask {
             deniedList.addAll(pb.permanentDeniedPermissions);
             deniedList.addAll(pb.permissionsWontRequest);
             if (pb.requireBackgroundLocationPermission) {
-                if (PermissionX.isGranted(pb.activity, ACCESS_BACKGROUND_LOCATION)) {
-                    pb.grantedPermissions.add(ACCESS_BACKGROUND_LOCATION);
+                if (PermissionX.isGranted(pb.activity, RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION)) {
+                    pb.grantedPermissions.add(RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION);
                 } else {
-                    deniedList.add(ACCESS_BACKGROUND_LOCATION);
+                    deniedList.add(RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION);
+                }
+            }
+            if (pb.requireSystemAlertWindowPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (Settings.canDrawOverlays(pb.activity)) {
+                    pb.grantedPermissions.add(Manifest.permission.SYSTEM_ALERT_WINDOW);
+                } else {
+                    deniedList.add(Manifest.permission.SYSTEM_ALERT_WINDOW);
                 }
             }
             if (pb.requestCallback != null) {

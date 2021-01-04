@@ -16,8 +16,12 @@
 
 package com.permissionx.guolindev.request;
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
+import android.provider.Settings;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -27,10 +31,9 @@ import androidx.fragment.app.Fragment;
 import com.permissionx.guolindev.PermissionX;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
-import static com.permissionx.guolindev.request.RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION;
 
 /**
  * An invisible fragment to embedded into activity for handling permission requests.
@@ -54,7 +57,9 @@ public class InvisibleFragment extends Fragment {
     /**
      * Code for forward to settings page of current app.
      */
-    public static final int FORWARD_TO_SETTINGS = 2;
+    public static final int FORWARD_TO_SETTINGS = 1;
+
+    public static final int ACTION_MANAGE_OVERLAY_PERMISSION = 2;
 
     /**
      * Instance of PermissionBuilder.
@@ -88,7 +93,19 @@ public class InvisibleFragment extends Fragment {
     void requestAccessBackgroundLocationNow(PermissionBuilder permissionBuilder, ChainTask chainTask) {
         pb = permissionBuilder;
         task = chainTask;
-        requestPermissions(new String[]{ ACCESS_BACKGROUND_LOCATION }, REQUEST_BACKGROUND_LOCATION_PERMISSION);
+        requestPermissions(new String[]{ RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION }, REQUEST_BACKGROUND_LOCATION_PERMISSION);
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    void requestOverlayPermissionNow(PermissionBuilder permissionBuilder, ChainTask chainTask) {
+        pb = permissionBuilder;
+        task = chainTask;
+        if (!Settings.canDrawOverlays(getContext())) {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+            startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION);
+        } else {
+            onRequestOverlayPermissionResult();
+        }
     }
 
     @Override
@@ -106,10 +123,15 @@ public class InvisibleFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == FORWARD_TO_SETTINGS) {
-            if (checkForGC()) {
-                // When user switch back from settings, just request again.
-                task.requestAgain(new ArrayList<>(pb.forwardPermissions));
+        // When user switch back from settings, just request again.
+        if (checkForGC()) {
+            switch (requestCode) {
+                case FORWARD_TO_SETTINGS:
+                    task.requestAgain(new ArrayList<>(pb.forwardPermissions));
+                    break;
+                case ACTION_MANAGE_OVERLAY_PERMISSION:
+                    onRequestOverlayPermissionResult();
+                    break;
             }
         }
     }
@@ -210,20 +232,20 @@ public class InvisibleFragment extends Fragment {
      */
     private void onRequestBackgroundLocationPermissionResult() {
         if (checkForGC()) {
-            if (PermissionX.isGranted(getContext(), ACCESS_BACKGROUND_LOCATION)) {
-                pb.grantedPermissions.add(ACCESS_BACKGROUND_LOCATION);
+            if (PermissionX.isGranted(getContext(), RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION)) {
+                pb.grantedPermissions.add(RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION);
                 // Remove granted permissions from deniedPermissions and permanentDeniedPermissions set in PermissionBuilder.
-                pb.deniedPermissions.remove(ACCESS_BACKGROUND_LOCATION);
-                pb.permanentDeniedPermissions.remove(ACCESS_BACKGROUND_LOCATION);
+                pb.deniedPermissions.remove(RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION);
+                pb.permanentDeniedPermissions.remove(RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION);
                 task.finish();
             } else {
                 boolean goesToRequestCallback = true; // Indicate if we should finish the task
-                boolean shouldShowRationale = shouldShowRequestPermissionRationale(ACCESS_BACKGROUND_LOCATION);
+                boolean shouldShowRationale = shouldShowRequestPermissionRationale(RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION);
                 // If explainReasonCallback is not null and we should show rationale. Try the ExplainReasonCallback.
                 if ((pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) && shouldShowRationale) {
                     goesToRequestCallback = false; // shouldn't because ExplainReasonCallback handles it
                     List<String> permissionsToExplain = new ArrayList<>();
-                    permissionsToExplain.add(ACCESS_BACKGROUND_LOCATION);
+                    permissionsToExplain.add(RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION);
                     if (pb.explainReasonCallbackWithBeforeParam != null) {
                         // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
                         pb.explainReasonCallbackWithBeforeParam.onExplainReason(task.getExplainScope(), permissionsToExplain, false);
@@ -235,7 +257,7 @@ public class InvisibleFragment extends Fragment {
                 else if (pb.forwardToSettingsCallback != null && !shouldShowRationale) {
                     goesToRequestCallback = false; // shouldn't because ForwardToSettingsCallback handles it
                     List<String> permissionsToForward = new ArrayList<>();
-                    permissionsToForward.add(ACCESS_BACKGROUND_LOCATION);
+                    permissionsToForward.add(RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION);
                     pb.forwardToSettingsCallback.onForwardToSettings(task.getForwardScope(), permissionsToForward);
                 }
                 // If showRequestReasonDialog or showForwardToSettingsDialog is not called. We should finish the task.
@@ -246,6 +268,26 @@ public class InvisibleFragment extends Fragment {
                     task.finish();
                 }
             }
+        }
+    }
+
+    /**
+     * Handle result of Settings.ACTION_MANAGE_OVERLAY_PERMISSION request.
+     */
+    private void onRequestOverlayPermissionResult() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (Settings.canDrawOverlays(getContext())) {
+                task.finish();
+            } else if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
+                if (pb.explainReasonCallbackWithBeforeParam != null) {
+                    // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
+                    pb.explainReasonCallbackWithBeforeParam.onExplainReason(task.getExplainScope(), Collections.singletonList(Manifest.permission.SYSTEM_ALERT_WINDOW), false);
+                } else {
+                    pb.explainReasonCallback.onExplainReason(task.getExplainScope(), Collections.singletonList(Manifest.permission.SYSTEM_ALERT_WINDOW));
+                }
+            }
+        } else {
+            task.finish();
         }
     }
 

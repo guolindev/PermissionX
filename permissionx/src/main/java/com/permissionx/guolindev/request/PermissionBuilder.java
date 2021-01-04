@@ -79,10 +79,15 @@ public class PermissionBuilder {
     Set<String> permissionsWontRequest;
 
     /**
-     * Indicate if we should require background location permission alone.
+     * Indicate if we should require background location permission.
      * If app run on Android R and targetSdkVersion is R, when request ACCESS_BACKGROUND_LOCATION, this should be true.
      */
     boolean requireBackgroundLocationPermission;
+
+    /**
+     * Indicate if we should require SYSTEM_ALERT_WINDOW permission.
+     */
+    boolean requireSystemAlertWindowPermission;
 
     /**
      * Indicates should PermissionX explain request reason before request.
@@ -153,7 +158,11 @@ public class PermissionBuilder {
      */
     ForwardToSettingsCallback forwardToSettingsCallback;
 
-    public PermissionBuilder(FragmentActivity activity, Fragment fragment, Set<String> normalPermissions, boolean requireBackgroundLocationPermission, Set<String> permissionsWontRequest) {
+    public PermissionBuilder(FragmentActivity activity, Fragment fragment,
+                             Set<String> normalPermissions,
+                             Set<String> permissionsWontRequest,
+                             boolean requireBackgroundLocationPermission,
+                             boolean requireSystemAlertWindowPermission) {
         // activity and fragment must not be null at same time
         this.activity = activity;
         this.fragment = fragment;
@@ -161,8 +170,9 @@ public class PermissionBuilder {
             this.activity = fragment.getActivity();
         }
         this.normalPermissions = normalPermissions;
-        this.requireBackgroundLocationPermission = requireBackgroundLocationPermission;
         this.permissionsWontRequest = permissionsWontRequest;
+        this.requireBackgroundLocationPermission = requireBackgroundLocationPermission;
+        this.requireSystemAlertWindowPermission = requireSystemAlertWindowPermission;
     }
 
     /**
@@ -244,6 +254,7 @@ public class PermissionBuilder {
         RequestChain requestChain = new RequestChain();
         requestChain.addTaskToChain(new RequestNormalPermissions(this));
         requestChain.addTaskToChain(new RequestBackgroundLocationPermission(this));
+        requestChain.addTaskToChain(new RequestSystemAlertWindowPermission(this));
         requestChain.runTask();
     }
 
@@ -377,6 +388,15 @@ public class PermissionBuilder {
      */
     void requestAccessBackgroundLocationNow(ChainTask chainTask) {
         getInvisibleFragment().requestAccessBackgroundLocationNow(this, chainTask);
+    }
+
+    /**
+     * Request Settings.ACTION_MANAGE_OVERLAY_PERMISSION at once in the fragment.
+     *
+     * @param chainTask Instance of current task.
+     */
+    void requestOverlayPermissionNow(ChainTask chainTask) {
+        getInvisibleFragment().requestOverlayPermissionNow(this, chainTask);
     }
 
     /**
