@@ -16,6 +16,7 @@
 
 package com.permissionx.guolindev.request;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -74,20 +75,10 @@ public class PermissionBuilder {
     Set<String> normalPermissions;
 
     /**
-     * Some permissions shouldn't request will be stored here. And notify back to user when request finished.
+     * Special permissions that we need to handle by special case.
+     * Such as SYSTEM_ALERT_WINDOW, WRITE_SETTINGS and MANAGE_EXTERNAL_STORAGE.
      */
-    Set<String> permissionsWontRequest;
-
-    /**
-     * Indicate if we should require background location permission.
-     * If app run on Android R and targetSdkVersion is R, when request ACCESS_BACKGROUND_LOCATION, this should be true.
-     */
-    boolean requireBackgroundLocationPermission;
-
-    /**
-     * Indicate if we should require SYSTEM_ALERT_WINDOW permission.
-     */
-    boolean requireSystemAlertWindowPermission;
+    Set<String> specialPermissions;
 
     /**
      * Indicates should PermissionX explain request reason before request.
@@ -109,6 +100,11 @@ public class PermissionBuilder {
      * The custom tint color to set on the DefaultDialog in dark theme.
      */
     int darkColor = -1;
+
+    /**
+     * Some permissions shouldn't request will be stored here. And notify back to user when request finished.
+     */
+    Set<String> permissionsWontRequest = new HashSet<>();
 
     /**
      * Holds permissions that have already granted in the requested permissions.
@@ -158,11 +154,10 @@ public class PermissionBuilder {
      */
     ForwardToSettingsCallback forwardToSettingsCallback;
 
-    public PermissionBuilder(FragmentActivity activity, Fragment fragment,
+    public PermissionBuilder(FragmentActivity activity,
+                             Fragment fragment,
                              Set<String> normalPermissions,
-                             Set<String> permissionsWontRequest,
-                             boolean requireBackgroundLocationPermission,
-                             boolean requireSystemAlertWindowPermission) {
+                             Set<String> specialPermissions) {
         // activity and fragment must not be null at same time
         this.activity = activity;
         this.fragment = fragment;
@@ -170,9 +165,7 @@ public class PermissionBuilder {
             this.activity = fragment.getActivity();
         }
         this.normalPermissions = normalPermissions;
-        this.permissionsWontRequest = permissionsWontRequest;
-        this.requireBackgroundLocationPermission = requireBackgroundLocationPermission;
-        this.requireSystemAlertWindowPermission = requireSystemAlertWindowPermission;
+        this.specialPermissions = specialPermissions;
     }
 
     /**
@@ -397,6 +390,14 @@ public class PermissionBuilder {
      */
     void requestOverlayPermissionNow(ChainTask chainTask) {
         getInvisibleFragment().requestOverlayPermissionNow(this, chainTask);
+    }
+
+    boolean requireBackgroundLocationPermission() {
+        return specialPermissions.contains(RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION);
+    }
+
+    boolean requireSystemAlertWindowPermission() {
+        return specialPermissions.contains(Manifest.permission.SYSTEM_ALERT_WINDOW);
     }
 
     /**

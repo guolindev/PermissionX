@@ -146,7 +146,7 @@ This library won't be long term supported, and could be deprecated at any time. 
 ## License
 
 ```
-Copyright (C)  guolin, PermissionX Open Source Project
+Copyright (C) guolin, PermissionX Open Source Project
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

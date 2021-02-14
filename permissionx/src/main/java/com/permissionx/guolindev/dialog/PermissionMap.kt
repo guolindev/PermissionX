@@ -21,10 +21,11 @@ import android.annotation.TargetApi
 import android.os.Build
 
 /**
- * Maintains the special permission list that we need to handle by special case.
+ * Maintains all the special permissions that we need to handle by special case.
  */
 @TargetApi(Build.VERSION_CODES.R)
-val specialPermissions = setOf(
+val allSpecialPermissions = setOf(
+    Manifest.permission.ACCESS_BACKGROUND_LOCATION,
     Manifest.permission.SYSTEM_ALERT_WINDOW,
     Manifest.permission.WRITE_SETTINGS,
     Manifest.permission.MANAGE_EXTERNAL_STORAGE

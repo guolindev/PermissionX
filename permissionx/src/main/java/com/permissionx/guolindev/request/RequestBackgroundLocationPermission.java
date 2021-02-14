@@ -17,6 +17,7 @@
 package com.permissionx.guolindev.request;
 
 import android.Manifest;
+import android.os.Build;
 
 import com.permissionx.guolindev.PermissionX;
 
@@ -41,7 +42,13 @@ public class RequestBackgroundLocationPermission extends BaseTask {
 
     @Override
     public void request() {
-        if (pb.requireBackgroundLocationPermission) {
+        if (pb.requireBackgroundLocationPermission()) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                // If app runs under Android Q, there's no ACCESS_BACKGROUND_LOCATION permissions.
+                // We remove it from request list, but will append it to the request callback as denied permission.
+                pb.specialPermissions.remove(ACCESS_BACKGROUND_LOCATION);
+                pb.permissionsWontRequest.add(ACCESS_BACKGROUND_LOCATION);
+            }
             if (PermissionX.isGranted(pb.activity, ACCESS_BACKGROUND_LOCATION)) {
                 // ACCESS_BACKGROUND_LOCATION has already granted, we can finish this task now.
                 finish();
@@ -72,7 +79,7 @@ public class RequestBackgroundLocationPermission extends BaseTask {
 
     @Override
     public void requestAgain(List<String> permissions) {
-        // don't care what the permissions param is, always request ACCESS_BACKGROUND_LOCATION
+        // Don't care what the permissions param is, always request ACCESS_BACKGROUND_LOCATION
         pb.requestAccessBackgroundLocationNow(this);
     }
 

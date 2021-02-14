@@ -123,7 +123,7 @@ class DefaultDialog(context: Context,
                 }
             }
             if ((permissionGroup != null && !tempSet.contains(permissionGroup))
-                || (permission in specialPermissions && !tempSet.contains(permission))) {
+                || (permission in allSpecialPermissions && !tempSet.contains(permission))) {
                 val itemBinding = PermissionxPermissionItemBinding.inflate(layoutInflater, binding.permissionsLayout, false)
                 when(permission) {
                     Manifest.permission.SYSTEM_ALERT_WINDOW -> {

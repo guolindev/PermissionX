@@ -46,8 +46,8 @@ public class PermissionX {
      * @param activity An instance of FragmentActivity
      * @return PermissionCollection instance.
      */
-    public static PermissionCollection init(FragmentActivity activity) {
-        return new PermissionCollection(activity);
+    public static PermissionMediator init(FragmentActivity activity) {
+        return new PermissionMediator(activity);
     }
 
     /**
@@ -56,8 +56,8 @@ public class PermissionX {
      * @param fragment An instance of Fragment
      * @return PermissionCollection instance.
      */
-    public static PermissionCollection init(Fragment fragment) {
-        return new PermissionCollection(fragment);
+    public static PermissionMediator init(Fragment fragment) {
+        return new PermissionMediator(fragment);
     }
 
     /**
