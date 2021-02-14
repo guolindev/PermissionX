@@ -1,5 +1,22 @@
+/*
+ * Copyright (C) guolin, PermissionX Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.permissionx.guolindev.dialog
 
+import android.Manifest
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.PorterDuff
@@ -94,26 +111,36 @@ class DefaultDialog(context: Context,
      * But we only need to add the permission group. So if there're two permissions belong to one group, only one item will be added to the dialog.
      */
     private fun buildPermissionsLayout() {
-        val groupSet = HashSet<String>()
+        val tempSet = HashSet<String>()
         val currentVersion = Build.VERSION.SDK_INT
         for (permission in permissions) {
-            // TODO Add support for SYSTEM_ALERT_WINDOW permissions by making a specific icon for it and define translatable strings label.
             val permissionGroup = when(currentVersion) {
-                Build.VERSION_CODES.Q -> {
-                    getPermissionMapOnQ()[permission]
-                }
-                Build.VERSION_CODES.R -> {
-                    getPermissionMapOnR()[permission]
-                }
+                Build.VERSION_CODES.Q -> permissionMapOnQ[permission]
+                Build.VERSION_CODES.R -> permissionMapOnR[permission]
                 else -> {
                     val permissionInfo = context.packageManager.getPermissionInfo(permission, 0)
                     permissionInfo.group
                 }
             }
-            if (permissionGroup != null && !groupSet.contains(permissionGroup)) {
+            if ((permissionGroup != null && !tempSet.contains(permissionGroup))
+                || (permission in specialPermissions && !tempSet.contains(permission))) {
                 val itemBinding = PermissionxPermissionItemBinding.inflate(layoutInflater, binding.permissionsLayout, false)
-                itemBinding.permissionText.text = context.getString(context.packageManager.getPermissionGroupInfo(permissionGroup, 0).labelRes)
-                itemBinding.permissionIcon.setImageResource(context.packageManager.getPermissionGroupInfo(permissionGroup, 0).icon)
+                when(permission) {
+                    Manifest.permission.SYSTEM_ALERT_WINDOW -> {
+                        itemBinding.permissionText.text = context.getString(R.string.permissionx_system_alert_window)
+                        itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_alert)
+                    }
+                    Manifest.permission.WRITE_SETTINGS -> {
+
+                    }
+                    Manifest.permission.MANAGE_EXTERNAL_STORAGE -> {
+
+                    }
+                    else -> {
+                        itemBinding.permissionText.text = context.getString(context.packageManager.getPermissionGroupInfo(permissionGroup!!, 0).labelRes)
+                        itemBinding.permissionIcon.setImageResource(context.packageManager.getPermissionGroupInfo(permissionGroup, 0).icon)
+                    }
+                }
                 if (isDarkTheme()) {
                     if (darkColor != -1) {
                         itemBinding.permissionIcon.setColorFilter(darkColor, PorterDuff.Mode.SRC_ATOP)
@@ -124,7 +151,7 @@ class DefaultDialog(context: Context,
                     }
                 }
                 binding.permissionsLayout.addView(itemBinding.root)
-                groupSet.add(permissionGroup)
+                tempSet.add(permissionGroup ?: permission)
             }
         }
     }

@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) guolin, PermissionX Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.permissionx.guolindev.dialog
 
 import android.Manifest
@@ -5,15 +21,23 @@ import android.annotation.TargetApi
 import android.os.Build
 
 /**
+ * Maintains the special permission list that we need to handle by special case.
+ */
+@TargetApi(Build.VERSION_CODES.R)
+val specialPermissions = setOf(
+    Manifest.permission.SYSTEM_ALERT_WINDOW,
+    Manifest.permission.WRITE_SETTINGS,
+    Manifest.permission.MANAGE_EXTERNAL_STORAGE
+)
+
+/**
  * Based on this link https://developer.android.com/about/versions/10/privacy/changes#permission-groups-removed
  * Since Android Q, we can not get the permission group name by permission name anymore.
- * So we need to keep a track of relationship between permissions and permission groups on every Android release since Android Q.
- *
- * @author guolin
- * @since 2020/8/27
+ * So we need to keep a track of relationship between permissions and permission groups on every
+ * Android release since Android Q.
  */
 @TargetApi(Build.VERSION_CODES.Q)
-fun getPermissionMapOnQ() = mapOf(
+val permissionMapOnQ = mapOf(
     Manifest.permission.READ_CALENDAR to Manifest.permission_group.CALENDAR,
     Manifest.permission.WRITE_CALENDAR to Manifest.permission_group.CALENDAR,
     Manifest.permission.READ_CALL_LOG to Manifest.permission_group.CALL_LOG,
@@ -50,4 +74,4 @@ fun getPermissionMapOnQ() = mapOf(
  * Thankfully Android R has no permission added or removed than Android Q.
  */
 @TargetApi(Build.VERSION_CODES.R)
-fun getPermissionMapOnR() = getPermissionMapOnQ()
+val permissionMapOnR = permissionMapOnQ

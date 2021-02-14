@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="permissionx_system_alert_window">显示在其他应用的上层</string>
+</resources>

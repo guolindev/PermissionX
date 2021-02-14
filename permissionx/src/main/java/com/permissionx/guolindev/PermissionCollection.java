@@ -1,5 +1,5 @@
 /*
- * Copyright (C)  guolin, PermissionX Open Source Project
+ * Copyright (C) guolin, PermissionX Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.permissionx.guolindev.request.PermissionBuilder;
 import com.permissionx.guolindev.request.RequestBackgroundLocationPermission;
-import com.permissionx.guolindev.request.RequestSystemAlertWindowPermission;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,8 +37,6 @@ import java.util.Set;
  * @since 2019/11/2
  */
 public class PermissionCollection {
-
-    private static final String TAG = "PermissionCollection";
 
     private FragmentActivity activity;
 
