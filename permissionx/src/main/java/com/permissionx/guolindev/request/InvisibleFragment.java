@@ -96,15 +96,19 @@ public class InvisibleFragment extends Fragment {
         requestPermissions(new String[]{ RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION }, REQUEST_BACKGROUND_LOCATION_PERMISSION);
     }
 
+    /**
+     * Request SYSTEM_ALERT_WINDOW permission. On Android M and above, it's request by
+     * Settings.ACTION_MANAGE_OVERLAY_PERMISSION with Intent.
+     */
     @TargetApi(Build.VERSION_CODES.M)
-    void requestOverlayPermissionNow(PermissionBuilder permissionBuilder, ChainTask chainTask) {
+    void requestSystemAlertWindowPermissionNow(PermissionBuilder permissionBuilder, ChainTask chainTask) {
         pb = permissionBuilder;
         task = chainTask;
         if (!Settings.canDrawOverlays(getContext())) {
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
             startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION);
         } else {
-            onRequestOverlayPermissionResult();
+            onRequestSystemAlertWindowPermissionResult();
         }
     }
 
@@ -130,7 +134,7 @@ public class InvisibleFragment extends Fragment {
                     task.requestAgain(new ArrayList<>(pb.forwardPermissions));
                     break;
                 case ACTION_MANAGE_OVERLAY_PERMISSION:
-                    onRequestOverlayPermissionResult();
+                    onRequestSystemAlertWindowPermissionResult();
                     break;
             }
         }
@@ -272,9 +276,9 @@ public class InvisibleFragment extends Fragment {
     }
 
     /**
-     * Handle result of Settings.ACTION_MANAGE_OVERLAY_PERMISSION request.
+     * Handle result of SYSTEM_ALERT_WINDOW permission request.
      */
-    private void onRequestOverlayPermissionResult() {
+    private void onRequestSystemAlertWindowPermissionResult() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (Settings.canDrawOverlays(getContext())) {
                 task.finish();

@@ -42,7 +42,7 @@ public class RequestBackgroundLocationPermission extends BaseTask {
 
     @Override
     public void request() {
-        if (pb.requireBackgroundLocationPermission()) {
+        if (pb.shouldRequestBackgroundLocationPermission()) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
                 // If app runs under Android Q, there's no ACCESS_BACKGROUND_LOCATION permissions.
                 // We remove it from request list, but will append it to the request callback as denied permission.

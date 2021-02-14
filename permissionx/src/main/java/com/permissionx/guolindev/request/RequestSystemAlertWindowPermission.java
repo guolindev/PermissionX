@@ -37,28 +37,36 @@ public class RequestSystemAlertWindowPermission extends BaseTask {
 
     @Override
     public void request() {
-        if (pb.requireSystemAlertWindowPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (Settings.canDrawOverlays(pb.activity)) {
-                // MANAGE_OVERLAY_PERMISSION has already granted, we can finish this task now.
-                finish();
-                return;
-            }
-            if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
-                List<String> requestList = new ArrayList<>();
-                requestList.add(Manifest.permission.SYSTEM_ALERT_WINDOW);
-                if (pb.explainReasonCallbackWithBeforeParam != null) {
-                    // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
-                    pb.explainReasonCallbackWithBeforeParam.onExplainReason(explainReasonScope, requestList, true);
+        if (pb.shouldRequestSystemAlertWindowPermission()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && pb.getTargetSdkVersion() >= Build.VERSION_CODES.M) {
+                if (Settings.canDrawOverlays(pb.activity)) {
+                    // SYSTEM_ALERT_WINDOW permission has already granted, we can finish this task now.
+                    finish();
+                    return;
+                }
+                if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
+                    List<String> requestList = new ArrayList<>();
+                    requestList.add(Manifest.permission.SYSTEM_ALERT_WINDOW);
+                    if (pb.explainReasonCallbackWithBeforeParam != null) {
+                        // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
+                        pb.explainReasonCallbackWithBeforeParam.onExplainReason(explainReasonScope, requestList, true);
+                    } else {
+                        pb.explainReasonCallback.onExplainReason(explainReasonScope, requestList);
+                    }
                 } else {
-                    pb.explainReasonCallback.onExplainReason(explainReasonScope, requestList);
+                    // No implementation of explainReasonCallback, we can't request
+                    // SYSTEM_ALERT_WINDOW permission at this time, because user won't understand why.
+                    finish();
                 }
             } else {
-                // No implementation of explainReasonCallback, we can't request
-                // Settings.ACTION_MANAGE_OVERLAY_PERMISSION at this time, because user won't understand why.
+                // SYSTEM_ALERT_WINDOW permission is automatically granted below Android M.
+                pb.grantedPermissions.add(Manifest.permission.SYSTEM_ALERT_WINDOW);
+                // At this time, SYSTEM_ALERT_WINDOW permission shouldn't be special treated anymore.
+                pb.specialPermissions.remove(Manifest.permission.SYSTEM_ALERT_WINDOW);
                 finish();
             }
         } else {
-            // shouldn't request Settings.ACTION_MANAGE_OVERLAY_PERMISSION at this time, so we call finish() to finish this task.
+            // shouldn't request SYSTEM_ALERT_WINDOW permission at this time, so we call finish() to finish this task.
             finish();
         }
     }
@@ -66,7 +74,7 @@ public class RequestSystemAlertWindowPermission extends BaseTask {
     @Override
     public void requestAgain(List<String> permissions) {
         // don't care what the permissions param is, always request Settings.ACTION_MANAGE_OVERLAY_PERMISSION
-        pb.requestOverlayPermissionNow(this);
+        pb.requestSystemAlertWindowPermissionNow(this);
     }
 
 }

@@ -388,16 +388,35 @@ public class PermissionBuilder {
      *
      * @param chainTask Instance of current task.
      */
-    void requestOverlayPermissionNow(ChainTask chainTask) {
-        getInvisibleFragment().requestOverlayPermissionNow(this, chainTask);
+    void requestSystemAlertWindowPermissionNow(ChainTask chainTask) {
+        getInvisibleFragment().requestSystemAlertWindowPermissionNow(this, chainTask);
     }
 
-    boolean requireBackgroundLocationPermission() {
+    /**
+     * Should we request ACCESS_BACKGROUND_LOCATION permission or not.
+     *
+     * @return True if specialPermissions contains ACCESS_BACKGROUND_LOCATION permission, false otherwise.
+     */
+    boolean shouldRequestBackgroundLocationPermission() {
         return specialPermissions.contains(RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION);
     }
 
-    boolean requireSystemAlertWindowPermission() {
+    /**
+     * Should we request SYSTEM_ALERT_WINDOW permission or not.
+     *
+     * @return True if specialPermissions contains SYSTEM_ALERT_WINDOW permission, false otherwise.
+     */
+    boolean shouldRequestSystemAlertWindowPermission() {
         return specialPermissions.contains(Manifest.permission.SYSTEM_ALERT_WINDOW);
+    }
+
+    /**
+     * Get the targetSdkVersion of current app.
+     *
+     * @return The targetSdkVersion of current app.
+     */
+    int getTargetSdkVersion() {
+        return activity.getApplicationInfo().targetSdkVersion;
     }
 
     /**

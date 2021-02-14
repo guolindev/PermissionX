@@ -78,20 +78,20 @@ abstract class BaseTask implements ChainTask {
             deniedList.addAll(pb.deniedPermissions);
             deniedList.addAll(pb.permanentDeniedPermissions);
             deniedList.addAll(pb.permissionsWontRequest);
-            if (pb.requireBackgroundLocationPermission()) {
+            if (pb.shouldRequestBackgroundLocationPermission()) {
                 if (PermissionX.isGranted(pb.activity, RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION)) {
                     pb.grantedPermissions.add(RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION);
                 } else {
                     deniedList.add(RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION);
                 }
             }
-//            if (pb.requireSystemAlertWindowPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//                if (Settings.canDrawOverlays(pb.activity)) {
-//                    pb.grantedPermissions.add(Manifest.permission.SYSTEM_ALERT_WINDOW);
-//                } else {
-//                    deniedList.add(Manifest.permission.SYSTEM_ALERT_WINDOW);
-//                }
-//            }
+            if (pb.shouldRequestSystemAlertWindowPermission() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (Settings.canDrawOverlays(pb.activity)) {
+                    pb.grantedPermissions.add(Manifest.permission.SYSTEM_ALERT_WINDOW);
+                } else {
+                    deniedList.add(Manifest.permission.SYSTEM_ALERT_WINDOW);
+                }
+            }
             if (pb.requestCallback != null) {
                 pb.requestCallback.onResult(deniedList.isEmpty(), new ArrayList<>(pb.grantedPermissions), deniedList);
             }
