@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="permissionx_access_background_location">后台访问位置信息</string>
     <string name="permissionx_system_alert_window">显示在其他应用的上层</string>
 </resources>

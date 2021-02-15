@@ -122,10 +122,14 @@ class DefaultDialog(context: Context,
                     permissionInfo.group
                 }
             }
-            if ((permissionGroup != null && !tempSet.contains(permissionGroup))
-                || (permission in allSpecialPermissions && !tempSet.contains(permission))) {
+            if ((permission in allSpecialPermissions && !tempSet.contains(permission))
+                || (permissionGroup != null && !tempSet.contains(permissionGroup))) {
                 val itemBinding = PermissionxPermissionItemBinding.inflate(layoutInflater, binding.permissionsLayout, false)
                 when(permission) {
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION -> {
+                        itemBinding.permissionText.text = context.getString(R.string.permissionx_access_background_location)
+                        itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_location)
+                    }
                     Manifest.permission.SYSTEM_ALERT_WINDOW -> {
                         itemBinding.permissionText.text = context.getString(R.string.permissionx_system_alert_window)
                         itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_alert)
