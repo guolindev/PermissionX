@@ -37,7 +37,7 @@ import com.permissionx.guolindev.dialog.DefaultDialog;
 import com.permissionx.guolindev.dialog.RationaleDialog;
 import com.permissionx.guolindev.dialog.RationaleDialogFragment;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -104,35 +104,35 @@ public class PermissionBuilder {
     /**
      * Some permissions shouldn't request will be stored here. And notify back to user when request finished.
      */
-    Set<String> permissionsWontRequest = new HashSet<>();
+    Set<String> permissionsWontRequest = new LinkedHashSet<>();
 
     /**
      * Holds permissions that have already granted in the requested permissions.
      */
-    Set<String> grantedPermissions = new HashSet<>();
+    Set<String> grantedPermissions = new LinkedHashSet<>();
 
     /**
      * Holds permissions that have been denied in the requested permissions.
      */
-    Set<String> deniedPermissions = new HashSet<>();
+    Set<String> deniedPermissions = new LinkedHashSet<>();
 
     /**
      * Holds permissions that have been permanently denied in the requested permissions. (Deny and never ask again)
      */
-    Set<String> permanentDeniedPermissions = new HashSet<>();
+    Set<String> permanentDeniedPermissions = new LinkedHashSet<>();
 
     /**
      * When we request multiple permissions. Some are denied, some are permanently denied. Denied permissions will be callback first.
      * And the permanently denied permissions will store in this tempPermanentDeniedPermissions. They will be callback once no more
      * denied permissions exist.
      */
-    Set<String> tempPermanentDeniedPermissions = new HashSet<>();
+    Set<String> tempPermanentDeniedPermissions = new LinkedHashSet<>();
 
     /**
      * Holds permissions which should forward to Settings to allow them.
      * Not all permanently denied permissions should forward to Settings. Only the ones developer think they are necessary should.
      */
-    Set<String> forwardPermissions = new HashSet<>();
+    Set<String> forwardPermissions = new LinkedHashSet<>();
 
     /**
      * The callback for {@link #request(RequestCallback)} method. Can not be null.

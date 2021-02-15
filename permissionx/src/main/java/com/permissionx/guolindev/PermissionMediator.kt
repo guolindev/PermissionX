@@ -22,7 +22,7 @@ import androidx.fragment.app.FragmentActivity
 import com.permissionx.guolindev.dialog.allSpecialPermissions
 import com.permissionx.guolindev.request.PermissionBuilder
 import com.permissionx.guolindev.request.RequestBackgroundLocationPermission
-import java.util.*
+import kotlin.collections.LinkedHashSet
 
 /**
  * An internal class to provide specific scope for passing permissions param.
@@ -50,8 +50,8 @@ class PermissionMediator {
      * @return PermissionBuilder itself.
      */
     fun permissions(permissions: List<String>): PermissionBuilder {
-        val normalPermissionSet = HashSet<String>()
-        val specialPermissionSet = HashSet<String>()
+        val normalPermissionSet = LinkedHashSet<String>()
+        val specialPermissionSet = LinkedHashSet<String>()
         val osVersion = Build.VERSION.SDK_INT
         val targetSdkVersion = if (activity != null) {
             activity!!.applicationInfo.targetSdkVersion
