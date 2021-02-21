@@ -135,7 +135,8 @@ class DefaultDialog(context: Context,
                         itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_alert)
                     }
                     Manifest.permission.WRITE_SETTINGS -> {
-
+                        itemBinding.permissionText.text = context.getString(R.string.permissionx_write_settings)
+                        itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_setting)
                     }
                     Manifest.permission.MANAGE_EXTERNAL_STORAGE -> {
 

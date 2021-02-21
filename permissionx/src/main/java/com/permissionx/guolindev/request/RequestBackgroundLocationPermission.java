@@ -79,7 +79,7 @@ public class RequestBackgroundLocationPermission extends BaseTask {
 
     @Override
     public void requestAgain(List<String> permissions) {
-        // Don't care what the permissions param is, always request ACCESS_BACKGROUND_LOCATION
+        // Don't care what the permissions param is, always request ACCESS_BACKGROUND_LOCATION.
         pb.requestAccessBackgroundLocationNow(this);
     }
 

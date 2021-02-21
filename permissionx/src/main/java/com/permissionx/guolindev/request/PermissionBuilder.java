@@ -248,6 +248,7 @@ public class PermissionBuilder {
         requestChain.addTaskToChain(new RequestNormalPermissions(this));
         requestChain.addTaskToChain(new RequestBackgroundLocationPermission(this));
         requestChain.addTaskToChain(new RequestSystemAlertWindowPermission(this));
+        requestChain.addTaskToChain(new RequestWriteSettingsPermission(this));
         requestChain.runTask();
     }
 
@@ -375,7 +376,7 @@ public class PermissionBuilder {
     }
 
     /**
-     * Request ACCESS_BACKGROUND_LOCATION at once in the fragment.
+     * Request ACCESS_BACKGROUND_LOCATION permission at once in the fragment.
      *
      * @param chainTask Instance of current task.
      */
@@ -384,12 +385,21 @@ public class PermissionBuilder {
     }
 
     /**
-     * Request Settings.ACTION_MANAGE_OVERLAY_PERMISSION at once in the fragment.
+     * Request SYSTEM_ALERT_WINDOW permission at once in the fragment.
      *
      * @param chainTask Instance of current task.
      */
     void requestSystemAlertWindowPermissionNow(ChainTask chainTask) {
         getInvisibleFragment().requestSystemAlertWindowPermissionNow(this, chainTask);
+    }
+
+    /**
+     * Request WRITE_SETTINGS permission at once in the fragment.
+     *
+     * @param chainTask Instance of current task.
+     */
+    void requestWriteSettingsPermissionNow(ChainTask chainTask) {
+        getInvisibleFragment().requestWriteSettingsPermissionNow(this, chainTask);
     }
 
     /**
@@ -408,6 +418,15 @@ public class PermissionBuilder {
      */
     boolean shouldRequestSystemAlertWindowPermission() {
         return specialPermissions.contains(Manifest.permission.SYSTEM_ALERT_WINDOW);
+    }
+
+    /**
+     * Should we request WRITE_SETTINGS permission or not.
+     *
+     * @return True if specialPermissions contains WRITE_SETTINGS permission, false otherwise.
+     */
+    boolean shouldRequestWriteSettingsPermission() {
+        return specialPermissions.contains(Manifest.permission.WRITE_SETTINGS);
     }
 
     /**

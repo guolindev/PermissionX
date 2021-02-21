@@ -24,29 +24,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Implementation for request android.permission.SYSTEM_ALERT_WINDOW.
+ * Implementation for request android.permission.WRITE_SETTINGS.
  *
  * @author guolin
- * @since 2020/12/28
+ * @since 2021/2/21
  */
-public class RequestSystemAlertWindowPermission extends BaseTask {
+public class RequestWriteSettingsPermission extends BaseTask {
 
-    RequestSystemAlertWindowPermission(PermissionBuilder permissionBuilder) {
+    RequestWriteSettingsPermission(PermissionBuilder permissionBuilder) {
         super(permissionBuilder);
     }
 
     @Override
     public void request() {
-        if (pb.shouldRequestSystemAlertWindowPermission()) {
+        if (pb.shouldRequestWriteSettingsPermission()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && pb.getTargetSdkVersion() >= Build.VERSION_CODES.M) {
-                if (Settings.canDrawOverlays(pb.activity)) {
-                    // SYSTEM_ALERT_WINDOW permission has already granted, we can finish this task now.
+                if (Settings.System.canWrite(pb.activity)) {
+                    // WRITE_SETTINGS permission has already granted, we can finish this task now.
                     finish();
                     return;
                 }
                 if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
                     List<String> requestList = new ArrayList<>();
-                    requestList.add(Manifest.permission.SYSTEM_ALERT_WINDOW);
+                    requestList.add(Manifest.permission.WRITE_SETTINGS);
                     if (pb.explainReasonCallbackWithBeforeParam != null) {
                         // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
                         pb.explainReasonCallbackWithBeforeParam.onExplainReason(explainReasonScope, requestList, true);
@@ -55,26 +55,26 @@ public class RequestSystemAlertWindowPermission extends BaseTask {
                     }
                 } else {
                     // No implementation of explainReasonCallback, we can't request
-                    // SYSTEM_ALERT_WINDOW permission at this time, because user won't understand why.
+                    // WRITE_SETTINGS permission at this time, because user won't understand why.
                     finish();
                 }
             } else {
-                // SYSTEM_ALERT_WINDOW permission is automatically granted below Android M.
-                pb.grantedPermissions.add(Manifest.permission.SYSTEM_ALERT_WINDOW);
-                // At this time, SYSTEM_ALERT_WINDOW permission shouldn't be special treated anymore.
-                pb.specialPermissions.remove(Manifest.permission.SYSTEM_ALERT_WINDOW);
+                // WRITE_SETTINGS permission is automatically granted below Android M.
+                pb.grantedPermissions.add(Manifest.permission.WRITE_SETTINGS);
+                // At this time, WRITE_SETTINGS permission shouldn't be special treated anymore.
+                pb.specialPermissions.remove(Manifest.permission.WRITE_SETTINGS);
                 finish();
             }
         } else {
-            // shouldn't request SYSTEM_ALERT_WINDOW permission at this time, so we call finish() to finish this task.
+            // shouldn't request WRITE_SETTINGS permission at this time, so we call finish() to finish this task.
             finish();
         }
     }
 
     @Override
     public void requestAgain(List<String> permissions) {
-        // don't care what the permissions param is, always request SYSTEM_ALERT_WINDOW permission.
-        pb.requestSystemAlertWindowPermissionNow(this);
+        // don't care what the permissions param is, always request WRITE_SETTINGS permission.
+        pb.requestWriteSettingsPermissionNow(this);
     }
 
 }

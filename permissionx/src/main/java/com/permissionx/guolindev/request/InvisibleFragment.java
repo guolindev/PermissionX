@@ -59,7 +59,15 @@ public class InvisibleFragment extends Fragment {
      */
     public static final int FORWARD_TO_SETTINGS = 1;
 
+    /**
+     * Code for request SYSTEM_ALERT_WINDOW permission.
+     */
     public static final int ACTION_MANAGE_OVERLAY_PERMISSION = 2;
+
+    /**
+     * Code for request WRITE_SETTINGS permission.
+     */
+    public static final int ACTION_WRITE_SETTINGS_PERMISSION = 3;
 
     /**
      * Instance of PermissionBuilder.
@@ -112,6 +120,22 @@ public class InvisibleFragment extends Fragment {
         }
     }
 
+    /**
+     * Request WRITE_SETTINGS permission. On Android M and above, it's request by
+     * Settings.ACTION_MANAGE_WRITE_SETTINGS with Intent.
+     */
+    @TargetApi(Build.VERSION_CODES.M)
+    void requestWriteSettingsPermissionNow(PermissionBuilder permissionBuilder, ChainTask chainTask) {
+        pb = permissionBuilder;
+        task = chainTask;
+        if (!Settings.System.canWrite(getContext())) {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+            startActivityForResult(intent, ACTION_WRITE_SETTINGS_PERMISSION);
+        } else {
+            onRequestWriteSettingsPermissionResult();
+        }
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_NORMAL_PERMISSIONS) {
@@ -135,6 +159,9 @@ public class InvisibleFragment extends Fragment {
                     break;
                 case ACTION_MANAGE_OVERLAY_PERMISSION:
                     onRequestSystemAlertWindowPermissionResult();
+                    break;
+                case ACTION_WRITE_SETTINGS_PERMISSION:
+                    onRequestWriteSettingsPermissionResult();
                     break;
             }
         }
@@ -288,6 +315,26 @@ public class InvisibleFragment extends Fragment {
                     pb.explainReasonCallbackWithBeforeParam.onExplainReason(task.getExplainScope(), Collections.singletonList(Manifest.permission.SYSTEM_ALERT_WINDOW), false);
                 } else {
                     pb.explainReasonCallback.onExplainReason(task.getExplainScope(), Collections.singletonList(Manifest.permission.SYSTEM_ALERT_WINDOW));
+                }
+            }
+        } else {
+            task.finish();
+        }
+    }
+
+    /**
+     * Handle result of WRITE_SETTINGS permission request.
+     */
+    private void onRequestWriteSettingsPermissionResult() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (Settings.System.canWrite(getContext())) {
+                task.finish();
+            } else if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
+                if (pb.explainReasonCallbackWithBeforeParam != null) {
+                    // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
+                    pb.explainReasonCallbackWithBeforeParam.onExplainReason(task.getExplainScope(), Collections.singletonList(Manifest.permission.WRITE_SETTINGS), false);
+                } else {
+                    pb.explainReasonCallback.onExplainReason(task.getExplainScope(), Collections.singletonList(Manifest.permission.WRITE_SETTINGS));
                 }
             }
         } else {

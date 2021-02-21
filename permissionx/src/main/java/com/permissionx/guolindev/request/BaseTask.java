@@ -85,11 +85,22 @@ abstract class BaseTask implements ChainTask {
                     deniedList.add(RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION);
                 }
             }
-            if (pb.shouldRequestSystemAlertWindowPermission() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (pb.shouldRequestSystemAlertWindowPermission()
+                    && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                    && pb.getTargetSdkVersion() >= Build.VERSION_CODES.M) {
                 if (Settings.canDrawOverlays(pb.activity)) {
                     pb.grantedPermissions.add(Manifest.permission.SYSTEM_ALERT_WINDOW);
                 } else {
                     deniedList.add(Manifest.permission.SYSTEM_ALERT_WINDOW);
+                }
+            }
+            if (pb.shouldRequestWriteSettingsPermission()
+                    && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                    && pb.getTargetSdkVersion() >= Build.VERSION_CODES.M) {
+                if (Settings.System.canWrite(pb.activity)) {
+                    pb.grantedPermissions.add(Manifest.permission.WRITE_SETTINGS);
+                } else {
+                    deniedList.add(Manifest.permission.WRITE_SETTINGS);
                 }
             }
             if (pb.requestCallback != null) {
