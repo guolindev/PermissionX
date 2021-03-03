@@ -249,6 +249,7 @@ public class PermissionBuilder {
         requestChain.addTaskToChain(new RequestBackgroundLocationPermission(this));
         requestChain.addTaskToChain(new RequestSystemAlertWindowPermission(this));
         requestChain.addTaskToChain(new RequestWriteSettingsPermission(this));
+        requestChain.addTaskToChain(new RequestManageExternalStoragePermission(this));
         requestChain.runTask();
     }
 
@@ -403,6 +404,15 @@ public class PermissionBuilder {
     }
 
     /**
+     * Request MANAGE_EXTERNAL_STORAGE permission at once in the fragment.
+     *
+     * @param chainTask Instance of current task.
+     */
+    void requestManageExternalStoragePermissionNow(ChainTask chainTask) {
+        getInvisibleFragment().requestManageExternalStoragePermissionNow(this, chainTask);
+    }
+
+    /**
      * Should we request ACCESS_BACKGROUND_LOCATION permission or not.
      *
      * @return True if specialPermissions contains ACCESS_BACKGROUND_LOCATION permission, false otherwise.
@@ -427,6 +437,15 @@ public class PermissionBuilder {
      */
     boolean shouldRequestWriteSettingsPermission() {
         return specialPermissions.contains(Manifest.permission.WRITE_SETTINGS);
+    }
+
+    /**
+     * Should we request MANAGE_EXTERNAL_STORAGE permission or not.
+     *
+     * @return True if specialPermissions contains MANAGE_EXTERNAL_STORAGE permission, false otherwise.
+     */
+    boolean shouldRequestManageExternalStoragePermission() {
+        return specialPermissions.contains(RequestManageExternalStoragePermission.MANAGE_EXTERNAL_STORAGE);
     }
 
     /**

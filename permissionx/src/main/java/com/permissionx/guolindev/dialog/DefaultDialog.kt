@@ -139,7 +139,8 @@ class DefaultDialog(context: Context,
                         itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_setting)
                     }
                     Manifest.permission.MANAGE_EXTERNAL_STORAGE -> {
-
+                        itemBinding.permissionText.text = context.getString(R.string.permissionx_manage_external_storage)
+                        itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_storage)
                     }
                     else -> {
                         itemBinding.permissionText.text = context.getString(context.packageManager.getPermissionGroupInfo(permissionGroup!!, 0).labelRes)

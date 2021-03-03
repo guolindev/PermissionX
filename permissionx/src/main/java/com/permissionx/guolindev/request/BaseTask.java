@@ -18,6 +18,7 @@ package com.permissionx.guolindev.request;
 
 import android.Manifest;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.Settings;
 
 import com.permissionx.guolindev.PermissionX;
@@ -101,6 +102,14 @@ abstract class BaseTask implements ChainTask {
                     pb.grantedPermissions.add(Manifest.permission.WRITE_SETTINGS);
                 } else {
                     deniedList.add(Manifest.permission.WRITE_SETTINGS);
+                }
+            }
+            if (pb.shouldRequestManageExternalStoragePermission()) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+                        Environment.isExternalStorageManager()) {
+                    pb.grantedPermissions.add(RequestManageExternalStoragePermission.MANAGE_EXTERNAL_STORAGE);
+                } else {
+                    deniedList.add(RequestManageExternalStoragePermission.MANAGE_EXTERNAL_STORAGE);
                 }
             }
             if (pb.requestCallback != null) {

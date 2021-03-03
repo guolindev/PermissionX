@@ -21,6 +21,7 @@ import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.Settings;
 import android.util.Log;
 
@@ -70,6 +71,11 @@ public class InvisibleFragment extends Fragment {
     public static final int ACTION_WRITE_SETTINGS_PERMISSION = 3;
 
     /**
+     * Code for request MANAGE_EXTERNAL_STORAGE permission.
+     */
+    public static final int ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION = 4;
+
+    /**
      * Instance of PermissionBuilder.
      */
     private PermissionBuilder pb;
@@ -80,7 +86,8 @@ public class InvisibleFragment extends Fragment {
     private ChainTask task;
 
     /**
-     * Request permissions at once by calling {@link Fragment#requestPermissions(String[], int)}, and handle request result in ActivityCompat.OnRequestPermissionsResultCallback.
+     * Request permissions at once by calling {@link Fragment#requestPermissions(String[], int)},
+     * and handle request result in ActivityCompat.OnRequestPermissionsResultCallback.
      *
      * @param permissionBuilder The instance of PermissionBuilder.
      * @param permissions       Permissions that you want to request.
@@ -93,7 +100,8 @@ public class InvisibleFragment extends Fragment {
     }
 
     /**
-     * Request ACCESS_BACKGROUND_LOCATION at once by calling {@link Fragment#requestPermissions(String[], int)}, and handle request result in ActivityCompat.OnRequestPermissionsResultCallback.
+     * Request ACCESS_BACKGROUND_LOCATION at once by calling {@link Fragment#requestPermissions(String[], int)},
+     * and handle request result in ActivityCompat.OnRequestPermissionsResultCallback.
      *
      * @param permissionBuilder The instance of PermissionBuilder.
      * @param chainTask         Instance of current task.
@@ -101,7 +109,7 @@ public class InvisibleFragment extends Fragment {
     void requestAccessBackgroundLocationNow(PermissionBuilder permissionBuilder, ChainTask chainTask) {
         pb = permissionBuilder;
         task = chainTask;
-        requestPermissions(new String[]{ RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION }, REQUEST_BACKGROUND_LOCATION_PERMISSION);
+        requestPermissions(new String[]{RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION}, REQUEST_BACKGROUND_LOCATION_PERMISSION);
     }
 
     /**
@@ -136,6 +144,21 @@ public class InvisibleFragment extends Fragment {
         }
     }
 
+    /**
+     * Request MANAGE_EXTERNAL_STORAGE permission. On Android R and above, it's request by
+     * Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION with Intent.
+     */
+    void requestManageExternalStoragePermissionNow(PermissionBuilder permissionBuilder, ChainTask chainTask) {
+        pb = permissionBuilder;
+        task = chainTask;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+            startActivityForResult(intent, ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+        } else {
+            onRequestManageExternalStoragePermissionResult();
+        }
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_NORMAL_PERMISSIONS) {
@@ -162,6 +185,9 @@ public class InvisibleFragment extends Fragment {
                     break;
                 case ACTION_WRITE_SETTINGS_PERMISSION:
                     onRequestWriteSettingsPermissionResult();
+                    break;
+                case ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION:
+                    onRequestManageExternalStoragePermissionResult();
                     break;
             }
         }
@@ -312,9 +338,11 @@ public class InvisibleFragment extends Fragment {
             } else if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
                 if (pb.explainReasonCallbackWithBeforeParam != null) {
                     // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
-                    pb.explainReasonCallbackWithBeforeParam.onExplainReason(task.getExplainScope(), Collections.singletonList(Manifest.permission.SYSTEM_ALERT_WINDOW), false);
+                    pb.explainReasonCallbackWithBeforeParam.onExplainReason(task.getExplainScope(),
+                            Collections.singletonList(Manifest.permission.SYSTEM_ALERT_WINDOW), false);
                 } else {
-                    pb.explainReasonCallback.onExplainReason(task.getExplainScope(), Collections.singletonList(Manifest.permission.SYSTEM_ALERT_WINDOW));
+                    pb.explainReasonCallback.onExplainReason(task.getExplainScope(),
+                            Collections.singletonList(Manifest.permission.SYSTEM_ALERT_WINDOW));
                 }
             }
         } else {
@@ -332,9 +360,33 @@ public class InvisibleFragment extends Fragment {
             } else if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
                 if (pb.explainReasonCallbackWithBeforeParam != null) {
                     // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
-                    pb.explainReasonCallbackWithBeforeParam.onExplainReason(task.getExplainScope(), Collections.singletonList(Manifest.permission.WRITE_SETTINGS), false);
+                    pb.explainReasonCallbackWithBeforeParam.onExplainReason(task.getExplainScope(),
+                            Collections.singletonList(Manifest.permission.WRITE_SETTINGS), false);
                 } else {
-                    pb.explainReasonCallback.onExplainReason(task.getExplainScope(), Collections.singletonList(Manifest.permission.WRITE_SETTINGS));
+                    pb.explainReasonCallback.onExplainReason(task.getExplainScope(),
+                            Collections.singletonList(Manifest.permission.WRITE_SETTINGS));
+                }
+            }
+        } else {
+            task.finish();
+        }
+    }
+
+    /**
+     * Handle result of MANAGE_EXTERNAL_STORAGE permission request.
+     */
+    private void onRequestManageExternalStoragePermissionResult() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (Environment.isExternalStorageManager()) {
+                task.finish();
+            } else if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
+                if (pb.explainReasonCallbackWithBeforeParam != null) {
+                    // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
+                    pb.explainReasonCallbackWithBeforeParam.onExplainReason(task.getExplainScope(),
+                            Collections.singletonList(Manifest.permission.MANAGE_EXTERNAL_STORAGE), false);
+                } else {
+                    pb.explainReasonCallback.onExplainReason(task.getExplainScope(),
+                            Collections.singletonList(Manifest.permission.MANAGE_EXTERNAL_STORAGE));
                 }
             }
         } else {
