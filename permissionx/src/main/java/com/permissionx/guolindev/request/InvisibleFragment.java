@@ -207,8 +207,8 @@ public class InvisibleFragment extends Fragment {
     /**
      * Handle result of normal permissions request.
      */
-    private void onRequestNormalPermissionsResult(@NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (checkForGC()) {
+    private void onRequestNormalPermissionsResult(String[] permissions, int[] grantResults) {
+        if (checkForGC() && permissions != null && grantResults != null && permissions.length == grantResults.length) {
             // We can never holds granted permissions for safety, because user may turn some permissions off in settings.
             // So every time request, must request the already granted permissions again and refresh the granted permission set.
             pb.grantedPermissions.clear();
