@@ -16,6 +16,8 @@
 
 package com.permissionx.guolindev.callback;
 
+import androidx.annotation.NonNull;
+
 import com.permissionx.guolindev.request.ForwardScope;
 import com.permissionx.guolindev.request.PermissionBuilder;
 
@@ -36,6 +38,6 @@ public interface ForwardToSettingsCallback {
      * @param deniedList
      *          Permissions that should allow in settings.
      */
-    void onForwardToSettings(ForwardScope scope, List<String> deniedList);
+    void onForwardToSettings(@NonNull ForwardScope scope, @NonNull List<String> deniedList);
 
 }

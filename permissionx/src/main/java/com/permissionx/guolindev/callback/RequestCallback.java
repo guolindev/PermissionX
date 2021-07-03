@@ -16,6 +16,8 @@
 
 package com.permissionx.guolindev.callback;
 
+import androidx.annotation.NonNull;
+
 import com.permissionx.guolindev.request.PermissionBuilder;
 
 import java.util.List;
@@ -37,6 +39,6 @@ public interface RequestCallback {
      * @param deniedList
      *          All permissions that denied by user.
      */
-    void onResult(boolean allGranted, List<String> grantedList, List<String> deniedList);
+    void onResult(boolean allGranted, @NonNull List<String> grantedList, @NonNull List<String> deniedList);
 
 }

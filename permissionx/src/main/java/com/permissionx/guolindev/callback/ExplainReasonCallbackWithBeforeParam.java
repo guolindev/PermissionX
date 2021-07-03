@@ -16,6 +16,8 @@
 
 package com.permissionx.guolindev.callback;
 
+import androidx.annotation.NonNull;
+
 import com.permissionx.guolindev.request.ExplainScope;
 import com.permissionx.guolindev.request.PermissionBuilder;
 
@@ -38,6 +40,6 @@ public interface ExplainReasonCallbackWithBeforeParam {
      * @param beforeRequest
      *          Indicate it's before or after permission request. Work with {@link PermissionBuilder#explainReasonBeforeRequest()}
      */
-    void onExplainReason(ExplainScope scope, List<String> deniedList, boolean beforeRequest);
+    void onExplainReason(@NonNull ExplainScope scope, @NonNull List<String> deniedList, boolean beforeRequest);
 
 }

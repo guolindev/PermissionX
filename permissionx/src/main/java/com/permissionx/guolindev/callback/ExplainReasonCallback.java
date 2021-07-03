@@ -16,6 +16,8 @@
 
 package com.permissionx.guolindev.callback;
 
+import androidx.annotation.NonNull;
+
 import com.permissionx.guolindev.request.ExplainScope;
 import com.permissionx.guolindev.request.PermissionBuilder;
 
@@ -36,6 +38,6 @@ public interface ExplainReasonCallback {
      * @param deniedList
      *          Permissions that you should explain.
      */
-    void onExplainReason(ExplainScope scope, List<String> deniedList);
+    void onExplainReason(@NonNull ExplainScope scope, @NonNull List<String> deniedList);
 
 }
