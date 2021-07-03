@@ -27,7 +27,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
-
 buildscript {
     repositories {
         mavenCentral()
@@ -37,5 +36,12 @@ buildscript {
     }
 }
 
-apply plugin: "com.vanniktech.maven.publish"
+allprojects {
+    plugins.withId("com.vanniktech.maven.publish") {
+        mavenPublish {
+            sonatypeHost = "S01"
+        }
+    }
+}
 
+apply plugin: "com.vanniktech.maven.publish"
