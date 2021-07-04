@@ -288,6 +288,15 @@ public class PermissionBuilder {
         }
         currentDialog = dialog;
         dialog.show();
+        if (dialog instanceof DefaultDialog) {
+            DefaultDialog defaultDialog = (DefaultDialog) dialog;
+            if (defaultDialog.isPermissionLayoutEmpty()) {
+                // No valid permission to show on the dialog.
+                // We call dismiss instead.
+                dialog.dismiss();
+                chainTask.finish();
+            }
+        }
         View positiveButton = dialog.getPositiveButton();
         View negativeButton = dialog.getNegativeButton();
         dialog.setCancelable(false);

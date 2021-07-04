@@ -18,6 +18,7 @@ package com.permissionx.guolindev.dialog
 
 import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.PorterDuff
 import android.os.Build
@@ -82,6 +83,15 @@ class DefaultDialog(context: Context,
     }
 
     /**
+     * Check if the permission layout if empty.
+     * It is possible if all the permissions passed in are invalid permission such as a string named
+     * "hello world". We won't add these into permission layout.
+     */
+    fun isPermissionLayoutEmpty(): Boolean {
+        return binding.permissionsLayout.childCount == 0
+    }
+
+    /**
      * Setup text and text color on the dialog.
      */
     private fun setupText() {
@@ -118,8 +128,13 @@ class DefaultDialog(context: Context,
                 Build.VERSION_CODES.Q -> permissionMapOnQ[permission]
                 Build.VERSION_CODES.R -> permissionMapOnR[permission]
                 else -> {
-                    val permissionInfo = context.packageManager.getPermissionInfo(permission, 0)
-                    permissionInfo.group
+                    try {
+                        val permissionInfo = context.packageManager.getPermissionInfo(permission, 0)
+                        permissionInfo.group
+                    } catch (e: PackageManager.NameNotFoundException) {
+                        e.printStackTrace()
+                        null
+                    }
                 }
             }
             if ((permission in allSpecialPermissions && !tempSet.contains(permission))
