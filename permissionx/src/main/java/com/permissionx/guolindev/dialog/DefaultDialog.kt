@@ -87,7 +87,7 @@ class DefaultDialog(context: Context,
      * It is possible if all the permissions passed in are invalid permission such as a string named
      * "hello world". We won't add these into permission layout.
      */
-    fun isPermissionLayoutEmpty(): Boolean {
+    internal fun isPermissionLayoutEmpty(): Boolean {
         return binding.permissionsLayout.childCount == 0
     }
 
