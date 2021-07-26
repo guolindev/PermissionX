@@ -9,8 +9,13 @@ PermissionX is an extension Android library that makes Android runtime permissio
 Edit your build.gradle file and add below dependency.
 
 ```groovy
+repositories {
+  google()
+  mavenCentral()
+}
+
 dependencies {
-    implementation 'com.permissionx.guolindev:permissionx:1.4.0'
+    implementation 'com.guolindev.permissionx:permissionx:1.5.0'
 }
 ```
 
