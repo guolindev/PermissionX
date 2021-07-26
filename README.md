@@ -136,18 +136,6 @@ The rationale dialog provided by PermissionsX support Android dark theme automat
 
 <img src="screenshots/5.gif" width="32%" />
 
-## Permission-Support
-
-If your app is still not ready for AndroidX, you need to use Permission-Support library instead. The API of Permission-Support library is completely same as PermissionX, except declare another dependency in your build.gradle file.
-
-```groovy
-dependencies {
-    implementation 'com.permissionx.guolindev:permission-support:1.4.0'
-}
-```
-
-This library won't be long term supported, and could be deprecated at any time. So try to switch to AndroidX as soon as you can.
-
 ## License
 
 ```
