@@ -109,7 +109,7 @@ PermissionX.init(activity)
     }
 ```
 
-The parameters in **showRequestReasonDialog** method are similar with **showRequestReasonDialog** method. When user click positive button, PermissionX will forward to the settings page of your app and user can turn on the necessary permissions very quickly. When user switch back to app, PermissionX will request the necessary permissions again automatically.
+The parameters in **showForwardToSettingsDialog** method are similar with **showRequestReasonDialog** method. When user click positive button, PermissionX will forward to the settings page of your app and user can turn on the necessary permissions very quickly. When user switch back to app, PermissionX will request the necessary permissions again automatically.
 
 <img src="screenshots/3.gif" width="32%" />
 
