@@ -62,9 +62,9 @@ public class RequestBackgroundLocationPermission extends BaseTask {
                     requestList.add(ACCESS_BACKGROUND_LOCATION);
                     if (pb.explainReasonCallbackWithBeforeParam != null) {
                         // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
-                        pb.explainReasonCallbackWithBeforeParam.onExplainReason(explainReasonScope, requestList, true);
+                        pb.explainReasonCallbackWithBeforeParam.onExplainReason(getExplainScope(), requestList, true);
                     } else {
-                        pb.explainReasonCallback.onExplainReason(explainReasonScope, requestList);
+                        pb.explainReasonCallback.onExplainReason(getExplainScope(), requestList);
                     }
                 } else {
                     // No implementation of explainReasonCallback, so we have to request ACCESS_BACKGROUND_LOCATION without explanation.

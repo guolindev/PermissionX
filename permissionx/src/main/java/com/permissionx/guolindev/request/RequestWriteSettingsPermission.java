@@ -49,9 +49,9 @@ public class RequestWriteSettingsPermission extends BaseTask {
                     requestList.add(Manifest.permission.WRITE_SETTINGS);
                     if (pb.explainReasonCallbackWithBeforeParam != null) {
                         // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
-                        pb.explainReasonCallbackWithBeforeParam.onExplainReason(explainReasonScope, requestList, true);
+                        pb.explainReasonCallbackWithBeforeParam.onExplainReason(getExplainScope(), requestList, true);
                     } else {
-                        pb.explainReasonCallback.onExplainReason(explainReasonScope, requestList);
+                        pb.explainReasonCallback.onExplainReason(getExplainScope(), requestList);
                     }
                 } else {
                     // No implementation of explainReasonCallback, we can't request

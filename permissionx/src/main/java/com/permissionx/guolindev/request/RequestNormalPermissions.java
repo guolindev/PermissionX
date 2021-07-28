@@ -53,9 +53,9 @@ public class RequestNormalPermissions extends BaseTask {
             pb.deniedPermissions.addAll(requestList);
             if (pb.explainReasonCallbackWithBeforeParam != null) {
                 // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
-                pb.explainReasonCallbackWithBeforeParam.onExplainReason(explainReasonScope, requestList, true);
+                pb.explainReasonCallbackWithBeforeParam.onExplainReason(getExplainScope(), requestList, true);
             } else {
-                pb.explainReasonCallback.onExplainReason(explainReasonScope, requestList);
+                pb.explainReasonCallback.onExplainReason(getExplainScope(), requestList);
             }
         } else {
             // Do the request at once. Always request all permissions no matter they are already granted or not, in case user turn them off in Settings.

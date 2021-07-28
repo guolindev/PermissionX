@@ -104,26 +104,26 @@ class PermissionBuilder(
      * Some permissions shouldn't request will be stored here. And notify back to user when request finished.
      */
     @JvmField
-    var permissionsWontRequest: Set<String> = LinkedHashSet()
+    var permissionsWontRequest: MutableSet<String> = LinkedHashSet()
 
     /**
      * Holds permissions that have already granted in the requested permissions.
      */
     @JvmField
-    var grantedPermissions: Set<String> = LinkedHashSet()
+    var grantedPermissions: MutableSet<String> = LinkedHashSet()
 
     /**
      * Holds permissions that have been denied in the requested permissions.
      */
     @JvmField
-    var deniedPermissions: Set<String> = LinkedHashSet()
+    var deniedPermissions: MutableSet<String> = LinkedHashSet()
 
     /**
      * Holds permissions that have been permanently denied in the requested permissions.
      * (Deny and never ask again)
      */
     @JvmField
-    var permanentDeniedPermissions: Set<String> = LinkedHashSet()
+    var permanentDeniedPermissions: MutableSet<String> = LinkedHashSet()
 
     /**
      * When we request multiple permissions. Some are denied, some are permanently denied.
@@ -132,7 +132,7 @@ class PermissionBuilder(
      * They will be callback once no more denied permissions exist.
      */
     @JvmField
-    var tempPermanentDeniedPermissions: Set<String> = LinkedHashSet()
+    var tempPermanentDeniedPermissions: MutableSet<String> = LinkedHashSet()
 
     /**
      * Holds permissions which should forward to Settings to allow them.
@@ -466,6 +466,30 @@ class PermissionBuilder(
     }
 
     /**
+     * Remove the InvisibleFragment from current FragmentManager.
+     */
+    internal fun removeInvisibleFragment() {
+        val existedFragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG)
+        if (existedFragment != null) {
+            fragmentManager.beginTransaction().remove(existedFragment).commitAllowingStateLoss()
+        }
+    }
+
+    /**
+     * Go to your app's Settings page to let user turn on the necessary permissions.
+     *
+     * @param permissions Permissions which are necessary.
+     */
+    private fun forwardToSettings(permissions: List<String>) {
+        forwardPermissions.clear()
+        forwardPermissions.addAll(permissions)
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        val uri = Uri.fromParts("package", activity.packageName, null)
+        intent.data = uri
+        invisibleFragment.startActivityForResult(intent, InvisibleFragment.FORWARD_TO_SETTINGS)
+    }
+
+    /**
      * Get the targetSdkVersion of current app.
      *
      * @return The targetSdkVersion of current app.
@@ -489,8 +513,8 @@ class PermissionBuilder(
      */
     private val invisibleFragment: InvisibleFragment
         get() {
-            val fragmentManager = fragmentManager
             val existedFragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG)
+            println("existedFragment is $existedFragment")
             return if (existedFragment != null) {
                 existedFragment as InvisibleFragment
             } else {
@@ -501,20 +525,6 @@ class PermissionBuilder(
                 invisibleFragment
             }
         }
-
-    /**
-     * Go to your app's Settings page to let user turn on the necessary permissions.
-     *
-     * @param permissions Permissions which are necessary.
-     */
-    private fun forwardToSettings(permissions: List<String>) {
-        forwardPermissions.clear()
-        forwardPermissions.addAll(permissions)
-        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-        val uri = Uri.fromParts("package", activity.packageName, null)
-        intent.data = uri
-        invisibleFragment.startActivityForResult(intent, InvisibleFragment.FORWARD_TO_SETTINGS)
-    }
 
     companion object {
         /**
