@@ -76,3 +76,9 @@ val permissionMapOnQ = mapOf(
  */
 @TargetApi(Build.VERSION_CODES.R)
 val permissionMapOnR = permissionMapOnQ
+
+/**
+ * Currently it seems no change form R
+ */
+@TargetApi(31)
+val permissionMapOnS = permissionMapOnR

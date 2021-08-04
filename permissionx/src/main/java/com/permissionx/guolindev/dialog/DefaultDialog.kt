@@ -127,6 +127,7 @@ class DefaultDialog(context: Context,
             val permissionGroup = when(currentVersion) {
                 Build.VERSION_CODES.Q -> permissionMapOnQ[permission]
                 Build.VERSION_CODES.R -> permissionMapOnR[permission]
+                31 -> permissionMapOnS[permission]
                 else -> {
                     try {
                         val permissionInfo = context.packageManager.getPermissionInfo(permission, 0)
