@@ -128,7 +128,16 @@ class DefaultDialog(context: Context,
                 Build.VERSION_CODES.Q -> permissionMapOnQ[permission]
                 Build.VERSION_CODES.R -> permissionMapOnR[permission]
                 else -> {
-                    try {
+                    var result: String? = null
+                    if (currentVersion > Build.VERSION_CODES.R) {
+                        //Currently android S is not stable version, worked it around runCatching
+                        result = runCatching {
+                            permissionMapOnS[permission]
+                        }.onFailure {
+                            it.printStackTrace()
+                        }.getOrNull()
+                    }
+                    result ?: try {
                         val permissionInfo = context.packageManager.getPermissionInfo(permission, 0)
                         permissionInfo.group
                     } catch (e: PackageManager.NameNotFoundException) {
