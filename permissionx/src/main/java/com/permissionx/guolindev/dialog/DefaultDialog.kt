@@ -124,10 +124,8 @@ class DefaultDialog(context: Context,
         val tempSet = HashSet<String>()
         val currentVersion = Build.VERSION.SDK_INT
         for (permission in permissions) {
-            val permissionGroup = when(currentVersion) {
-                Build.VERSION_CODES.Q -> permissionMapOnQ[permission]
-                Build.VERSION_CODES.R -> permissionMapOnR[permission]
-                else -> {
+            val permissionGroup = when {
+                currentVersion < Build.VERSION_CODES.Q -> {
                     try {
                         val permissionInfo = context.packageManager.getPermissionInfo(permission, 0)
                         permissionInfo.group
@@ -135,6 +133,13 @@ class DefaultDialog(context: Context,
                         e.printStackTrace()
                         null
                     }
+                }
+                currentVersion == Build.VERSION_CODES.Q -> permissionMapOnQ[permission]
+                currentVersion == Build.VERSION_CODES.R -> permissionMapOnR[permission]
+                else -> {
+                    // If currentVersion is newer than the latest version we support, we just use
+                    // the latest version for temp. Will upgrade in the next release.
+                    permissionMapOnR[permission]
                 }
             }
             if ((permission in allSpecialPermissions && !tempSet.contains(permission))
