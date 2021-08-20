@@ -72,7 +72,11 @@ public class RequestNormalPermissions extends BaseTask {
     public void requestAgain(List<String> permissions) {
         Set<String> permissionsToRequestAgain = new HashSet<>(pb.grantedPermissions);
         permissionsToRequestAgain.addAll(permissions);
-        pb.requestNow(permissionsToRequestAgain, this);
+        if (!permissionsToRequestAgain.isEmpty()) {
+            pb.requestNow(permissionsToRequestAgain, this);
+        } else {
+            finish();
+        }
     }
 
 }
