@@ -514,7 +514,6 @@ class PermissionBuilder(
     private val invisibleFragment: InvisibleFragment
         get() {
             val existedFragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG)
-            println("existedFragment is $existedFragment")
             return if (existedFragment != null) {
                 existedFragment as InvisibleFragment
             } else {
