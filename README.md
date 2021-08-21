@@ -52,7 +52,7 @@ PermissionX.init(activity)
     }
 ```
 
-Pass any instance of FragmentActivity into **init** method, and specify the permissions that you want to request in the **permissions** method, then call **request** method for actual request.
+Pass any instance of FragmentActivity or Fragment into **init** method, and specify the permissions that you want to request in the **permissions** method, then call **request** method for actual request.
 
 The request result will be callback in the request lambda. **allGranted** means if all permissions that you requested are granted by user, maybe true or false. **grantedList** holds all granted permissions and **deniedList** holds all denied permissions.
 
