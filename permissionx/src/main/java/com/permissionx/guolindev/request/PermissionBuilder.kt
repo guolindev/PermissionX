@@ -270,15 +270,15 @@ class PermissionBuilder(
         chainTask: ChainTask,
         showReasonOrGoSettings: Boolean,
         permissions: List<String>,
-        message: String?,
-        positiveText: String?,
+        message: String,
+        positiveText: String,
         negativeText: String?
     ) {
         val defaultDialog = DefaultDialog(
             activity,
             permissions,
-            message!!,
-            positiveText!!,
+            message,
+            positiveText,
             negativeText,
             lightColor,
             darkColor

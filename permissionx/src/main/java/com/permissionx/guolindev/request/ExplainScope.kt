@@ -13,76 +13,53 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.permissionx.guolindev.request
 
-package com.permissionx.guolindev.request;
-
-import androidx.annotation.NonNull;
-
-import com.permissionx.guolindev.dialog.RationaleDialog;
-import com.permissionx.guolindev.dialog.RationaleDialogFragment;
-
-import java.util.List;
+import kotlin.jvm.JvmOverloads
+import com.permissionx.guolindev.dialog.RationaleDialog
+import com.permissionx.guolindev.dialog.RationaleDialogFragment
 
 /**
- * Provide specific scopes for {@link com.permissionx.guolindev.callback.ExplainReasonCallback} and {@link com.permissionx.guolindev.callback.ExplainReasonCallbackWithBeforeParam} to give it specific functions to call.
+ * Provide specific scopes for [com.permissionx.guolindev.callback.ExplainReasonCallback]
+ * and [com.permissionx.guolindev.callback.ExplainReasonCallbackWithBeforeParam] to give it specific functions to call.
  * @author guolin
  * @since 2020/3/18
  */
-public class ExplainScope {
-
-    private PermissionBuilder pb;
-
-    private ChainTask chainTask;
-
-    ExplainScope(PermissionBuilder pb, ChainTask chainTask) {
-        this.pb = pb;
-        this.chainTask = chainTask;
-    }
-
+class ExplainScope internal constructor(
+    private val pb: PermissionBuilder,
+    private val chainTask: ChainTask
+) {
     /**
      * Show a rationale dialog to explain to user why you need these permissions.
      * @param permissions
-     *          Permissions that to request.
+     * Permissions that to request.
      * @param message
-     *          Message that show to user.
+     * Message that show to user.
      * @param positiveText
-     *          Text on the positive button. When user click, PermissionX will request permissions again.
+     * Text on the positive button. When user click, PermissionX will request permissions again.
      * @param negativeText
-     *          Text on the negative button. When user click, PermissionX will finish request.
+     * Text on the negative button. When user click, PermissionX will finish request.
      */
-    public void showRequestReasonDialog(List<String> permissions, String message, String positiveText, String negativeText) {
-        pb.showHandlePermissionDialog(chainTask, true, permissions, message, positiveText, negativeText);
-    }
-
-    /**
-     * Show a rationale dialog to explain to user why you need these permissions.
-     * @param permissions
-     *          Permissions that to request.
-     * @param message
-     *          Message that show to user.
-     * @param positiveText
-     *          Text on the positive button. When user click, PermissionX will request permissions again.
-     */
-    public void showRequestReasonDialog(List<String> permissions, String message, String positiveText) {
-        showRequestReasonDialog(permissions, message, positiveText, null);
+    @JvmOverloads
+    fun showRequestReasonDialog(permissions: List<String>, message: String, positiveText: String, negativeText: String? = null) {
+        pb.showHandlePermissionDialog(chainTask, true, permissions, message, positiveText, negativeText)
     }
 
     /**
      * Show a rationale dialog to explain to user why you need these permissions.
      * @param dialog
-     *          Dialog to explain to user why these permissions are necessary.
+     * Dialog to explain to user why these permissions are necessary.
      */
-    public void showRequestReasonDialog(@NonNull RationaleDialog dialog) {
-        pb.showHandlePermissionDialog(chainTask, true, dialog);
+    fun showRequestReasonDialog(dialog: RationaleDialog) {
+        pb.showHandlePermissionDialog(chainTask, true, dialog)
     }
 
     /**
      * Show a rationale dialog to explain to user why you need these permissions.
      * @param dialogFragment
-     *          DialogFragment to explain to user why these permissions are necessary.
+     * DialogFragment to explain to user why these permissions are necessary.
      */
-    public void showRequestReasonDialog(@NonNull RationaleDialogFragment dialogFragment) {
-        pb.showHandlePermissionDialog(chainTask, true, dialogFragment);
+    fun showRequestReasonDialog(dialogFragment: RationaleDialogFragment) {
+        pb.showHandlePermissionDialog(chainTask, true, dialogFragment)
     }
-
 }
