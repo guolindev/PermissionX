@@ -13,14 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.permissionx.guolindev.request
 
-package com.permissionx.guolindev.request;
-
-import android.os.Build;
-import android.os.Environment;
-
-import java.util.ArrayList;
-import java.util.List;
+import android.os.Build
+import android.os.Environment
+import java.util.*
 
 /**
  * Implementation for request android.permission.MANAGE_EXTERNAL_STORAGE.
@@ -28,51 +25,45 @@ import java.util.List;
  * @author guolin
  * @since 2021/3/1
  */
-public class RequestManageExternalStoragePermission extends BaseTask {
+internal class RequestManageExternalStoragePermission internal constructor(permissionBuilder: PermissionBuilder) :
+    BaseTask(permissionBuilder) {
 
-    /**
-     * Define the const to compat with system lower than R.
-     */
-    public static final String MANAGE_EXTERNAL_STORAGE = "android.permission.MANAGE_EXTERNAL_STORAGE";
-
-    RequestManageExternalStoragePermission(PermissionBuilder permissionBuilder) {
-        super(permissionBuilder);
-    }
-
-    @Override
-    public void request() {
-        if (pb.shouldRequestManageExternalStoragePermission()
-                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+    override fun request() {
+        if (pb.shouldRequestManageExternalStoragePermission() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (Environment.isExternalStorageManager()) {
                 // MANAGE_EXTERNAL_STORAGE permission has already granted, we can finish this task now.
-                finish();
-                return;
+                finish()
+                return
             }
             if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
-                List<String> requestList = new ArrayList<>();
-                requestList.add(MANAGE_EXTERNAL_STORAGE);
+                val requestList = mutableListOf(MANAGE_EXTERNAL_STORAGE)
                 if (pb.explainReasonCallbackWithBeforeParam != null) {
                     // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
-                    pb.explainReasonCallbackWithBeforeParam.onExplainReason(getExplainScope(), requestList, true);
+                    pb.explainReasonCallbackWithBeforeParam!!.onExplainReason(explainScope, requestList, true)
                 } else {
-                    pb.explainReasonCallback.onExplainReason(getExplainScope(), requestList);
+                    pb.explainReasonCallback!!.onExplainReason(explainScope, requestList)
                 }
             } else {
                 // No implementation of explainReasonCallback, we can't request
                 // MANAGE_EXTERNAL_STORAGE permission at this time, because user won't understand why.
-                finish();
+                finish()
             }
-            return;
+            return
         }
         // shouldn't request MANAGE_EXTERNAL_STORAGE permission at this time, so we call finish()
         // to finish this task.
-        finish();
+        finish()
     }
 
-    @Override
-    public void requestAgain(List<String> permissions) {
+    override fun requestAgain(permissions: List<String>) {
         // don't care what the permissions param is, always request WRITE_SETTINGS permission.
-        pb.requestManageExternalStoragePermissionNow(this);
+        pb.requestManageExternalStoragePermissionNow(this)
     }
 
+    companion object {
+        /**
+         * Define the const to compat with system lower than R.
+         */
+        const val MANAGE_EXTERNAL_STORAGE = "android.permission.MANAGE_EXTERNAL_STORAGE"
+    }
 }

@@ -45,8 +45,7 @@ internal class RequestBackgroundLocationPermission internal constructor(permissi
             val accessCoarseLocationGranted = PermissionX.isGranted(pb.activity, Manifest.permission.ACCESS_COARSE_LOCATION)
             if (accessFindLocationGranted || accessCoarseLocationGranted) {
                 if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
-                    val requestList: MutableList<String> = ArrayList()
-                    requestList.add(ACCESS_BACKGROUND_LOCATION)
+                    val requestList = mutableListOf(ACCESS_BACKGROUND_LOCATION)
                     if (pb.explainReasonCallbackWithBeforeParam != null) {
                         // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
                         pb.explainReasonCallbackWithBeforeParam!!.onExplainReason(explainScope, requestList, true)
