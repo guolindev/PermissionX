@@ -389,7 +389,7 @@ class PermissionBuilder(
      * @param permissions Permissions that you want to request.
      * @param chainTask   Instance of current task.
      */
-    fun requestNow(permissions: Set<String?>?, chainTask: ChainTask?) {
+    fun requestNow(permissions: Set<String>, chainTask: ChainTask) {
         invisibleFragment.requestNow(this, permissions, chainTask)
     }
 
@@ -398,7 +398,7 @@ class PermissionBuilder(
      *
      * @param chainTask Instance of current task.
      */
-    fun requestAccessBackgroundLocationNow(chainTask: ChainTask?) {
+    fun requestAccessBackgroundLocationNow(chainTask: ChainTask) {
         invisibleFragment.requestAccessBackgroundLocationNow(this, chainTask)
     }
 
@@ -407,7 +407,7 @@ class PermissionBuilder(
      *
      * @param chainTask Instance of current task.
      */
-    fun requestSystemAlertWindowPermissionNow(chainTask: ChainTask?) {
+    fun requestSystemAlertWindowPermissionNow(chainTask: ChainTask) {
         invisibleFragment.requestSystemAlertWindowPermissionNow(this, chainTask)
     }
 
@@ -416,7 +416,7 @@ class PermissionBuilder(
      *
      * @param chainTask Instance of current task.
      */
-    fun requestWriteSettingsPermissionNow(chainTask: ChainTask?) {
+    fun requestWriteSettingsPermissionNow(chainTask: ChainTask) {
         invisibleFragment.requestWriteSettingsPermissionNow(this, chainTask)
     }
 
@@ -425,7 +425,7 @@ class PermissionBuilder(
      *
      * @param chainTask Instance of current task.
      */
-    fun requestManageExternalStoragePermissionNow(chainTask: ChainTask?) {
+    fun requestManageExternalStoragePermissionNow(chainTask: ChainTask) {
         invisibleFragment.requestManageExternalStoragePermissionNow(this, chainTask)
     }
 
