@@ -13,74 +13,66 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.permissionx.guolindev.request
 
-package com.permissionx.guolindev.request;
-
-import android.Manifest;
-import android.os.Build;
-
-import com.permissionx.guolindev.PermissionX;
-
-import java.util.ArrayList;
-import java.util.List;
+import android.Manifest
+import android.os.Build
+import com.permissionx.guolindev.PermissionX
+import java.util.*
 
 /**
  * Implementation for request ACCESS_BACKGROUND_LOCATION permission.
  * @author guolin
  * @since 2020/6/10
  */
-public class RequestBackgroundLocationPermission extends BaseTask {
+internal class RequestBackgroundLocationPermission internal constructor(permissionBuilder: PermissionBuilder)
+    : BaseTask(permissionBuilder) {
 
-    /**
-     * Define the const to compat with system lower than Q.
-     */
-    public static final String ACCESS_BACKGROUND_LOCATION = "android.permission.ACCESS_BACKGROUND_LOCATION";
-
-    RequestBackgroundLocationPermission(PermissionBuilder permissionBuilder) {
-        super(permissionBuilder);
-    }
-
-    @Override
-    public void request() {
+    override fun request() {
         if (pb.shouldRequestBackgroundLocationPermission()) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
                 // If app runs under Android Q, there's no ACCESS_BACKGROUND_LOCATION permissions.
                 // We remove it from request list, but will append it to the request callback as denied permission.
-                pb.specialPermissions.remove(ACCESS_BACKGROUND_LOCATION);
-                pb.permissionsWontRequest.add(ACCESS_BACKGROUND_LOCATION);
+                pb.specialPermissions.remove(ACCESS_BACKGROUND_LOCATION)
+                pb.permissionsWontRequest.add(ACCESS_BACKGROUND_LOCATION)
             }
             if (PermissionX.isGranted(pb.activity, ACCESS_BACKGROUND_LOCATION)) {
                 // ACCESS_BACKGROUND_LOCATION has already granted, we can finish this task now.
-                finish();
-                return;
+                finish()
+                return
             }
-            boolean accessFindLocationGranted = PermissionX.isGranted(pb.activity, Manifest.permission.ACCESS_FINE_LOCATION);
-            boolean accessCoarseLocationGranted = PermissionX.isGranted(pb.activity, Manifest.permission.ACCESS_COARSE_LOCATION);
+            val accessFindLocationGranted = PermissionX.isGranted(pb.activity, Manifest.permission.ACCESS_FINE_LOCATION)
+            val accessCoarseLocationGranted = PermissionX.isGranted(pb.activity, Manifest.permission.ACCESS_COARSE_LOCATION)
             if (accessFindLocationGranted || accessCoarseLocationGranted) {
                 if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
-                    List<String> requestList = new ArrayList<>();
-                    requestList.add(ACCESS_BACKGROUND_LOCATION);
+                    val requestList: MutableList<String> = ArrayList()
+                    requestList.add(ACCESS_BACKGROUND_LOCATION)
                     if (pb.explainReasonCallbackWithBeforeParam != null) {
                         // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
-                        pb.explainReasonCallbackWithBeforeParam.onExplainReason(getExplainScope(), requestList, true);
+                        pb.explainReasonCallbackWithBeforeParam!!.onExplainReason(explainScope, requestList, true)
                     } else {
-                        pb.explainReasonCallback.onExplainReason(getExplainScope(), requestList);
+                        pb.explainReasonCallback!!.onExplainReason(explainScope, requestList)
                     }
                 } else {
                     // No implementation of explainReasonCallback, so we have to request ACCESS_BACKGROUND_LOCATION without explanation.
-                    requestAgain(null);
+                    requestAgain(emptyList())
                 }
-                return;
+                return
             }
         }
         // Shouldn't request ACCESS_BACKGROUND_LOCATION at this time, so we call finish() to finish this task.
-        finish();
+        finish()
     }
 
-    @Override
-    public void requestAgain(List<String> permissions) {
+    override fun requestAgain(permissions: List<String>) {
         // Don't care what the permissions param is, always request ACCESS_BACKGROUND_LOCATION.
-        pb.requestAccessBackgroundLocationNow(this);
+        pb.requestAccessBackgroundLocationNow(this)
     }
 
+    companion object {
+        /**
+         * Define the const to compat with system lower than Q.
+         */
+        const val ACCESS_BACKGROUND_LOCATION = "android.permission.ACCESS_BACKGROUND_LOCATION"
+    }
 }

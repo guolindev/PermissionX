@@ -42,8 +42,8 @@ import java.util.*
 class PermissionBuilder(
     fragmentActivity: FragmentActivity?,
     fragment: Fragment?,
-    normalPermissions: Set<String>,
-    specialPermissions: Set<String>
+    normalPermissions: MutableSet<String>,
+    specialPermissions: MutableSet<String>
 ) {
 
     /**
@@ -77,14 +77,14 @@ class PermissionBuilder(
      * Normal runtime permissions that app want to request.
      */
     @JvmField
-    var normalPermissions: Set<String>
+    var normalPermissions: MutableSet<String>
 
     /**
      * Special permissions that we need to handle by special case.
      * Such as SYSTEM_ALERT_WINDOW, WRITE_SETTINGS and MANAGE_EXTERNAL_STORAGE.
      */
     @JvmField
-    var specialPermissions: Set<String>
+    var specialPermissions: MutableSet<String>
 
     /**
      * Indicates should PermissionX explain request reason before request.
