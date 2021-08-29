@@ -13,46 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.permissionx.guolindev.request;
+package com.permissionx.guolindev.request
 
 /**
  * Maintain the task chain of permission request process.
  * @author guolin
  * @since 2020/6/10
  */
-public class RequestChain {
-
+class RequestChain {
     /**
      * Holds the first task of request process. Permissions request begins here.
      */
-    private BaseTask headTask;
+    private var headTask: BaseTask? = null
 
     /**
      * Holds the last task of request process. Permissions request ends here.
      */
-    private BaseTask tailTask;
+    private var tailTask: BaseTask? = null
 
     /**
      * Add a task into task chain.
      * @param task  task to add.
      */
-    public void addTaskToChain(BaseTask task) {
+    internal fun addTaskToChain(task: BaseTask) {
         if (headTask == null) {
-            headTask = task;
+            headTask = task
         }
         // add task to the tail
-        if (tailTask != null) {
-            tailTask.next = task;
-        }
-        tailTask = task;
+        tailTask?.next = task
+        tailTask = task
     }
 
     /**
      * Run this task chain from the first task.
      */
-    public void runTask() {
-        headTask.request();
+    internal fun runTask() {
+        headTask?.request()
     }
-
 }
