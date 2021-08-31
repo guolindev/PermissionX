@@ -17,7 +17,6 @@ package com.permissionx.guolindev.request
 
 import android.os.Build
 import android.os.Environment
-import java.util.*
 
 /**
  * Implementation for request android.permission.MANAGE_EXTERNAL_STORAGE.

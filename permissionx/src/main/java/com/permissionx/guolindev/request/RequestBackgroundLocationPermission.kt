@@ -18,7 +18,6 @@ package com.permissionx.guolindev.request
 import android.Manifest
 import android.os.Build
 import com.permissionx.guolindev.PermissionX
-import java.util.*
 
 /**
  * Implementation for request ACCESS_BACKGROUND_LOCATION permission.
