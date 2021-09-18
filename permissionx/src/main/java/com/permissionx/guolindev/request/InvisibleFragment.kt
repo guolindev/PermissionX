@@ -20,6 +20,7 @@ import android.annotation.TargetApi
 import android.os.Build
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Environment
 import android.provider.Settings
 import android.util.Log
@@ -85,6 +86,7 @@ class InvisibleFragment : Fragment() {
         task = chainTask
         if (!Settings.canDrawOverlays(context)) {
             val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
+            intent.data = Uri.parse("package:${requireActivity().packageName}")
             startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION)
         } else {
             onRequestSystemAlertWindowPermissionResult()
@@ -101,6 +103,7 @@ class InvisibleFragment : Fragment() {
         task = chainTask
         if (!Settings.System.canWrite(context)) {
             val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
+            intent.data = Uri.parse("package:${requireActivity().packageName}")
             startActivityForResult(intent, ACTION_WRITE_SETTINGS_PERMISSION)
         } else {
             onRequestWriteSettingsPermissionResult()
