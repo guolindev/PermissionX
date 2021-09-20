@@ -250,6 +250,7 @@ class PermissionBuilder(
         requestChain.addTaskToChain(RequestSystemAlertWindowPermission(this))
         requestChain.addTaskToChain(RequestWriteSettingsPermission(this))
         requestChain.addTaskToChain(RequestManageExternalStoragePermission(this))
+        requestChain.addTaskToChain(RequestInstallPackagesPermission(this))
         requestChain.runTask()
     }
 
@@ -430,6 +431,15 @@ class PermissionBuilder(
     }
 
     /**
+     * Request REQUEST_INSTALL_PACKAGES permission at once in the fragment.
+     *
+     * @param chainTask Instance of current task.
+     */
+    fun requestInstallPackagePermissionNow(chainTask: ChainTask) {
+        invisibleFragment.requestInstallPackagesPermissionNow(this, chainTask)
+    }
+
+    /**
      * Should we request ACCESS_BACKGROUND_LOCATION permission or not.
      *
      * @return True if specialPermissions contains ACCESS_BACKGROUND_LOCATION permission, false otherwise.
@@ -463,6 +473,15 @@ class PermissionBuilder(
      */
     fun shouldRequestManageExternalStoragePermission(): Boolean {
         return specialPermissions.contains(RequestManageExternalStoragePermission.MANAGE_EXTERNAL_STORAGE)
+    }
+
+    /**
+     * Should we request REQUEST_INSTALL_PACKAGES permission or not.
+     *
+     * @return True if specialPermissions contains REQUEST_INSTALL_PACKAGES permission, false otherwise.
+     */
+    fun shouldRequestInstallPackagesPermission(): Boolean {
+        return specialPermissions.contains(RequestInstallPackagesPermission.REQUEST_INSTALL_PACKAGES)
     }
 
     /**

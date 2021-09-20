@@ -33,6 +33,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
@@ -45,20 +46,20 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <!--        <activity android:name=".MainJavaActivity">
+        <!--        <activity android:name=".MainJavaActivity" android:exported="true">
                 <intent-filter>
                     <action android:name="android.intent.action.MAIN" />
 
                     <category android:name="android.intent.category.LAUNCHER" />
                 </intent-filter>
             </activity>-->
-   <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity" android:exported="true">
            <intent-filter>
                <action android:name="android.intent.action.MAIN" />
 
                <category android:name="android.intent.category.LAUNCHER" />
            </intent-filter>
-      </activity>
+        </activity>
     </application>
 
 </manifest>

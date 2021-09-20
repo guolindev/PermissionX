@@ -19,16 +19,19 @@ package com.permissionx.guolindev.dialog
 import android.Manifest
 import android.annotation.TargetApi
 import android.os.Build
+import com.permissionx.guolindev.request.RequestBackgroundLocationPermission
+import com.permissionx.guolindev.request.RequestInstallPackagesPermission
+import com.permissionx.guolindev.request.RequestManageExternalStoragePermission
 
 /**
  * Maintains all the special permissions that we need to handle by special case.
  */
-@TargetApi(Build.VERSION_CODES.R)
 val allSpecialPermissions = setOf(
-    Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+    RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION,
     Manifest.permission.SYSTEM_ALERT_WINDOW,
     Manifest.permission.WRITE_SETTINGS,
-    Manifest.permission.MANAGE_EXTERNAL_STORAGE
+    RequestManageExternalStoragePermission.MANAGE_EXTERNAL_STORAGE,
+    RequestInstallPackagesPermission.REQUEST_INSTALL_PACKAGES,
 )
 
 /**

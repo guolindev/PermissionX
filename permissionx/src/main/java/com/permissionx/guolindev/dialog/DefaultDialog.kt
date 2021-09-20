@@ -162,6 +162,10 @@ class DefaultDialog(context: Context,
                         itemBinding.permissionText.text = context.getString(R.string.permissionx_manage_external_storage)
                         itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_storage)
                     }
+                    Manifest.permission.REQUEST_INSTALL_PACKAGES -> {
+                        itemBinding.permissionText.text = context.getString(R.string.permissionx_request_install_packages)
+                        itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_install)
+                    }
                     else -> {
                         itemBinding.permissionText.text = context.getString(context.packageManager.getPermissionGroupInfo(permissionGroup!!, 0).labelRes)
                         itemBinding.permissionIcon.setImageResource(context.packageManager.getPermissionGroupInfo(permissionGroup, 0).icon)

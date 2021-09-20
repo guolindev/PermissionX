@@ -4,4 +4,5 @@
     <string name="permissionx_system_alert_window">显示在其他应用的上层</string>
     <string name="permissionx_write_settings">修改系统设置</string>
     <string name="permissionx_manage_external_storage">所有文件访问权限</string>
+    <string name="permissionx_request_install_packages">安装未知应用</string>
 </resources>

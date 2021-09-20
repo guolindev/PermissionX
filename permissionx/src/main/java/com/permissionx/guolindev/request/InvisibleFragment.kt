@@ -16,7 +16,6 @@
 package com.permissionx.guolindev.request
 
 import android.Manifest
-import android.annotation.TargetApi
 import android.os.Build
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -80,11 +79,10 @@ class InvisibleFragment : Fragment() {
      * Request SYSTEM_ALERT_WINDOW permission. On Android M and above, it's request by
      * Settings.ACTION_MANAGE_OVERLAY_PERMISSION with Intent.
      */
-    @TargetApi(Build.VERSION_CODES.M)
     fun requestSystemAlertWindowPermissionNow(permissionBuilder: PermissionBuilder, chainTask: ChainTask) {
         pb = permissionBuilder
         task = chainTask
-        if (!Settings.canDrawOverlays(context)) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(context)) {
             val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
             intent.data = Uri.parse("package:${requireActivity().packageName}")
             startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION)
@@ -97,11 +95,10 @@ class InvisibleFragment : Fragment() {
      * Request WRITE_SETTINGS permission. On Android M and above, it's request by
      * Settings.ACTION_MANAGE_WRITE_SETTINGS with Intent.
      */
-    @TargetApi(Build.VERSION_CODES.M)
     fun requestWriteSettingsPermissionNow(permissionBuilder: PermissionBuilder, chainTask: ChainTask) {
         pb = permissionBuilder
         task = chainTask
-        if (!Settings.System.canWrite(context)) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.System.canWrite(context)) {
             val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
             intent.data = Uri.parse("package:${requireActivity().packageName}")
             startActivityForResult(intent, ACTION_WRITE_SETTINGS_PERMISSION)
@@ -125,6 +122,22 @@ class InvisibleFragment : Fragment() {
         }
     }
 
+    /**
+     * Request REQUEST_INSTALL_PACKAGES permission. On Android O and above, it's request by
+     * Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES with Intent.
+     */
+    fun requestInstallPackagesPermissionNow(permissionBuilder: PermissionBuilder, chainTask: ChainTask) {
+        pb = permissionBuilder
+        task = chainTask
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES)
+            intent.data = Uri.parse("package:${requireActivity().packageName}")
+            startActivityForResult(intent, ACTION_MANAGE_UNKNOWN_APP_SOURCES_PERMISSION)
+        } else {
+            onRequestInstallPackagesPermissionResult()
+        }
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode == REQUEST_NORMAL_PERMISSIONS) {
             onRequestNormalPermissionsResult(permissions, grantResults)
@@ -145,6 +158,7 @@ class InvisibleFragment : Fragment() {
                 ACTION_MANAGE_OVERLAY_PERMISSION -> onRequestSystemAlertWindowPermissionResult()
                 ACTION_WRITE_SETTINGS_PERMISSION -> onRequestWriteSettingsPermissionResult()
                 ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION -> onRequestManageExternalStoragePermissionResult()
+                ACTION_MANAGE_UNKNOWN_APP_SOURCES_PERMISSION -> onRequestInstallPackagesPermissionResult()
             }
         }
     }
@@ -350,6 +364,28 @@ class InvisibleFragment : Fragment() {
     }
 
     /**
+     * Handle result of REQUEST_INSTALL_PACKAGES permission request.
+     */
+    private fun onRequestInstallPackagesPermissionResult() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (requireActivity().packageManager.canRequestPackageInstalls()) {
+                task.finish()
+            } else if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
+                if (pb.explainReasonCallbackWithBeforeParam != null) {
+                    // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
+                    pb.explainReasonCallbackWithBeforeParam!!.onExplainReason(
+                        task.explainScope, listOf(Manifest.permission.REQUEST_INSTALL_PACKAGES), false)
+                } else {
+                    pb.explainReasonCallback!!.onExplainReason(
+                        task.explainScope, listOf(Manifest.permission.REQUEST_INSTALL_PACKAGES))
+                }
+            }
+        } else {
+            task.finish()
+        }
+    }
+
+    /**
      * On some phones, PermissionBuilder and ChainTask may become null under unpredictable occasions such as GC.
      * They should not be null at this time, so we can do nothing in this case.
      * @return PermissionBuilder and ChainTask are still alive or not. If not, we should not do any further logic.
@@ -395,5 +431,10 @@ class InvisibleFragment : Fragment() {
          * Code for request MANAGE_EXTERNAL_STORAGE permission.
          */
         const val ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION = 4
+
+        /**
+         * Code for request ACTION_MANAGE_UNKNOWN_APP_SOURCES permission.
+         */
+        const val ACTION_MANAGE_UNKNOWN_APP_SOURCES_PERMISSION = 5
     }
 }

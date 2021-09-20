@@ -88,6 +88,17 @@ internal abstract class BaseTask(@JvmField var pb: PermissionBuilder) : ChainTas
                     deniedList.add(RequestManageExternalStoragePermission.MANAGE_EXTERNAL_STORAGE)
                 }
             }
+            if (pb.shouldRequestInstallPackagesPermission()) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && pb.targetSdkVersion >= Build.VERSION_CODES.O) {
+                    if (pb.activity.packageManager.canRequestPackageInstalls()) {
+                        pb.grantedPermissions.add(RequestInstallPackagesPermission.REQUEST_INSTALL_PACKAGES)
+                    } else {
+                        deniedList.add(RequestInstallPackagesPermission.REQUEST_INSTALL_PACKAGES)
+                    }
+                } else {
+                    deniedList.add(RequestInstallPackagesPermission.REQUEST_INSTALL_PACKAGES)
+                }
+            }
             if (pb.requestCallback != null) {
                 pb.requestCallback!!.onResult(deniedList.isEmpty(), ArrayList(pb.grantedPermissions), deniedList)
             }
