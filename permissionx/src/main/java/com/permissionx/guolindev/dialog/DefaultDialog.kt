@@ -136,6 +136,7 @@ class DefaultDialog(context: Context,
                 }
                 currentVersion == Build.VERSION_CODES.Q -> permissionMapOnQ[permission]
                 currentVersion == Build.VERSION_CODES.R -> permissionMapOnR[permission]
+                currentVersion == Build.VERSION_CODES.S -> permissionMapOnS[permission]
                 else -> {
                     // If currentVersion is newer than the latest version we support, we just use
                     // the latest version for temp. Will upgrade in the next release.

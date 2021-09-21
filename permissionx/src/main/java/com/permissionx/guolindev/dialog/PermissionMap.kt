@@ -71,7 +71,7 @@ val permissionMapOnQ = mapOf(
     Manifest.permission.RECEIVE_MMS to Manifest.permission_group.SMS,
     Manifest.permission.READ_EXTERNAL_STORAGE to Manifest.permission_group.STORAGE,
     Manifest.permission.WRITE_EXTERNAL_STORAGE to Manifest.permission_group.STORAGE,
-    Manifest.permission.ACCESS_MEDIA_LOCATION to Manifest.permission_group.STORAGE
+    Manifest.permission.ACCESS_MEDIA_LOCATION to Manifest.permission_group.STORAGE,
 )
 
 /**
@@ -79,3 +79,15 @@ val permissionMapOnQ = mapOf(
  */
 @TargetApi(Build.VERSION_CODES.R)
 val permissionMapOnR = permissionMapOnQ
+
+/**
+ * Android S added 3 bluetooth related runtime permissions.
+ */
+@TargetApi(Build.VERSION_CODES.S)
+val permissionMapOnS = mapOf(
+    Manifest.permission.BLUETOOTH_SCAN to Manifest.permission_group.NEARBY_DEVICES,
+    Manifest.permission.BLUETOOTH_ADVERTISE to Manifest.permission_group.NEARBY_DEVICES,
+    Manifest.permission.BLUETOOTH_CONNECT to Manifest.permission_group.NEARBY_DEVICES,
+).toMutableMap().apply {
+    putAll(permissionMapOnR)
+}.toMap()
