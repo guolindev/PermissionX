@@ -17,9 +17,6 @@ package com.permissionx.guolindev.request
 
 import android.Manifest
 import android.app.Dialog
-import android.content.Intent
-import android.net.Uri
-import android.provider.Settings
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -502,10 +499,7 @@ class PermissionBuilder(
     private fun forwardToSettings(permissions: List<String>) {
         forwardPermissions.clear()
         forwardPermissions.addAll(permissions)
-        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-        val uri = Uri.fromParts("package", activity.packageName, null)
-        intent.data = uri
-        invisibleFragment.startActivityForResult(intent, InvisibleFragment.FORWARD_TO_SETTINGS)
+        invisibleFragment.forwardToSettings()
     }
 
     /**
