@@ -56,7 +56,7 @@ class PermissionMediator {
         val targetSdkVersion = if (activity != null) {
             activity!!.applicationInfo.targetSdkVersion
         } else {
-            fragment!!.context!!.applicationInfo.targetSdkVersion
+            fragment!!.requireContext().applicationInfo.targetSdkVersion
         }
         for (permission in permissions) {
             if (permission in allSpecialPermissions) {
