@@ -1,6 +1,7 @@
 package com.permissionx.app
 
 import android.Manifest
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -39,6 +40,7 @@ class MainFragment : Fragment() {
 //                    Manifest.permission.SEND_SMS,
 //                    Manifest.permission.READ_EXTERNAL_STORAGE
                 )
+                .setDialogTintColor(Color.parseColor("#1972e8"), Color.parseColor("#8ab6f5"))
                 .onExplainRequestReason { scope, deniedList, beforeRequest ->
                     val message = "PermissionX needs following permissions to continue"
                     scope.showRequestReasonDialog(deniedList, message, "Allow", "Deny")
