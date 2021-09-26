@@ -67,6 +67,12 @@ class PermissionBuilder(
     private var darkColor = -1
 
     /**
+     * The origin request orientation of the current Activity. We need to restore it when
+     * permission request finished.
+     */
+    private var originRequestOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+
+    /**
      * Instance of the current dialog that shows to user.
      * We need to dismiss this dialog when InvisibleFragment destroyed.
      */
@@ -500,7 +506,7 @@ class PermissionBuilder(
      * Restore the screen orientation. Activity just behave as before locked.
      */
     internal fun restoreOrientation() {
-        activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        activity.requestedOrientation = originRequestOrientation
     }
 
     /**
@@ -508,6 +514,7 @@ class PermissionBuilder(
      */
     @SuppressLint("SourceLockedOrientationActivity")
     private fun lockOrientation() {
+        originRequestOrientation = activity.requestedOrientation
         val orientation = activity.resources.configuration.orientation
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
             activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
