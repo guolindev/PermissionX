@@ -102,7 +102,10 @@ internal abstract class BaseTask(@JvmField var pb: PermissionBuilder) : ChainTas
             if (pb.requestCallback != null) {
                 pb.requestCallback!!.onResult(deniedList.isEmpty(), ArrayList(pb.grantedPermissions), deniedList)
             }
+            // Remove the InvisibleFragment from current Activity after request finished.
             pb.removeInvisibleFragment()
+            // Restore the orientation after request finished since it's locked before.
+            pb.restoreOrientation()
         }
     }
 
