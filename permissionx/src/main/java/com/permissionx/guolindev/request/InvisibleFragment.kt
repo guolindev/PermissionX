@@ -91,7 +91,9 @@ class InvisibleFragment : Fragment() {
      * Used to get the result when user switch back from Settings.
      */
     private val forwardToSettingsLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        task.requestAgain(ArrayList(pb.forwardPermissions))
+        if (checkForGC()) {
+            task.requestAgain(ArrayList(pb.forwardPermissions))
+        }
     }
 
     /**
@@ -331,21 +333,23 @@ class InvisibleFragment : Fragment() {
      * Handle result of SYSTEM_ALERT_WINDOW permission request.
      */
     private fun onRequestSystemAlertWindowPermissionResult() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (Settings.canDrawOverlays(context)) {
-                task.finish()
-            } else if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
-                if (pb.explainReasonCallbackWithBeforeParam != null) {
-                    // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
-                    pb.explainReasonCallbackWithBeforeParam!!.onExplainReason(
-                        task.explainScope, listOf(Manifest.permission.SYSTEM_ALERT_WINDOW), false)
-                } else {
-                    pb.explainReasonCallback!!.onExplainReason(
-                        task.explainScope, listOf(Manifest.permission.SYSTEM_ALERT_WINDOW))
+        if (checkForGC()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (Settings.canDrawOverlays(context)) {
+                    task.finish()
+                } else if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
+                    if (pb.explainReasonCallbackWithBeforeParam != null) {
+                        // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
+                        pb.explainReasonCallbackWithBeforeParam!!.onExplainReason(
+                            task.explainScope, listOf(Manifest.permission.SYSTEM_ALERT_WINDOW), false)
+                    } else {
+                        pb.explainReasonCallback!!.onExplainReason(
+                            task.explainScope, listOf(Manifest.permission.SYSTEM_ALERT_WINDOW))
+                    }
                 }
+            } else {
+                task.finish()
             }
-        } else {
-            task.finish()
         }
     }
 
@@ -353,21 +357,23 @@ class InvisibleFragment : Fragment() {
      * Handle result of WRITE_SETTINGS permission request.
      */
     private fun onRequestWriteSettingsPermissionResult() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (Settings.System.canWrite(context)) {
-                task.finish()
-            } else if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
-                if (pb.explainReasonCallbackWithBeforeParam != null) {
-                    // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
-                    pb.explainReasonCallbackWithBeforeParam!!.onExplainReason(
-                        task.explainScope, listOf(Manifest.permission.WRITE_SETTINGS), false)
-                } else {
-                    pb.explainReasonCallback!!.onExplainReason(
-                        task.explainScope, listOf(Manifest.permission.WRITE_SETTINGS))
+        if (checkForGC()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (Settings.System.canWrite(context)) {
+                    task.finish()
+                } else if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
+                    if (pb.explainReasonCallbackWithBeforeParam != null) {
+                        // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
+                        pb.explainReasonCallbackWithBeforeParam!!.onExplainReason(
+                            task.explainScope, listOf(Manifest.permission.WRITE_SETTINGS), false)
+                    } else {
+                        pb.explainReasonCallback!!.onExplainReason(
+                            task.explainScope, listOf(Manifest.permission.WRITE_SETTINGS))
+                    }
                 }
+            } else {
+                task.finish()
             }
-        } else {
-            task.finish()
         }
     }
 
@@ -375,21 +381,23 @@ class InvisibleFragment : Fragment() {
      * Handle result of MANAGE_EXTERNAL_STORAGE permission request.
      */
     private fun onRequestManageExternalStoragePermissionResult() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (Environment.isExternalStorageManager()) {
-                task.finish()
-            } else if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
-                if (pb.explainReasonCallbackWithBeforeParam != null) {
-                    // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
-                    pb.explainReasonCallbackWithBeforeParam!!.onExplainReason(
-                        task.explainScope, listOf(Manifest.permission.MANAGE_EXTERNAL_STORAGE), false)
-                } else {
-                    pb.explainReasonCallback!!.onExplainReason(
-                        task.explainScope, listOf(Manifest.permission.MANAGE_EXTERNAL_STORAGE))
+        if (checkForGC()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                if (Environment.isExternalStorageManager()) {
+                    task.finish()
+                } else if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
+                    if (pb.explainReasonCallbackWithBeforeParam != null) {
+                        // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
+                        pb.explainReasonCallbackWithBeforeParam!!.onExplainReason(
+                            task.explainScope, listOf(Manifest.permission.MANAGE_EXTERNAL_STORAGE), false)
+                    } else {
+                        pb.explainReasonCallback!!.onExplainReason(
+                            task.explainScope, listOf(Manifest.permission.MANAGE_EXTERNAL_STORAGE))
+                    }
                 }
+            } else {
+                task.finish()
             }
-        } else {
-            task.finish()
         }
     }
 
@@ -397,21 +405,23 @@ class InvisibleFragment : Fragment() {
      * Handle result of REQUEST_INSTALL_PACKAGES permission request.
      */
     private fun onRequestInstallPackagesPermissionResult() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (requireActivity().packageManager.canRequestPackageInstalls()) {
-                task.finish()
-            } else if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
-                if (pb.explainReasonCallbackWithBeforeParam != null) {
-                    // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
-                    pb.explainReasonCallbackWithBeforeParam!!.onExplainReason(
-                        task.explainScope, listOf(Manifest.permission.REQUEST_INSTALL_PACKAGES), false)
-                } else {
-                    pb.explainReasonCallback!!.onExplainReason(
-                        task.explainScope, listOf(Manifest.permission.REQUEST_INSTALL_PACKAGES))
+        if (checkForGC()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if (requireActivity().packageManager.canRequestPackageInstalls()) {
+                    task.finish()
+                } else if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
+                    if (pb.explainReasonCallbackWithBeforeParam != null) {
+                        // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
+                        pb.explainReasonCallbackWithBeforeParam!!.onExplainReason(
+                            task.explainScope, listOf(Manifest.permission.REQUEST_INSTALL_PACKAGES), false)
+                    } else {
+                        pb.explainReasonCallback!!.onExplainReason(
+                            task.explainScope, listOf(Manifest.permission.REQUEST_INSTALL_PACKAGES))
+                    }
                 }
+            } else {
+                task.finish()
             }
-        } else {
-            task.finish()
         }
     }
 
