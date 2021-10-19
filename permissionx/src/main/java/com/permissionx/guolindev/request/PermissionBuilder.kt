@@ -49,7 +49,7 @@ class PermissionBuilder(
     /**
      * Instance of activity for everything.
      */
-    lateinit var activity: FragmentActivity
+    internal lateinit var activity: FragmentActivity
 
     /**
      * Instance of fragment for everything as an alternative choice for activity.
@@ -77,26 +77,26 @@ class PermissionBuilder(
      * We need to dismiss this dialog when InvisibleFragment destroyed.
      */
     @JvmField
-    var currentDialog: Dialog? = null
+    internal var currentDialog: Dialog? = null
 
     /**
      * Normal runtime permissions that app want to request.
      */
     @JvmField
-    var normalPermissions: MutableSet<String>
+    internal var normalPermissions: MutableSet<String>
 
     /**
      * Special permissions that we need to handle by special case.
      * Such as SYSTEM_ALERT_WINDOW, WRITE_SETTINGS and MANAGE_EXTERNAL_STORAGE.
      */
     @JvmField
-    var specialPermissions: MutableSet<String>
+    internal var specialPermissions: MutableSet<String>
 
     /**
-     * Indicates should PermissionX explain request reason before request.
+     * Indicates should PermissionX explain request reason after request.
      */
     @JvmField
-    var explainReasonBeforeRequest = false
+    internal var explainReasonAfterRequest = false
 
     /**
      * Indicates [ExplainScope.showRequestReasonDialog] or [ForwardScope.showForwardToSettingsDialog]
@@ -104,32 +104,32 @@ class PermissionBuilder(
      * If not called, requestCallback will be called by PermissionX automatically.
      */
     @JvmField
-    var showDialogCalled = false
+    internal var showDialogCalled = false
 
     /**
      * Some permissions shouldn't request will be stored here. And notify back to user when request finished.
      */
     @JvmField
-    var permissionsWontRequest: MutableSet<String> = LinkedHashSet()
+    internal var permissionsWontRequest: MutableSet<String> = LinkedHashSet()
 
     /**
      * Holds permissions that have already granted in the requested permissions.
      */
     @JvmField
-    var grantedPermissions: MutableSet<String> = LinkedHashSet()
+    internal var grantedPermissions: MutableSet<String> = LinkedHashSet()
 
     /**
      * Holds permissions that have been denied in the requested permissions.
      */
     @JvmField
-    var deniedPermissions: MutableSet<String> = LinkedHashSet()
+    internal var deniedPermissions: MutableSet<String> = LinkedHashSet()
 
     /**
      * Holds permissions that have been permanently denied in the requested permissions.
      * (Deny and never ask again)
      */
     @JvmField
-    var permanentDeniedPermissions: MutableSet<String> = LinkedHashSet()
+    internal var permanentDeniedPermissions: MutableSet<String> = LinkedHashSet()
 
     /**
      * When we request multiple permissions. Some are denied, some are permanently denied.
@@ -138,7 +138,7 @@ class PermissionBuilder(
      * They will be callback once no more denied permissions exist.
      */
     @JvmField
-    var tempPermanentDeniedPermissions: MutableSet<String> = LinkedHashSet()
+    internal var tempPermanentDeniedPermissions: MutableSet<String> = LinkedHashSet()
 
     /**
      * Holds permissions which should forward to Settings to allow them.
@@ -146,31 +146,31 @@ class PermissionBuilder(
      * Only the ones developer think they are necessary should.
      */
     @JvmField
-    var forwardPermissions: MutableSet<String> = LinkedHashSet()
+    internal var forwardPermissions: MutableSet<String> = LinkedHashSet()
 
     /**
      * The callback for [.request] method. Can not be null.
      */
     @JvmField
-    var requestCallback: RequestCallback? = null
+    internal var requestCallback: RequestCallback? = null
 
     /**
      * The callback for [.onExplainRequestReason] method. Maybe null.
      */
     @JvmField
-    var explainReasonCallback: ExplainReasonCallback? = null
+    internal var explainReasonCallback: ExplainReasonCallback? = null
 
     /**
      * The callback for [.onExplainRequestReason] method, but with beforeRequest param. Maybe null.
      */
     @JvmField
-    var explainReasonCallbackWithBeforeParam: ExplainReasonCallbackWithBeforeParam? = null
+    internal var explainReasonCallbackWithBeforeParam: ExplainReasonCallbackWithBeforeParam? = null
 
     /**
      * The callback for [.onForwardToSettings] method. Maybe null.
      */
     @JvmField
-    var forwardToSettingsCallback: ForwardToSettingsCallback? = null
+    internal var forwardToSettingsCallback: ForwardToSettingsCallback? = null
 
     /**
      * Called when permissions need to explain request reason.
@@ -215,12 +215,12 @@ class PermissionBuilder(
 
     /**
      * If you need to show request permission rationale, chain this method in your request syntax.
-     * [.onExplainRequestReason] will be called before permission request.
+     * [.onExplainRequestReason] will be called after permission request.
      *
      * @return PermissionBuilder itself.
      */
-    fun explainReasonBeforeRequest(): PermissionBuilder {
-        explainReasonBeforeRequest = true
+    fun explainReasonAfterRequest(): PermissionBuilder {
+        explainReasonAfterRequest = true
         return this
     }
 
@@ -539,7 +539,7 @@ class PermissionBuilder(
      *
      * @return The targetSdkVersion of current app.
      */
-    val targetSdkVersion: Int
+    internal val targetSdkVersion: Int
         get() = activity.applicationInfo.targetSdkVersion
 
     /**
