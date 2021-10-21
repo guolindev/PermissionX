@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.guolindev.permissionx:permissionx:1.6.0'
+    implementation 'com.guolindev.permissionx:permissionx:1.6.1'
 }
 ```
 
