@@ -17,9 +17,12 @@ package com.permissionx.guolindev.request
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Dialog
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
+import android.content.res.TypedArray
+import android.os.Build
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -31,7 +34,7 @@ import com.permissionx.guolindev.callback.RequestCallback
 import com.permissionx.guolindev.dialog.DefaultDialog
 import com.permissionx.guolindev.dialog.RationaleDialog
 import com.permissionx.guolindev.dialog.RationaleDialogFragment
-import java.util.*
+
 
 /**
  * More APIs for developers to control PermissionX functions.
@@ -506,7 +509,9 @@ class PermissionBuilder(
      * Restore the screen orientation. Activity just behave as before locked.
      */
     internal fun restoreOrientation() {
-        activity.requestedOrientation = originRequestOrientation
+        if (activity.requestedOrientation != originRequestOrientation && isAllowOrientation(activity)) {
+            activity.requestedOrientation = originRequestOrientation
+        }
     }
 
     /**
@@ -516,11 +521,32 @@ class PermissionBuilder(
     private fun lockOrientation() {
         originRequestOrientation = activity.requestedOrientation
         val orientation = activity.resources.configuration.orientation
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE
+                && activity.requestedOrientation != ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                && isAllowOrientation(activity)) {
             activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-        } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+        } else if (orientation == Configuration.ORIENTATION_PORTRAIT
+                && activity.requestedOrientation != ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+                && isAllowOrientation(activity)) {
             activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
         }
+    }
+
+    /**
+     * Fix java.lang.IllegalStateException Only fullscreen activities can request orientation
+     */
+    private fun isAllowOrientation(activity: Activity): Boolean {
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.O) {
+            val tmpArray = intArrayOf(android.R.attr.windowIsTranslucent)
+            val a: TypedArray = activity.obtainStyledAttributes(null, tmpArray)
+            try {
+                val windowIsTranslucent = a.getBoolean(0, false)
+                return !windowIsTranslucent
+            } finally {
+                a.recycle()
+            }
+        }
+        return true
     }
 
     /**
