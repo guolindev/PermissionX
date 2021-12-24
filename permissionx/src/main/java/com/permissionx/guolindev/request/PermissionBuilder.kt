@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
+import android.os.Build
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -504,22 +505,30 @@ class PermissionBuilder(
 
     /**
      * Restore the screen orientation. Activity just behave as before locked.
+     * Android O has bug that only full screen activity can request orientation,
+     * so we need to exclude Android O.
      */
     internal fun restoreOrientation() {
-        activity.requestedOrientation = originRequestOrientation
+        if (Build.VERSION.SDK_INT != Build.VERSION_CODES.O) {
+            activity.requestedOrientation = originRequestOrientation
+        }
     }
 
     /**
      * Lock the screen orientation. Activity couldn't rotate with sensor.
+     * Android O has bug that only full screen activity can request orientation,
+     * so we need to exclude Android O.
      */
     @SuppressLint("SourceLockedOrientationActivity")
     private fun lockOrientation() {
-        originRequestOrientation = activity.requestedOrientation
-        val orientation = activity.resources.configuration.orientation
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-        } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-            activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+        if (Build.VERSION.SDK_INT != Build.VERSION_CODES.O) {
+            originRequestOrientation = activity.requestedOrientation
+            val orientation = activity.resources.configuration.orientation
+            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+            } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+            }
         }
     }
 
