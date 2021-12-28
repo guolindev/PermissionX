@@ -15,8 +15,11 @@
  */
 package com.permissionx.guolindev.request
 
+import androidx.core.app.ActivityCompat
+import androidx.fragment.app.FragmentActivity
 import com.permissionx.guolindev.PermissionX
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Implementation for request normal permissions.
@@ -39,8 +42,11 @@ internal class RequestNormalPermissions internal constructor(permissionBuilder: 
             finish()
             return
         }
-        if (pb.explainReasonBeforeRequest && (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null)) {
-            pb.explainReasonBeforeRequest = false
+        if (shouldShowRequestPermissionRationale(
+                pb.activity,
+                requestList
+            ) && (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null)
+        ) {
             pb.deniedPermissions.addAll(requestList)
             if (pb.explainReasonCallbackWithBeforeParam != null) {
                 // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
@@ -52,6 +58,18 @@ internal class RequestNormalPermissions internal constructor(permissionBuilder: 
             // Do the request at once. Always request all permissions no matter they are already granted or not, in case user turn them off in Settings.
             pb.requestNow(pb.normalPermissions, this)
         }
+    }
+
+    private fun shouldShowRequestPermissionRationale(
+        activity: FragmentActivity,
+        requestList: ArrayList<String>
+    ): Boolean {
+        for (permission in requestList) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
+                return true
+            }
+        }
+        return false
     }
 
     /**

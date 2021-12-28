@@ -16,9 +16,9 @@
 package com.permissionx.guolindev.request
 
 import android.Manifest
-import android.os.Build
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.provider.Settings
 import android.util.Log
@@ -255,7 +255,7 @@ class InvisibleFragment : Fragment() {
             } else {
                 var shouldFinishTheTask = true // Indicate if we should finish the task
                 // If explainReasonCallback is not null and there are denied permissions. Try the ExplainReasonCallback.
-                if ((pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) && showReasonList.isNotEmpty()) {
+                if (pb.explainReasonAfterRequest && (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) && showReasonList.isNotEmpty()) {
                     shouldFinishTheTask = false // shouldn't because ExplainReasonCallback handles it
                     if (pb.explainReasonCallbackWithBeforeParam != null) {
                         // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
