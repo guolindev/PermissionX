@@ -3,6 +3,7 @@ package com.permissionx.app
 import android.Manifest
 import android.graphics.Color
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,7 +44,7 @@ class MainFragment : Fragment() {
                 .setDialogTintColor(Color.parseColor("#1972e8"), Color.parseColor("#8ab6f5"))
                 .onExplainRequestReason { scope, deniedList, beforeRequest ->
                     val message = "PermissionX needs following permissions to continue"
-                    scope.showRequestReasonDialog(deniedList, message, "Allow", "Deny")
+                    scope.showRequestReasonDialog(deniedList, message, "Allow", "Deny",Gravity.LEFT)
 //                    val message = "Please allow the following permissions in settings"
 //                    val dialog = CustomDialogFragment(message, deniedList)
 //                    scope.showRequestReasonDialog(dialog)

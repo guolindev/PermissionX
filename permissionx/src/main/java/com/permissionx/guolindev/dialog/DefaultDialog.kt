@@ -41,7 +41,8 @@ class DefaultDialog(context: Context,
     private val positiveText: String,
     private val negativeText: String?,
     private val lightColor: Int,
-    private val darkColor: Int
+    private val darkColor: Int,
+    private val textAlign: Int
 ) : RationaleDialog(context, R.style.PermissionXDefaultDialog) {
 
     private lateinit var binding: PermissionxDefaultDialogLayoutBinding
@@ -96,6 +97,7 @@ class DefaultDialog(context: Context,
      */
     private fun setupText() {
         binding.messageText.text = message
+        binding.messageText.gravity = textAlign
         binding.positiveBtn.text = positiveText
         if (negativeText != null) {
             binding.negativeLayout.visibility = View.VISIBLE

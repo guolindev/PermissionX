@@ -15,6 +15,7 @@
  */
 package com.permissionx.guolindev.request
 
+import android.graphics.Paint
 import kotlin.jvm.JvmOverloads
 import com.permissionx.guolindev.dialog.RationaleDialog
 import com.permissionx.guolindev.dialog.RationaleDialogFragment
@@ -41,8 +42,8 @@ class ExplainScope internal constructor(
      * Text on the negative button. When user click, PermissionX will finish request.
      */
     @JvmOverloads
-    fun showRequestReasonDialog(permissions: List<String>, message: String, positiveText: String, negativeText: String? = null) {
-        pb.showHandlePermissionDialog(chainTask, true, permissions, message, positiveText, negativeText)
+    fun showRequestReasonDialog(permissions: List<String>, message: String, positiveText: String, negativeText: String? = null,textAlign: Int) {
+        pb.showHandlePermissionDialog(chainTask, true, permissions, message, positiveText, negativeText,textAlign)
     }
 
     /**

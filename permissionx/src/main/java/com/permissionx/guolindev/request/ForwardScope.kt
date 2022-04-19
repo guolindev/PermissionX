@@ -41,8 +41,8 @@ class ForwardScope internal constructor(
      * Text on the negative button. When user click, PermissionX will finish request.
      */
     @JvmOverloads
-    fun showForwardToSettingsDialog(permissions: List<String>, message: String, positiveText: String, negativeText: String? = null) {
-        pb.showHandlePermissionDialog(chainTask, false, permissions, message, positiveText, negativeText)
+    fun showForwardToSettingsDialog(permissions: List<String>, message: String, positiveText: String, negativeText: String? = null,textAlign: Int) {
+        pb.showHandlePermissionDialog(chainTask, false, permissions, message, positiveText, negativeText, textAlign)
     }
 
     /**

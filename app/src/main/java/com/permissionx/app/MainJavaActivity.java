@@ -2,6 +2,7 @@ package com.permissionx.app;
 
 import android.Manifest;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,10 +23,10 @@ public class MainJavaActivity extends AppCompatActivity {
                 .onExplainRequestReason((scope, deniedList, beforeRequest) -> {
 //                    CustomDialog customDialog = new CustomDialog(MainJavaActivity.this, "PermissionX needs following permissions to continue", deniedList);
 //                    scope.showRequestReasonDialog(customDialog);
-                    scope.showRequestReasonDialog(deniedList, "PermissionX needs following permissions to continue", "Allow");
+                    scope.showRequestReasonDialog(deniedList, "PermissionX needs following permissions to continue", "Allow", Gravity.LEFT);
                 })
                 .onForwardToSettings((scope, deniedList) -> {
-                    scope.showForwardToSettingsDialog(deniedList, "Please allow following permissions in settings", "Allow");
+                    scope.showForwardToSettingsDialog(deniedList, "Please allow following permissions in settings", "Allow",Gravity.LEFT);
                 })
                 .request((allGranted, grantedList, deniedList) -> {
                     if (allGranted) {
