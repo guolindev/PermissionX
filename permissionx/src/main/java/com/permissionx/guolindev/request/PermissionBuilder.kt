@@ -74,6 +74,34 @@ class PermissionBuilder(
     private var originRequestOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
     /**
+     * Get the FragmentManager if it's in Activity, or the ChildFragmentManager if it's in Fragment.
+     * @return The FragmentManager to operate Fragment.
+     */
+    private val fragmentManager: FragmentManager
+        get() {
+            return fragment?.childFragmentManager ?: activity.supportFragmentManager
+        }
+
+    /**
+     * Get the invisible fragment in activity for request permissions.
+     * If there is no invisible fragment, add one into activity.
+     * Don't worry. This is very lightweight.
+     */
+    private val invisibleFragment: InvisibleFragment
+        get() {
+            val existedFragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG)
+            return if (existedFragment != null) {
+                existedFragment as InvisibleFragment
+            } else {
+                val invisibleFragment = InvisibleFragment()
+                fragmentManager.beginTransaction()
+                    .add(invisibleFragment, FRAGMENT_TAG)
+                    .commitNowAllowingStateLoss()
+                invisibleFragment
+            }
+        }
+
+    /**
      * Instance of the current dialog that shows to user.
      * We need to dismiss this dialog when InvisibleFragment destroyed.
      */
@@ -174,6 +202,14 @@ class PermissionBuilder(
     var forwardToSettingsCallback: ForwardToSettingsCallback? = null
 
     /**
+     * Get the targetSdkVersion of current app.
+     *
+     * @return The targetSdkVersion of current app.
+     */
+    val targetSdkVersion: Int
+        get() = activity.applicationInfo.targetSdkVersion
+
+    /**
      * Called when permissions need to explain request reason.
      * Typically every time user denies your request would call this method.
      * If you chained [.explainReasonBeforeRequest], this method might run before permission request.
@@ -248,19 +284,7 @@ class PermissionBuilder(
      */
     fun request(callback: RequestCallback?) {
         requestCallback = callback
-        // Lock the orientation when requesting permissions, or callback maybe missed due to
-        // activity destroyed.
-        lockOrientation()
-
-        // Build the request chain. RequestNormalPermissions runs first, then RequestBackgroundLocationPermission runs.
-        val requestChain = RequestChain()
-        requestChain.addTaskToChain(RequestNormalPermissions(this))
-        requestChain.addTaskToChain(RequestBackgroundLocationPermission(this))
-        requestChain.addTaskToChain(RequestSystemAlertWindowPermission(this))
-        requestChain.addTaskToChain(RequestWriteSettingsPermission(this))
-        requestChain.addTaskToChain(RequestManageExternalStoragePermission(this))
-        requestChain.addTaskToChain(RequestInstallPackagesPermission(this))
-        requestChain.runTask()
+        startRequest()
     }
 
     /**
@@ -493,13 +517,33 @@ class PermissionBuilder(
         return specialPermissions.contains(RequestInstallPackagesPermission.REQUEST_INSTALL_PACKAGES)
     }
 
+    private fun startRequest() {
+        // If it's already in a request flow, we shouldn't start a new one.
+        if (inRequestFlow) return
+
+        inRequestFlow = true
+        // Lock the orientation when requesting permissions, or callback maybe missed due to
+        // activity destroyed.
+        lockOrientation()
+
+        // Build the request chain. RequestNormalPermissions runs first, then RequestBackgroundLocationPermission runs.
+        val requestChain = RequestChain()
+        requestChain.addTaskToChain(RequestNormalPermissions(this))
+        requestChain.addTaskToChain(RequestBackgroundLocationPermission(this))
+        requestChain.addTaskToChain(RequestSystemAlertWindowPermission(this))
+        requestChain.addTaskToChain(RequestWriteSettingsPermission(this))
+        requestChain.addTaskToChain(RequestManageExternalStoragePermission(this))
+        requestChain.addTaskToChain(RequestInstallPackagesPermission(this))
+        requestChain.runTask()
+    }
+
     /**
      * Remove the InvisibleFragment from current FragmentManager.
      */
-    internal fun removeInvisibleFragment() {
+    private fun removeInvisibleFragment() {
         val existedFragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG)
         if (existedFragment != null) {
-            fragmentManager.beginTransaction().remove(existedFragment).commitAllowingStateLoss()
+            fragmentManager.beginTransaction().remove(existedFragment).commitNowAllowingStateLoss()
         }
     }
 
@@ -508,7 +552,7 @@ class PermissionBuilder(
      * Android O has bug that only full screen activity can request orientation,
      * so we need to exclude Android O.
      */
-    internal fun restoreOrientation() {
+    private fun restoreOrientation() {
         if (Build.VERSION.SDK_INT != Build.VERSION_CODES.O) {
             activity.requestedOrientation = originRequestOrientation
         }
@@ -543,47 +587,25 @@ class PermissionBuilder(
         invisibleFragment.forwardToSettings()
     }
 
-    /**
-     * Get the targetSdkVersion of current app.
-     *
-     * @return The targetSdkVersion of current app.
-     */
-    val targetSdkVersion: Int
-        get() = activity.applicationInfo.targetSdkVersion
-
-    /**
-     * Get the FragmentManager if it's in Activity, or the ChildFragmentManager if it's in Fragment.
-     * @return The FragmentManager to operate Fragment.
-     */
-    private val fragmentManager: FragmentManager
-        get() {
-            return fragment?.childFragmentManager ?: activity.supportFragmentManager
-        }
-
-    /**
-     * Get the invisible fragment in activity for request permissions.
-     * If there is no invisible fragment, add one into activity.
-     * Don't worry. This is very lightweight.
-     */
-    private val invisibleFragment: InvisibleFragment
-        get() {
-            val existedFragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG)
-            return if (existedFragment != null) {
-                existedFragment as InvisibleFragment
-            } else {
-                val invisibleFragment = InvisibleFragment()
-                fragmentManager.beginTransaction()
-                    .add(invisibleFragment, FRAGMENT_TAG)
-                    .commitNowAllowingStateLoss()
-                invisibleFragment
-            }
-        }
+    internal fun endRequest() {
+        // Remove the InvisibleFragment from current Activity after request finished.
+        removeInvisibleFragment()
+        // Restore the orientation after request finished since it's locked before.
+        restoreOrientation()
+        // Permission request flow finished.
+        inRequestFlow = false
+    }
 
     companion object {
         /**
          * TAG of InvisibleFragment to find and create.
          */
         private const val FRAGMENT_TAG = "InvisibleFragment"
+
+        /**
+         * Flag to indicate the current request flow is finished or not.
+         */
+        private var inRequestFlow = false
     }
 
     init {
