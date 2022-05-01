@@ -55,7 +55,9 @@ class InvisibleFragment : Fragment() {
      */
     private val requestNormalPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { grantResults ->
-            onRequestNormalPermissionsResult(grantResults)
+            postForResult {
+                onRequestNormalPermissionsResult(grantResults)
+            }
         }
 
     /**
@@ -63,7 +65,9 @@ class InvisibleFragment : Fragment() {
      */
     private val requestBackgroundLocationLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            onRequestBackgroundLocationPermissionResult(granted)
+            postForResult {
+                onRequestBackgroundLocationPermissionResult(granted)
+            }
         }
 
     /**
@@ -71,7 +75,9 @@ class InvisibleFragment : Fragment() {
      */
     private val requestSystemAlertWindowLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            onRequestSystemAlertWindowPermissionResult()
+            postForResult {
+                onRequestSystemAlertWindowPermissionResult()
+            }
         }
 
     /**
@@ -79,7 +85,9 @@ class InvisibleFragment : Fragment() {
      */
     private val requestWriteSettingsLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            onRequestWriteSettingsPermissionResult()
+            postForResult {
+                onRequestWriteSettingsPermissionResult()
+            }
         }
 
     /**
@@ -87,7 +95,9 @@ class InvisibleFragment : Fragment() {
      */
     private val requestManageExternalStorageLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            onRequestManageExternalStoragePermissionResult()
+            postForResult {
+                onRequestManageExternalStoragePermissionResult()
+            }
         }
 
     /**
@@ -95,7 +105,9 @@ class InvisibleFragment : Fragment() {
      */
     private val requestInstallPackagesLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            onRequestInstallPackagesPermissionResult()
+            postForResult {
+                onRequestInstallPackagesPermissionResult()
+            }
         }
 
     /**
@@ -389,27 +401,25 @@ class InvisibleFragment : Fragment() {
      */
     private fun onRequestSystemAlertWindowPermissionResult() {
         if (checkForGC()) {
-            postForResult {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (Settings.canDrawOverlays(context)) {
-                        task.finish()
-                    } else if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
-                        if (pb.explainReasonCallbackWithBeforeParam != null) {
-                            // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
-                            pb.explainReasonCallbackWithBeforeParam!!.onExplainReason(
-                                task.explainScope,
-                                listOf(Manifest.permission.SYSTEM_ALERT_WINDOW),
-                                false
-                            )
-                        } else {
-                            pb.explainReasonCallback!!.onExplainReason(
-                                task.explainScope, listOf(Manifest.permission.SYSTEM_ALERT_WINDOW)
-                            )
-                        }
-                    }
-                } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (Settings.canDrawOverlays(context)) {
                     task.finish()
+                } else if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
+                    if (pb.explainReasonCallbackWithBeforeParam != null) {
+                        // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
+                        pb.explainReasonCallbackWithBeforeParam!!.onExplainReason(
+                            task.explainScope,
+                            listOf(Manifest.permission.SYSTEM_ALERT_WINDOW),
+                            false
+                        )
+                    } else {
+                        pb.explainReasonCallback!!.onExplainReason(
+                            task.explainScope, listOf(Manifest.permission.SYSTEM_ALERT_WINDOW)
+                        )
+                    }
                 }
+            } else {
+                task.finish()
             }
         }
     }
