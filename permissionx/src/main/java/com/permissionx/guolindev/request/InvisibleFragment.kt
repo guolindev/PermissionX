@@ -203,7 +203,8 @@ class InvisibleFragment : Fragment() {
         pb = permissionBuilder
         task = chainTask
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
-            val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+            intent.data = Uri.parse("package:${requireActivity().packageName}")
             requestManageExternalStorageLauncher.launch(intent)
         } else {
             onRequestManageExternalStoragePermissionResult()
