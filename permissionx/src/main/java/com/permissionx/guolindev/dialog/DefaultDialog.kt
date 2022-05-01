@@ -140,7 +140,7 @@ class DefaultDialog(context: Context,
                 else -> {
                     // If currentVersion is newer than the latest version we support, we just use
                     // the latest version for temp. Will upgrade in the next release.
-                    permissionMapOnR[permission]
+                    permissionMapOnS[permission]
                 }
             }
             if ((permission in allSpecialPermissions && !tempSet.contains(permission))
