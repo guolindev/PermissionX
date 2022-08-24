@@ -19,6 +19,8 @@ package com.permissionx.guolindev;
 import android.content.Context;
 import android.content.pm.PackageManager;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -46,7 +48,7 @@ public class PermissionX {
      * @param activity An instance of FragmentActivity
      * @return PermissionCollection instance.
      */
-    public static PermissionMediator init(FragmentActivity activity) {
+    public static PermissionMediator init(@NonNull FragmentActivity activity) {
         return new PermissionMediator(activity);
     }
 
@@ -56,7 +58,7 @@ public class PermissionX {
      * @param fragment An instance of Fragment
      * @return PermissionCollection instance.
      */
-    public static PermissionMediator init(Fragment fragment) {
+    public static PermissionMediator init(@NonNull Fragment fragment) {
         return new PermissionMediator(fragment);
     }
 
@@ -67,8 +69,24 @@ public class PermissionX {
      *  @param permission Specific permission name to check. e.g. [android.Manifest.permission.CAMERA].
      *  @return True if this permission is granted, False otherwise.
      */
-    public static boolean isGranted(Context context, String permission) {
+    public static boolean isGranted(@NonNull Context context, @NonNull String permission) {
         return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
     }
 
+    /**
+     * A helper function to check are notifications are enabled for current app.
+     * @param context
+     *          Any context, will not be retained.
+     * @return Note that if Android version is lower than N, the return value will always be true.
+     */
+    public static boolean areNotificationsEnabled(@NonNull Context context) {
+        return NotificationManagerCompat.from(context).areNotificationsEnabled();
+    }
+
+    public static final class permission {
+        /**
+         * Define the const to compat with system lower than T.
+         */
+        public static final String POST_NOTIFICATIONS = "android.permission.POST_NOTIFICATIONS";
+    }
 }

@@ -74,6 +74,14 @@ class PermissionMediator {
                 normalPermissionSet.add(RequestBackgroundLocationPermission.ACCESS_BACKGROUND_LOCATION)
             }
         }
+        if (PermissionX.permission.POST_NOTIFICATIONS in specialPermissionSet) {
+            if (osVersion >= Build.VERSION_CODES.TIRAMISU && targetSdkVersion >= Build.VERSION_CODES.TIRAMISU) {
+                // If we request POST_NOTIFICATIONS on TIRAMISU or above and targetSdkVersion >= TIRAMISU,
+                // We don't need to request specially, just request as normal permission.
+                specialPermissionSet.remove(PermissionX.permission.POST_NOTIFICATIONS)
+                normalPermissionSet.add(PermissionX.permission.POST_NOTIFICATIONS)
+            }
+        }
         return PermissionBuilder(activity, fragment, normalPermissionSet, specialPermissionSet)
     }
 

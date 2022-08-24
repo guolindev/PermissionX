@@ -25,6 +25,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
+import com.permissionx.guolindev.PermissionX
 import com.permissionx.guolindev.callback.ExplainReasonCallback
 import com.permissionx.guolindev.callback.ExplainReasonCallbackWithBeforeParam
 import com.permissionx.guolindev.callback.ForwardToSettingsCallback
@@ -473,6 +474,15 @@ class PermissionBuilder(
     }
 
     /**
+     * Request notification permission at once in the fragment.
+     *
+     * @param chainTask Instance of current task.
+     */
+    fun requestNotificationPermissionNow(chainTask: ChainTask) {
+        invisibleFragment.requestNotificationPermissionNow(this, chainTask)
+    }
+
+    /**
      * Should we request ACCESS_BACKGROUND_LOCATION permission or not.
      *
      * @return True if specialPermissions contains ACCESS_BACKGROUND_LOCATION permission, false otherwise.
@@ -517,6 +527,15 @@ class PermissionBuilder(
         return specialPermissions.contains(RequestInstallPackagesPermission.REQUEST_INSTALL_PACKAGES)
     }
 
+    /**
+     * Should we request the specific special permission or not.
+     *
+     * @return True if specialPermissions contains POST_NOTIFICATIONS permission, false otherwise.
+     */
+    fun shouldRequestNotificationPermission(): Boolean {
+        return specialPermissions.contains(PermissionX.permission.POST_NOTIFICATIONS)
+    }
+
     private fun startRequest() {
         // If it's already in a request flow, we shouldn't start a new one.
         if (inRequestFlow) return
@@ -534,6 +553,7 @@ class PermissionBuilder(
         requestChain.addTaskToChain(RequestWriteSettingsPermission(this))
         requestChain.addTaskToChain(RequestManageExternalStoragePermission(this))
         requestChain.addTaskToChain(RequestInstallPackagesPermission(this))
+        requestChain.addTaskToChain(RequestNotificationPermission(this))
         requestChain.runTask()
     }
 

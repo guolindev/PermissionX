@@ -111,6 +111,16 @@ class InvisibleFragment : Fragment() {
         }
 
     /**
+     * Used to get the result for notification permission.
+     */
+    private val requestNotificationLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            postForResult {
+                onRequestNotificationPermissionResult()
+            }
+        }
+
+    /**
      * Used to get the result when user switch back from Settings.
      */
     private val forwardToSettingsLauncher =
@@ -164,7 +174,7 @@ class InvisibleFragment : Fragment() {
     ) {
         pb = permissionBuilder
         task = chainTask
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(context)) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(requireContext())) {
             val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
             intent.data = Uri.parse("package:${requireActivity().packageName}")
             requestSystemAlertWindowLauncher.launch(intent)
@@ -183,7 +193,7 @@ class InvisibleFragment : Fragment() {
     ) {
         pb = permissionBuilder
         task = chainTask
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.System.canWrite(context)) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.System.canWrite(requireContext())) {
             val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
             intent.data = Uri.parse("package:${requireActivity().packageName}")
             requestWriteSettingsLauncher.launch(intent)
@@ -225,6 +235,25 @@ class InvisibleFragment : Fragment() {
             val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES)
             intent.data = Uri.parse("package:${requireActivity().packageName}")
             requestInstallPackagesLauncher.launch(intent)
+        } else {
+            onRequestInstallPackagesPermissionResult()
+        }
+    }
+
+    /**
+     * Request notification permission. On Android O and above, it's request by
+     * Settings.ACTION_APP_NOTIFICATION_SETTINGS with Intent.
+     */
+    fun requestNotificationPermissionNow(
+        permissionBuilder: PermissionBuilder,
+        chainTask: ChainTask
+    ) {
+        pb = permissionBuilder
+        task = chainTask
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+            intent.putExtra(Settings.EXTRA_APP_PACKAGE, requireActivity().packageName)
+            requestNotificationLauncher.launch(intent)
         } else {
             onRequestInstallPackagesPermissionResult()
         }
@@ -291,7 +320,7 @@ class InvisibleFragment : Fragment() {
             deniedPermissions.addAll(pb.permanentDeniedPermissions)
             // maybe user can turn some permissions on in settings that we didn't request, so check the denied permissions again for safety.
             for (permission in deniedPermissions) {
-                if (PermissionX.isGranted(context, permission)) {
+                if (PermissionX.isGranted(requireContext(), permission)) {
                     pb.deniedPermissions.remove(permission)
                     pb.grantedPermissions.add(permission)
                 }
@@ -403,7 +432,7 @@ class InvisibleFragment : Fragment() {
     private fun onRequestSystemAlertWindowPermissionResult() {
         if (checkForGC()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (Settings.canDrawOverlays(context)) {
+                if (Settings.canDrawOverlays(requireContext())) {
                     task.finish()
                 } else if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
                     if (pb.explainReasonCallbackWithBeforeParam != null) {
@@ -432,7 +461,7 @@ class InvisibleFragment : Fragment() {
         if (checkForGC()) {
             postForResult {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (Settings.System.canWrite(context)) {
+                    if (Settings.System.canWrite(requireContext())) {
                         task.finish()
                     } else if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
                         if (pb.explainReasonCallbackWithBeforeParam != null) {
@@ -505,6 +534,37 @@ class InvisibleFragment : Fragment() {
                             pb.explainReasonCallback!!.onExplainReason(
                                 task.explainScope,
                                 listOf(Manifest.permission.REQUEST_INSTALL_PACKAGES)
+                            )
+                        }
+                    }
+                } else {
+                    task.finish()
+                }
+            }
+        }
+    }
+
+    /**
+     * Handle result of notification permission request.
+     */
+    private fun onRequestNotificationPermissionResult() {
+        if (checkForGC()) {
+            postForResult {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    if (PermissionX.areNotificationsEnabled(requireContext())) {
+                        task.finish()
+                    } else if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
+                        if (pb.explainReasonCallbackWithBeforeParam != null) {
+                            // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
+                            pb.explainReasonCallbackWithBeforeParam!!.onExplainReason(
+                                task.explainScope,
+                                listOf(PermissionX.permission.POST_NOTIFICATIONS),
+                                false
+                            )
+                        } else {
+                            pb.explainReasonCallback!!.onExplainReason(
+                                task.explainScope,
+                                listOf(PermissionX.permission.POST_NOTIFICATIONS)
                             )
                         }
                     }

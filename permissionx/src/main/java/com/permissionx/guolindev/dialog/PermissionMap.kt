@@ -19,6 +19,7 @@ package com.permissionx.guolindev.dialog
 import android.Manifest
 import android.annotation.TargetApi
 import android.os.Build
+import com.permissionx.guolindev.PermissionX
 import com.permissionx.guolindev.request.RequestBackgroundLocationPermission
 import com.permissionx.guolindev.request.RequestInstallPackagesPermission
 import com.permissionx.guolindev.request.RequestManageExternalStoragePermission
@@ -32,6 +33,7 @@ val allSpecialPermissions = setOf(
     Manifest.permission.WRITE_SETTINGS,
     RequestManageExternalStoragePermission.MANAGE_EXTERNAL_STORAGE,
     RequestInstallPackagesPermission.REQUEST_INSTALL_PACKAGES,
+    PermissionX.permission.POST_NOTIFICATIONS,
 )
 
 /**

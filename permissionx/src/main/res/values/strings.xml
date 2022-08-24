@@ -5,4 +5,5 @@
     <string name="permissionx_write_settings">Modify system settings</string>
     <string name="permissionx_manage_external_storage">All files access</string>
     <string name="permissionx_request_install_packages">Install unknown apps</string>
+    <string name="permissionx_post_notification">Notifications</string>
 </resources>

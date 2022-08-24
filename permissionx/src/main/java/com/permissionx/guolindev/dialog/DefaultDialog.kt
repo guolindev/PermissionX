@@ -25,6 +25,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
+import com.permissionx.guolindev.PermissionX
 import com.permissionx.guolindev.R
 import com.permissionx.guolindev.databinding.PermissionxDefaultDialogLayoutBinding
 import com.permissionx.guolindev.databinding.PermissionxPermissionItemBinding
@@ -147,25 +148,33 @@ class DefaultDialog(context: Context,
             if ((permission in allSpecialPermissions && !tempSet.contains(permission))
                 || (permissionGroup != null && !tempSet.contains(permissionGroup))) {
                 val itemBinding = PermissionxPermissionItemBinding.inflate(layoutInflater, binding.permissionsLayout, false)
-                when(permission) {
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION -> {
+                when {
+                    permission == Manifest.permission.ACCESS_BACKGROUND_LOCATION -> {
                         itemBinding.permissionText.text = context.getString(R.string.permissionx_access_background_location)
                         itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_location)
                     }
-                    Manifest.permission.SYSTEM_ALERT_WINDOW -> {
+                    permission == Manifest.permission.SYSTEM_ALERT_WINDOW -> {
                         itemBinding.permissionText.text = context.getString(R.string.permissionx_system_alert_window)
                         itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_alert)
                     }
-                    Manifest.permission.WRITE_SETTINGS -> {
+                    permission == Manifest.permission.WRITE_SETTINGS -> {
                         itemBinding.permissionText.text = context.getString(R.string.permissionx_write_settings)
                         itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_setting)
                     }
-                    Manifest.permission.MANAGE_EXTERNAL_STORAGE -> {
+                    permission == Manifest.permission.MANAGE_EXTERNAL_STORAGE -> {
                         itemBinding.permissionText.text = context.getString(R.string.permissionx_manage_external_storage)
                         itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_storage)
                     }
-                    Manifest.permission.REQUEST_INSTALL_PACKAGES -> {
+                    permission == Manifest.permission.REQUEST_INSTALL_PACKAGES -> {
                         itemBinding.permissionText.text = context.getString(R.string.permissionx_request_install_packages)
+                        itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_install)
+                    }
+                    permission == PermissionX.permission.POST_NOTIFICATIONS
+                            && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU -> {
+                        // When OS version is lower than Android 13, there isn't a notification icon or labelRes for us to get.
+                        // So we need to handle it as special permission's way.
+                        itemBinding.permissionText.text = context.getString(R.string.permissionx_post_notification)
+                        // TODO replace with notification icon
                         itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_install)
                     }
                     else -> {

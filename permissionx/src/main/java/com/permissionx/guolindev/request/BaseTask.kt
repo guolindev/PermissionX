@@ -99,6 +99,13 @@ internal abstract class BaseTask(@JvmField var pb: PermissionBuilder) : ChainTas
                     deniedList.add(RequestInstallPackagesPermission.REQUEST_INSTALL_PACKAGES)
                 }
             }
+            if (pb.shouldRequestNotificationPermission()) {
+                if (PermissionX.areNotificationsEnabled(pb.activity)) {
+                    pb.grantedPermissions.add(PermissionX.permission.POST_NOTIFICATIONS)
+                } else {
+                    deniedList.add(PermissionX.permission.POST_NOTIFICATIONS)
+                }
+            }
             if (pb.requestCallback != null) {
                 pb.requestCallback!!.onResult(deniedList.isEmpty(), ArrayList(pb.grantedPermissions), deniedList)
             }
