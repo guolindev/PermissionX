@@ -121,6 +121,16 @@ class InvisibleFragment : Fragment() {
         }
 
     /**
+     * Used to get the result for BODY_SENSORS_BACKGROUND permission.
+     */
+    private val requestBodySensorsBackgroundLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            postForResult {
+                onRequestBodySensorsBackgroundPermissionResult(granted)
+            }
+        }
+
+    /**
      * Used to get the result when user switch back from Settings.
      */
     private val forwardToSettingsLauncher =
@@ -155,7 +165,7 @@ class InvisibleFragment : Fragment() {
      * @param permissionBuilder The instance of PermissionBuilder.
      * @param chainTask         Instance of current task.
      */
-    fun requestAccessBackgroundLocationNow(
+    fun requestAccessBackgroundLocationPermissionNow(
         permissionBuilder: PermissionBuilder,
         chainTask: ChainTask
     ) {
@@ -257,6 +267,22 @@ class InvisibleFragment : Fragment() {
         } else {
             onRequestInstallPackagesPermissionResult()
         }
+    }
+
+    /**
+     * Request ACCESS_BACKGROUND_LOCATION at once by calling [Fragment.requestPermissions],
+     * and handle request result in ActivityCompat.OnRequestPermissionsResultCallback.
+     *
+     * @param permissionBuilder The instance of PermissionBuilder.
+     * @param chainTask         Instance of current task.
+     */
+    fun requestBodySensorsBackgroundPermissionNow(
+        permissionBuilder: PermissionBuilder,
+        chainTask: ChainTask
+    ) {
+        pb = permissionBuilder
+        task = chainTask
+        requestBodySensorsBackgroundLauncher.launch(RequestBodySensorsBackgroundPermission.BODY_SENSORS_BACKGROUND)
     }
 
     /**
@@ -570,6 +596,61 @@ class InvisibleFragment : Fragment() {
                     }
                 } else {
                     task.finish()
+                }
+            }
+        }
+    }
+
+    /**
+     * Handle result of BODY_SENSORS_BACKGROUND permission request.
+     */
+    private fun onRequestBodySensorsBackgroundPermissionResult(granted: Boolean) {
+        if (checkForGC()) {
+            postForResult {
+                if (granted) {
+                    pb.grantedPermissions.add(RequestBodySensorsBackgroundPermission.BODY_SENSORS_BACKGROUND)
+                    // Remove granted permissions from deniedPermissions and permanentDeniedPermissions set in PermissionBuilder.
+                    pb.deniedPermissions.remove(RequestBodySensorsBackgroundPermission.BODY_SENSORS_BACKGROUND)
+                    pb.permanentDeniedPermissions.remove(RequestBodySensorsBackgroundPermission.BODY_SENSORS_BACKGROUND)
+                    task.finish()
+                } else {
+                    var goesToRequestCallback = true // Indicate if we should finish the task
+                    val shouldShowRationale =
+                        shouldShowRequestPermissionRationale(RequestBodySensorsBackgroundPermission.BODY_SENSORS_BACKGROUND)
+                    // If explainReasonCallback is not null and we should show rationale. Try the ExplainReasonCallback.
+                    if ((pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) && shouldShowRationale) {
+                        goesToRequestCallback =
+                            false // shouldn't because ExplainReasonCallback handles it
+                        val permissionsToExplain: MutableList<String> = ArrayList()
+                        permissionsToExplain.add(RequestBodySensorsBackgroundPermission.BODY_SENSORS_BACKGROUND)
+                        if (pb.explainReasonCallbackWithBeforeParam != null) {
+                            // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
+                            pb.explainReasonCallbackWithBeforeParam!!.onExplainReason(
+                                task.explainScope, permissionsToExplain, false
+                            )
+                        } else {
+                            pb.explainReasonCallback!!.onExplainReason(
+                                task.explainScope,
+                                permissionsToExplain
+                            )
+                        }
+                    } else if (pb.forwardToSettingsCallback != null && !shouldShowRationale) {
+                        goesToRequestCallback =
+                            false // shouldn't because ForwardToSettingsCallback handles it
+                        val permissionsToForward: MutableList<String> = ArrayList()
+                        permissionsToForward.add(RequestBodySensorsBackgroundPermission.BODY_SENSORS_BACKGROUND)
+                        pb.forwardToSettingsCallback!!.onForwardToSettings(
+                            task.forwardScope,
+                            permissionsToForward
+                        )
+                    }
+                    // If showRequestReasonDialog or showForwardToSettingsDialog is not called. We should finish the task.
+                    // There's case that ExplainReasonCallback or ForwardToSettingsCallback is called, but developer didn't invoke
+                    // showRequestReasonDialog or showForwardToSettingsDialog in the callback.
+                    // At this case and all other cases, task should be finished.
+                    if (goesToRequestCallback || !pb.showDialogCalled) {
+                        task.finish()
+                    }
                 }
             }
         }

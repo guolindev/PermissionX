@@ -22,31 +22,34 @@ import com.permissionx.guolindev.PermissionX
 /**
  * Implementation for request ACCESS_BACKGROUND_LOCATION permission.
  * @author guolin
- * @since 2020/6/10
+ * @since 2022/8/26
  */
-internal class RequestBackgroundLocationPermission internal constructor(permissionBuilder: PermissionBuilder)
+internal class RequestBodySensorsBackgroundPermission internal constructor(permissionBuilder: PermissionBuilder)
     : BaseTask(permissionBuilder) {
 
     override fun request() {
-        if (pb.shouldRequestBackgroundLocationPermission()) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-                // If app runs under Android Q, there's no ACCESS_BACKGROUND_LOCATION permissions.
+        if (pb.shouldRequestBodySensorsBackgroundPermission()) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                // If app runs under Android T, there's no BODY_SENSORS_BACKGROUND permissions.
                 // We remove it from request list, but will append it to the request callback as denied permission.
-                pb.specialPermissions.remove(ACCESS_BACKGROUND_LOCATION)
-                pb.permissionsWontRequest.add(ACCESS_BACKGROUND_LOCATION)
+                pb.specialPermissions.remove(BODY_SENSORS_BACKGROUND)
+                pb.permissionsWontRequest.add(BODY_SENSORS_BACKGROUND)
                 finish()
                 return
             }
-            if (PermissionX.isGranted(pb.activity, ACCESS_BACKGROUND_LOCATION)) {
-                // ACCESS_BACKGROUND_LOCATION has already granted, we can finish this task now.
+            if (PermissionX.isGranted(pb.activity, BODY_SENSORS_BACKGROUND)) {
+                // BODY_SENSORS_BACKGROUND has already granted, we can finish this task now.
                 finish()
                 return
             }
-            val accessFindLocationGranted = PermissionX.isGranted(pb.activity, Manifest.permission.ACCESS_FINE_LOCATION)
-            val accessCoarseLocationGranted = PermissionX.isGranted(pb.activity, Manifest.permission.ACCESS_COARSE_LOCATION)
-            if (accessFindLocationGranted || accessCoarseLocationGranted) {
+            val bodySensorGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+                PermissionX.isGranted(pb.activity, Manifest.permission.BODY_SENSORS)
+            } else {
+                false
+            }
+            if (bodySensorGranted) {
                 if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
-                    val requestList = mutableListOf(ACCESS_BACKGROUND_LOCATION)
+                    val requestList = mutableListOf(BODY_SENSORS_BACKGROUND)
                     if (pb.explainReasonCallbackWithBeforeParam != null) {
                         // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
                         pb.explainReasonCallbackWithBeforeParam!!.onExplainReason(explainScope, requestList, true)
@@ -54,25 +57,25 @@ internal class RequestBackgroundLocationPermission internal constructor(permissi
                         pb.explainReasonCallback!!.onExplainReason(explainScope, requestList)
                     }
                 } else {
-                    // No implementation of explainReasonCallback, so we have to request ACCESS_BACKGROUND_LOCATION without explanation.
+                    // No implementation of explainReasonCallback, so we have to request BODY_SENSORS_BACKGROUND without explanation.
                     requestAgain(emptyList())
                 }
                 return
             }
         }
-        // Shouldn't request ACCESS_BACKGROUND_LOCATION at this time, so we call finish() to finish this task.
+        // Shouldn't request BODY_SENSORS_BACKGROUND at this time, so we call finish() to finish this task.
         finish()
     }
 
     override fun requestAgain(permissions: List<String>) {
-        // Don't care what the permissions param is, always request ACCESS_BACKGROUND_LOCATION.
-        pb.requestAccessBackgroundLocationPermissionNow(this)
+        // Don't care what the permissions param is, always request BODY_SENSORS_BACKGROUND.
+        pb.requestBodySensorsBackgroundPermissionNow(this)
     }
 
     companion object {
         /**
-         * Define the const to compat with system lower than Q.
+         * Define the const to compat with system lower than T.
          */
-        const val ACCESS_BACKGROUND_LOCATION = "android.permission.ACCESS_BACKGROUND_LOCATION"
+        const val BODY_SENSORS_BACKGROUND = "android.permission.BODY_SENSORS_BACKGROUND"
     }
 }

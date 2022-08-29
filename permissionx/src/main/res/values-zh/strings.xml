@@ -6,4 +6,5 @@
     <string name="permissionx_manage_external_storage">所有文件访问权限</string>
     <string name="permissionx_request_install_packages">安装未知应用</string>
     <string name="permissionx_post_notification">通知</string>
+    <string name="permissionx_body_sensor_background">后台访问身体传感器</string>
 </resources>

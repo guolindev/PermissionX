@@ -433,8 +433,8 @@ class PermissionBuilder(
      *
      * @param chainTask Instance of current task.
      */
-    fun requestAccessBackgroundLocationNow(chainTask: ChainTask) {
-        invisibleFragment.requestAccessBackgroundLocationNow(this, chainTask)
+    fun requestAccessBackgroundLocationPermissionNow(chainTask: ChainTask) {
+        invisibleFragment.requestAccessBackgroundLocationPermissionNow(this, chainTask)
     }
 
     /**
@@ -480,6 +480,15 @@ class PermissionBuilder(
      */
     fun requestNotificationPermissionNow(chainTask: ChainTask) {
         invisibleFragment.requestNotificationPermissionNow(this, chainTask)
+    }
+
+    /**
+     * Request BODY_SENSORS_BACKGROUND permission at once in the fragment.
+     *
+     * @param chainTask Instance of current task.
+     */
+    fun requestBodySensorsBackgroundPermissionNow(chainTask: ChainTask) {
+        invisibleFragment.requestBodySensorsBackgroundPermissionNow(this, chainTask)
     }
 
     /**
@@ -536,6 +545,15 @@ class PermissionBuilder(
         return specialPermissions.contains(PermissionX.permission.POST_NOTIFICATIONS)
     }
 
+    /**
+     * Should we request the specific special permission or not.
+     *
+     * @return True if specialPermissions contains BODY_SENSORS_BACKGROUND permission, false otherwise.
+     */
+    fun shouldRequestBodySensorsBackgroundPermission(): Boolean {
+        return specialPermissions.contains(RequestBodySensorsBackgroundPermission.BODY_SENSORS_BACKGROUND)
+    }
+
     private fun startRequest() {
         // If it's already in a request flow, we shouldn't start a new one.
         if (inRequestFlow) return
@@ -554,6 +572,7 @@ class PermissionBuilder(
         requestChain.addTaskToChain(RequestManageExternalStoragePermission(this))
         requestChain.addTaskToChain(RequestInstallPackagesPermission(this))
         requestChain.addTaskToChain(RequestNotificationPermission(this))
+        requestChain.addTaskToChain(RequestBodySensorsBackgroundPermission(this))
         requestChain.runTask()
     }
 

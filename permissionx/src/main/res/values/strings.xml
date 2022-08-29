@@ -6,4 +6,5 @@
     <string name="permissionx_manage_external_storage">All files access</string>
     <string name="permissionx_request_install_packages">Install unknown apps</string>
     <string name="permissionx_post_notification">Notifications</string>
+    <string name="permissionx_body_sensor_background">Background body sensors</string>
 </resources>

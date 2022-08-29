@@ -106,6 +106,13 @@ internal abstract class BaseTask(@JvmField var pb: PermissionBuilder) : ChainTas
                     deniedList.add(PermissionX.permission.POST_NOTIFICATIONS)
                 }
             }
+            if (pb.shouldRequestBodySensorsBackgroundPermission()) {
+                if (PermissionX.isGranted(pb.activity, RequestBodySensorsBackgroundPermission.BODY_SENSORS_BACKGROUND)) {
+                    pb.grantedPermissions.add(RequestBodySensorsBackgroundPermission.BODY_SENSORS_BACKGROUND)
+                } else {
+                    deniedList.add(RequestBodySensorsBackgroundPermission.BODY_SENSORS_BACKGROUND)
+                }
+            }
             if (pb.requestCallback != null) {
                 pb.requestCallback!!.onResult(deniedList.isEmpty(), ArrayList(pb.grantedPermissions), deniedList)
             }

@@ -50,8 +50,7 @@ class MainFragment : Fragment() {
                 }
                 .onForwardToSettings { scope, deniedList ->
                     val message = "Please allow following permissions in settings"
-                    val dialog = CustomDialogFragment(message, deniedList)
-                    scope.showForwardToSettingsDialog(dialog)
+                    scope.showForwardToSettingsDialog(deniedList, message, "Allow", "Deny")
                 }
                 .request { allGranted, grantedList, deniedList ->
                     if (allGranted) {

@@ -169,12 +169,17 @@ class DefaultDialog(context: Context,
                         itemBinding.permissionText.text = context.getString(R.string.permissionx_request_install_packages)
                         itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_install)
                     }
-                    permission == PermissionX.permission.POST_NOTIFICATIONS
+                    permission == Manifest.permission.POST_NOTIFICATIONS
                             && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU -> {
                         // When OS version is lower than Android 13, there isn't a notification icon or labelRes for us to get.
                         // So we need to handle it as special permission's way.
                         itemBinding.permissionText.text = context.getString(R.string.permissionx_post_notification)
                         // TODO replace with notification icon
+                        itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_install)
+                    }
+                    permission == Manifest.permission.BODY_SENSORS_BACKGROUND -> {
+                        itemBinding.permissionText.text = context.getString(R.string.permissionx_body_sensor_background)
+                        // TODO replace with body sensor icon
                         itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_install)
                     }
                     else -> {
