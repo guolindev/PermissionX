@@ -82,7 +82,11 @@ val permissionMapOnQ = mapOf(
  * Thankfully Android R has no permission added or removed than Android Q.
  */
 @TargetApi(Build.VERSION_CODES.R)
-val permissionMapOnR = permissionMapOnQ
+val permissionMapOnR = mapOf(
+    Manifest.permission.MANAGE_EXTERNAL_STORAGE to Manifest.permission_group.STORAGE,
+).toMutableMap().apply {
+    putAll(permissionMapOnQ)
+}.toMap()
 
 /**
  * Android S added 3 bluetooth related runtime permissions.

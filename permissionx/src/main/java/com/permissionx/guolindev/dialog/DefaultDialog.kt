@@ -151,7 +151,7 @@ class DefaultDialog(context: Context,
                 when {
                     permission == Manifest.permission.ACCESS_BACKGROUND_LOCATION -> {
                         itemBinding.permissionText.text = context.getString(R.string.permissionx_access_background_location)
-                        itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_location)
+                        itemBinding.permissionIcon.setImageResource(context.packageManager.getPermissionGroupInfo(permissionGroup!!, 0).icon)
                     }
                     permission == Manifest.permission.SYSTEM_ALERT_WINDOW -> {
                         itemBinding.permissionText.text = context.getString(R.string.permissionx_system_alert_window)
@@ -163,7 +163,7 @@ class DefaultDialog(context: Context,
                     }
                     permission == Manifest.permission.MANAGE_EXTERNAL_STORAGE -> {
                         itemBinding.permissionText.text = context.getString(R.string.permissionx_manage_external_storage)
-                        itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_storage)
+                        itemBinding.permissionIcon.setImageResource(context.packageManager.getPermissionGroupInfo(permissionGroup!!, 0).icon)
                     }
                     permission == Manifest.permission.REQUEST_INSTALL_PACKAGES -> {
                         itemBinding.permissionText.text = context.getString(R.string.permissionx_request_install_packages)
@@ -174,13 +174,11 @@ class DefaultDialog(context: Context,
                         // When OS version is lower than Android 13, there isn't a notification icon or labelRes for us to get.
                         // So we need to handle it as special permission's way.
                         itemBinding.permissionText.text = context.getString(R.string.permissionx_post_notification)
-                        // TODO replace with notification icon
-                        itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_install)
+                        itemBinding.permissionIcon.setImageResource(context.packageManager.getPermissionGroupInfo(permissionGroup!!, 0).icon)
                     }
                     permission == Manifest.permission.BODY_SENSORS_BACKGROUND -> {
                         itemBinding.permissionText.text = context.getString(R.string.permissionx_body_sensor_background)
-                        // TODO replace with body sensor icon
-                        itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_install)
+                        itemBinding.permissionIcon.setImageResource(context.packageManager.getPermissionGroupInfo(permissionGroup!!, 0).icon)
                     }
                     else -> {
                         itemBinding.permissionText.text = context.getString(context.packageManager.getPermissionGroupInfo(permissionGroup!!, 0).labelRes)
