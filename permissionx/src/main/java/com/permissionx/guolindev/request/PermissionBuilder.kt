@@ -555,10 +555,6 @@ class PermissionBuilder(
     }
 
     private fun startRequest() {
-        // If it's already in a request flow, we shouldn't start a new one.
-        if (inRequestFlow) return
-
-        inRequestFlow = true
         // Lock the orientation when requesting permissions, or callback maybe missed due to
         // activity destroyed.
         lockOrientation()
@@ -631,8 +627,6 @@ class PermissionBuilder(
         removeInvisibleFragment()
         // Restore the orientation after request finished since it's locked before.
         restoreOrientation()
-        // Permission request flow finished.
-        inRequestFlow = false
     }
 
     companion object {
@@ -640,11 +634,6 @@ class PermissionBuilder(
          * TAG of InvisibleFragment to find and create.
          */
         private const val FRAGMENT_TAG = "InvisibleFragment"
-
-        /**
-         * Flag to indicate the current request flow is finished or not.
-         */
-        private var inRequestFlow = false
     }
 
     init {
