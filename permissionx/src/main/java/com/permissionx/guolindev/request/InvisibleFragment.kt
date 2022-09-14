@@ -16,6 +16,7 @@
 package com.permissionx.guolindev.request
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.os.Build
 import android.content.Intent
 import android.net.Uri
@@ -216,6 +217,7 @@ class InvisibleFragment : Fragment() {
      * Request MANAGE_EXTERNAL_STORAGE permission. On Android R and above, it's request by
      * Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION with Intent.
      */
+    @SuppressLint("QueryPermissionsNeeded")
     fun requestManageExternalStoragePermissionNow(
         permissionBuilder: PermissionBuilder,
         chainTask: ChainTask
@@ -223,8 +225,11 @@ class InvisibleFragment : Fragment() {
         pb = permissionBuilder
         task = chainTask
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
-            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+            var intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
             intent.data = Uri.parse("package:${requireActivity().packageName}")
+            if (intent.resolveActivity(requireActivity().packageManager) == null) {
+                intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+            }
             requestManageExternalStorageLauncher.launch(intent)
         } else {
             onRequestManageExternalStoragePermissionResult()
