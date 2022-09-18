@@ -174,7 +174,7 @@ class DefaultDialog(context: Context,
                         // When OS version is lower than Android 13, there isn't a notification icon or labelRes for us to get.
                         // So we need to handle it as special permission's way.
                         itemBinding.permissionText.text = context.getString(R.string.permissionx_post_notification)
-                        itemBinding.permissionIcon.setImageResource(context.packageManager.getPermissionGroupInfo(permissionGroup!!, 0).icon)
+                        itemBinding.permissionIcon.setImageResource(R.drawable.permissionx_ic_notification)
                     }
                     permission == Manifest.permission.BODY_SENSORS_BACKGROUND -> {
                         itemBinding.permissionText.text = context.getString(R.string.permissionx_body_sensor_background)
