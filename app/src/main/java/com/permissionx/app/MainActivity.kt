@@ -10,4 +10,17 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
     }
 
+    override fun onStart() {
+        super.onStart()
+        PermissionXHelper.checkPermissions(
+            PermissionXHelper.PermissionType.LOCATION,
+            this,
+            object : PermissionXHelper.PermissionCallback {
+                override fun allGranted() {
+//                    initLocation()
+//                    startLocation()
+                }
+            })
+    }
+
 }
