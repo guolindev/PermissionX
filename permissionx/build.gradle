@@ -19,6 +19,7 @@ android {
     buildFeatures {
         viewBinding true
     }
+    namespace 'com.permissionx.guolindev'
 }
 
 dependencies {
