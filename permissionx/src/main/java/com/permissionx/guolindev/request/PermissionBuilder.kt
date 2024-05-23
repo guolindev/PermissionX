@@ -170,6 +170,9 @@ class PermissionBuilder(
     @JvmField
     var tempPermanentDeniedPermissions: MutableSet<String> = LinkedHashSet()
 
+    @JvmField
+    var tempReadMediaPermissions: MutableSet<String> = LinkedHashSet()
+
     /**
      * Holds permissions which should forward to Settings to allow them.
      * Not all permanently denied permissions should forward to Settings.

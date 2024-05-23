@@ -345,6 +345,30 @@ class InvisibleFragment : Fragment() {
                     }
                 }
             }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                if (pb.grantedPermissions.contains(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)) {
+                    if (pb.deniedPermissions.contains(Manifest.permission.READ_MEDIA_IMAGES)) {
+                        pb.deniedPermissions.remove(Manifest.permission.READ_MEDIA_IMAGES)
+                        showReasonList.remove(Manifest.permission.READ_MEDIA_IMAGES)
+                        pb.tempReadMediaPermissions.add(Manifest.permission.READ_MEDIA_IMAGES)
+                    } else if (pb.permanentDeniedPermissions.contains(Manifest.permission.READ_MEDIA_IMAGES)) {
+                        pb.permanentDeniedPermissions.remove(Manifest.permission.READ_MEDIA_IMAGES)
+                        forwardList.remove(Manifest.permission.READ_MEDIA_IMAGES)
+                        pb.tempReadMediaPermissions.add(Manifest.permission.READ_MEDIA_IMAGES)
+                    }
+                    if (pb.deniedPermissions.contains(Manifest.permission.READ_MEDIA_VIDEO)) {
+                        pb.deniedPermissions.remove(Manifest.permission.READ_MEDIA_VIDEO)
+                        showReasonList.remove(Manifest.permission.READ_MEDIA_VIDEO)
+                        pb.tempReadMediaPermissions.add(Manifest.permission.READ_MEDIA_VIDEO)
+                    } else if (pb.permanentDeniedPermissions.contains(Manifest.permission.READ_MEDIA_VIDEO)) {
+                        pb.permanentDeniedPermissions.remove(Manifest.permission.READ_MEDIA_VIDEO)
+                        forwardList.remove(Manifest.permission.READ_MEDIA_VIDEO)
+                        pb.tempReadMediaPermissions.add(Manifest.permission.READ_MEDIA_VIDEO)
+                    }
+                }
+            }
+
             val deniedPermissions: MutableList<String> =
                 ArrayList() // used to validate the deniedPermissions and permanentDeniedPermissions
             deniedPermissions.addAll(pb.deniedPermissions)
@@ -392,6 +416,10 @@ class InvisibleFragment : Fragment() {
                 // showRequestReasonDialog or showForwardToSettingsDialog in the callback.
                 // At this case and all other cases, task should be finished.
                 if (shouldFinishTheTask || !pb.showDialogCalled) {
+                    for (tempReadMediaPermission in pb.tempReadMediaPermissions) {
+                        pb.deniedPermissions.add(tempReadMediaPermission)
+                    }
+                    pb.tempReadMediaPermissions.clear()
                     task.finish()
                 }
                 // Reset this value after each request. If we don't do this, developer invoke showRequestReasonDialog in ExplainReasonCallback
