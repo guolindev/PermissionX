@@ -25,7 +25,6 @@ import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
-import com.permissionx.guolindev.PermissionX
 import com.permissionx.guolindev.R
 import com.permissionx.guolindev.databinding.PermissionxDefaultDialogLayoutBinding
 import com.permissionx.guolindev.databinding.PermissionxPermissionItemBinding

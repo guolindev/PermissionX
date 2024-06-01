@@ -1,5 +1,0 @@
-include ':app'
-include ':permissionx'
-//include ':appsupport'
-//include ':support'
-rootProject.name='PermissionX'
