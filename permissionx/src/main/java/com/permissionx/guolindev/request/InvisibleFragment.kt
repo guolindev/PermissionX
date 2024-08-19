@@ -695,7 +695,7 @@ class InvisibleFragment : Fragment() {
      * @return PermissionBuilder and ChainTask are still alive or not. If not, we should not do any further logic.
      */
     private fun checkForGC(): Boolean {
-        if (!::pb.isInitialized || !::task.isInitialized) {
+        if (!::pb.isInitialized || !::task.isInitialized || context == null) {
             Log.w(
                 "PermissionX",
                 "PermissionBuilder and ChainTask should not be null at this time, so we can do nothing in this case."
