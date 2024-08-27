@@ -3,7 +3,7 @@ import com.vanniktech.maven.publish.SonatypeHost
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
-    id("com.vanniktech.maven.publish") version "0.28.0"
+    id("com.vanniktech.maven.publish") version "0.29.0"
 }
 
 android {
@@ -47,7 +47,7 @@ mavenPublishing {
 }
 
 mavenPublishing {
-    coordinates("com.guolindev.permissionx", "permissionx", "1.8.0")
+    coordinates("com.guolindev.permissionx", "permissionx", "1.8.1")
 
     pom {
         name.set("PermissionX")
