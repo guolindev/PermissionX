@@ -18,6 +18,8 @@ package com.permissionx.guolindev;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Build;
+import android.provider.Settings;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationManagerCompat;
@@ -83,7 +85,23 @@ public class PermissionX {
         return NotificationManagerCompat.from(context).areNotificationsEnabled();
     }
 
-    public static final class permission {
+    /**
+     * A helper function , Checks current app can draw on top of other apps
+     * Manifest.permission.SYSTEM_ALERT_WINDOW
+     * @param context Any context, will not be retained.
+     * @return Note that if Android version is lower than M, the return value will always be true.
+     */
+    public static boolean canDrawOverlays(@NonNull Context context ){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            // 对于Android 6.0（API 级别 23）及以上版本，需要检查悬浮窗权限
+            return Settings.canDrawOverlays(context);
+        }
+        // 在Android 6.0以下，可以认为此权限是默认授予的
+        return true;
+    }
+
+
+        public static final class permission {
         /**
          * Define the const to compat with system lower than T.
          */
