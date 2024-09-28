@@ -16,6 +16,7 @@
 
 package com.permissionx.guolindev;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 
@@ -24,6 +25,11 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+
+import com.permissionx.guolindev.patch.PermissionDelegateHolder;
+
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 
 /**
  * An open source Android library that makes handling runtime permissions extremely easy.
@@ -36,6 +42,18 @@ import androidx.fragment.app.FragmentActivity;
  *          // handling the logic
  *      }
  *</pre>
+ *
+ * if you are using component activity, you can use the following snippet:
+ * <pre>
+ * PermissionX.init(this, permissionMediator -> {
+ *     permissionMediator
+ *          .permissions(Manifest.permission.READ_CONTACTS, Manifest.permission.CAMERA)
+ *          .request { allGranted, grantedList, deniedList ->
+ *              // handling the logic
+ *          }
+ *     return null;
+ * });
+ * </pre>
  *
  * @author guolin
  * @since 2019/11/2
@@ -60,6 +78,21 @@ public class PermissionX {
      */
     public static PermissionMediator init(@NonNull Fragment fragment) {
         return new PermissionMediator(fragment);
+    }
+
+    /**
+     * Init PermissionX to make everything prepare to work.
+     * request permissions in a component activity.
+     *
+     * @param context the context which can launch a new activity
+     * @param block the request permissions block to be executed
+     */
+    public static void init(@NonNull Context context, @NonNull Function1<PermissionMediator, Unit> block) {
+        PermissionDelegateHolder.delegate(context, fragmentActivity -> {
+            PermissionMediator permissionMediator = new PermissionMediator(fragmentActivity);
+            block.invoke(permissionMediator);
+            return null;
+        });
     }
 
     /**

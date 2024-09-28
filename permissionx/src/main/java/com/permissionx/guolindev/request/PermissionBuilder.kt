@@ -21,6 +21,7 @@ import android.app.Dialog
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Build
+import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -33,6 +34,7 @@ import com.permissionx.guolindev.callback.RequestCallback
 import com.permissionx.guolindev.dialog.DefaultDialog
 import com.permissionx.guolindev.dialog.RationaleDialog
 import com.permissionx.guolindev.dialog.RationaleDialogFragment
+import com.permissionx.guolindev.patch.PermissionDelegateHolder
 import java.util.*
 
 /**
@@ -579,6 +581,10 @@ class PermissionBuilder(
      * Remove the InvisibleFragment from current FragmentManager.
      */
     private fun removeInvisibleFragment() {
+        // notify that the request is finished.
+        fragmentManager.setFragmentResult(PermissionDelegateHolder.REQUEST_KEY, Bundle().apply {
+            putBoolean(PermissionDelegateHolder.RESULT_KEY, true)
+        })
         val existedFragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG)
         if (existedFragment != null) {
             fragmentManager.beginTransaction().remove(existedFragment).commitNowAllowingStateLoss()
