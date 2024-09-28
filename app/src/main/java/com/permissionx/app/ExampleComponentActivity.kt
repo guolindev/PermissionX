@@ -1,37 +1,44 @@
 package com.permissionx.app
 
 import android.Manifest
-import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.Fragment
-import com.permissionx.app.databinding.FragmentMainBinding
+import androidx.activity.ComponentActivity
+import com.permissionx.app.databinding.ActivityExampleComponentBinding
 import com.permissionx.guolindev.PermissionX
+import com.permissionx.guolindev.patch.PermissionDelegateHolder
 
-class MainFragment : Fragment() {
+class ExampleComponentActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val layout = ActivityExampleComponentBinding.inflate(layoutInflater)
+        layout.makeRequestBtn.setOnClickListener {
 
-    private var _binding: FragmentMainBinding? = null
-
-    private val binding get() = _binding!!
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        _binding = FragmentMainBinding.inflate(inflater, container, false)
-        return binding.root
+            PermissionX.init(this) {
+                it.permissions(Manifest.permission.CAMERA)
+                    .request { allGranted, grantedList, deniedList ->
+                        if (allGranted) {
+                            Toast.makeText(this, "All permissions are granted", Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
+                            Toast.makeText(
+                                this,
+                                "The following permissions are denied：$deniedList",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+            }
+            // or directly use PermissionDelegateHolder
+//            requestPerms()
+        }
+        setContentView(layout.root)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-//        val context = context!!
-        binding.makeRequestBtn.setOnClickListener {
-            PermissionX.init(this)
+    fun requestPerms() {
+        PermissionDelegateHolder.delegate(this) {
+            PermissionX.init(it)
                 .permissions(
                     Manifest.permission.CAMERA,
                     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -59,38 +66,16 @@ class MainFragment : Fragment() {
                 }
                 .request { allGranted, grantedList, deniedList ->
                     if (allGranted) {
-                        Toast.makeText(activity, "All permissions are granted", Toast.LENGTH_SHORT)
+                        Toast.makeText(it, "All permissions are granted", Toast.LENGTH_SHORT)
                             .show()
                     } else {
                         Toast.makeText(
-                            activity,
+                            it,
                             "The following permissions are denied：$deniedList",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
                 }
         }
-        binding.makeRequestBtn2.setOnClickListener {
-            requireActivity().startActivity(
-                Intent(
-                    requireActivity(),
-                    ExampleComponentActivity::class.java
-                )
-            )
-        }
-        binding.makeRequestBtn3.setOnClickListener {
-            requireActivity().startActivity(
-                Intent(
-                    requireActivity(),
-                    MainJavaActivity::class.java
-                )
-            )
-        }
     }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
 }
