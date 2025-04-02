@@ -36,8 +36,8 @@ internal class RequestInstallPackagesPermission internal constructor(permissionB
                 finish()
                 return
             }
+            val requestList = mutableListOf(Manifest.permission.REQUEST_INSTALL_PACKAGES)
             if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
-                val requestList = mutableListOf(Manifest.permission.REQUEST_INSTALL_PACKAGES)
                 if (pb.explainReasonCallbackWithBeforeParam != null) {
                     // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
                     pb.explainReasonCallbackWithBeforeParam!!.onExplainReason(explainScope, requestList, true)
@@ -45,6 +45,9 @@ internal class RequestInstallPackagesPermission internal constructor(permissionB
                     pb.explainReasonCallback!!.onExplainReason(explainScope, requestList)
                 }
             } else {
+                if (pb.explainReasonCallbackWhenRequest != null) {
+                    pb.explainReasonCallbackWhenRequest!!.onExplainReason(explainScope, requestList)
+                }
                 // No implementation of explainReasonCallback, we can't request
                 // REQUEST_INSTALL_PACKAGES permission at this time, because user won't understand why.
                 finish()

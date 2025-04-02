@@ -34,8 +34,8 @@ internal class RequestManageExternalStoragePermission internal constructor(permi
                 finish()
                 return
             }
+            val requestList = mutableListOf(MANAGE_EXTERNAL_STORAGE)
             if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
-                val requestList = mutableListOf(MANAGE_EXTERNAL_STORAGE)
                 if (pb.explainReasonCallbackWithBeforeParam != null) {
                     // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
                     pb.explainReasonCallbackWithBeforeParam!!.onExplainReason(explainScope, requestList, true)
@@ -43,6 +43,9 @@ internal class RequestManageExternalStoragePermission internal constructor(permi
                     pb.explainReasonCallback!!.onExplainReason(explainScope, requestList)
                 }
             } else {
+                if (pb.explainReasonCallbackWhenRequest != null) {
+                    pb.explainReasonCallbackWhenRequest!!.onExplainReason(explainScope, requestList)
+                }
                 // No implementation of explainReasonCallback, we can't request
                 // MANAGE_EXTERNAL_STORAGE permission at this time, because user won't understand why.
                 finish()

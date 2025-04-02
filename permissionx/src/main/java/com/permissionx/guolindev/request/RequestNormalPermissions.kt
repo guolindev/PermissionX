@@ -49,6 +49,9 @@ internal class RequestNormalPermissions internal constructor(permissionBuilder: 
                 pb.explainReasonCallback!!.onExplainReason(explainScope, requestList)
             }
         } else {
+            if (pb.explainReasonCallbackWhenRequest != null) {
+                pb.explainReasonCallbackWhenRequest!!.onExplainReason(explainScope, requestList)
+            }
             // Do the request at once. Always request all permissions no matter they are already granted or not, in case user turn them off in Settings.
             pb.requestNow(pb.normalPermissions, this)
         }

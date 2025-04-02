@@ -45,8 +45,8 @@ internal class RequestBackgroundLocationPermission internal constructor(permissi
             val accessFindLocationGranted = PermissionX.isGranted(pb.activity, Manifest.permission.ACCESS_FINE_LOCATION)
             val accessCoarseLocationGranted = PermissionX.isGranted(pb.activity, Manifest.permission.ACCESS_COARSE_LOCATION)
             if (accessFindLocationGranted || accessCoarseLocationGranted) {
+                val requestList = mutableListOf(ACCESS_BACKGROUND_LOCATION)
                 if (pb.explainReasonCallback != null || pb.explainReasonCallbackWithBeforeParam != null) {
-                    val requestList = mutableListOf(ACCESS_BACKGROUND_LOCATION)
                     if (pb.explainReasonCallbackWithBeforeParam != null) {
                         // callback ExplainReasonCallbackWithBeforeParam prior to ExplainReasonCallback
                         pb.explainReasonCallbackWithBeforeParam!!.onExplainReason(explainScope, requestList, true)
@@ -54,6 +54,9 @@ internal class RequestBackgroundLocationPermission internal constructor(permissi
                         pb.explainReasonCallback!!.onExplainReason(explainScope, requestList)
                     }
                 } else {
+                    if (pb.explainReasonCallbackWhenRequest != null) {
+                        pb.explainReasonCallbackWhenRequest!!.onExplainReason(explainScope, requestList)
+                    }
                     // No implementation of explainReasonCallback, so we have to request ACCESS_BACKGROUND_LOCATION without explanation.
                     requestAgain(emptyList())
                 }

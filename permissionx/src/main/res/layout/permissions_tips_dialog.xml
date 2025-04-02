@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="@drawable/permission_tips_background"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ImageView
+        android:id="@+id/iconImageView"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginLeft="12dp"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="12dp"
+        android:visibility="gone"
+        />
+
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="摄像头"
+        android:textSize="14sp"
+        android:layout_marginStart="12dp"
+        android:textColor="#FF313847"
+        android:layout_marginTop="8dp"
+        android:layout_toEndOf="@id/iconImageView" />
+
+    <TextView
+        android:id="@+id/messageTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginStart="12dp"
+        android:layout_below="@id/titleTextView"
+        tools:text="授课过程中，如果需要视频直播展示，我们想使用该权限。"
+        android:layout_marginBottom="8dp"
+        android:textColor="#FF313847"
+        android:textSize="14sp"
+        android:layout_toEndOf="@id/iconImageView" />
+
+</RelativeLayout>

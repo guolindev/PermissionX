@@ -27,6 +27,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import com.permissionx.guolindev.PermissionX
 import com.permissionx.guolindev.callback.ExplainReasonCallback
+import com.permissionx.guolindev.callback.ExplainReasonCallbackWhenRequest
 import com.permissionx.guolindev.callback.ExplainReasonCallbackWithBeforeParam
 import com.permissionx.guolindev.callback.ForwardToSettingsCallback
 import com.permissionx.guolindev.callback.RequestCallback
@@ -129,6 +130,12 @@ class PermissionBuilder(
     var explainReasonBeforeRequest = false
 
     /**
+     * Indicates should PermissionX explain request reason when request.
+     */
+    @JvmField
+    var explainReasonWhenRequest = false
+
+    /**
      * Indicates [ExplainScope.showRequestReasonDialog] or [ForwardScope.showForwardToSettingsDialog]
      * is called in [.onExplainRequestReason] or [.onForwardToSettings] callback.
      * If not called, requestCallback will be called by PermissionX automatically.
@@ -199,6 +206,9 @@ class PermissionBuilder(
     @JvmField
     var explainReasonCallbackWithBeforeParam: ExplainReasonCallbackWithBeforeParam? = null
 
+    @JvmField
+    var explainReasonCallbackWhenRequest: ExplainReasonCallbackWhenRequest? = null
+
     /**
      * The callback for [.onForwardToSettings] method. Maybe null.
      */
@@ -240,6 +250,11 @@ class PermissionBuilder(
         return this
     }
 
+    fun onExplainRequestReasonWhenRequest(callback: ExplainReasonCallbackWhenRequest?): PermissionBuilder {
+        explainReasonCallbackWhenRequest = callback
+        return this
+    }
+
     /**
      * Called when permissions need to forward to Settings for allowing.
      * Typically user denies your request and checked never ask again would call this method.
@@ -262,6 +277,11 @@ class PermissionBuilder(
      */
     fun explainReasonBeforeRequest(): PermissionBuilder {
         explainReasonBeforeRequest = true
+        return this
+    }
+
+    fun explainReasonWhenRequest(): PermissionBuilder {
+        explainReasonWhenRequest = true
         return this
     }
 
